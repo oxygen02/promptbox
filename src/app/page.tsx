@@ -28,9 +28,9 @@ const TAG_OPTIONS: Record<ContentType, string[]> = {
 };
 
 const MODELS: { key: Model; name: string; nameEn: string; region: string; color: string; textColor: string }[] = [
-  { key: "deepseek", name: "DeepSeek", nameEn: "DeepSeek", region: "Global", color: "bg-blue-600", textColor: "text-blue-600" },
-  { key: "kimi", name: "Kimi", nameEn: "Kimi", region: "CN", color: "bg-indigo-600", textColor: "text-indigo-600" },
-  { key: "minimax", name: "MiniMax", nameEn: "MiniMax", region: "CN", color: "bg-purple-600", textColor: "text-purple-600" },
+  { key: "deepseek", name: "DeepSeek", nameEn: "DeepSeek", region: "Global", color: "bg-emerald-500", textColor: "text-emerald-500" },
+  { key: "kimi", name: "Kimi", nameEn: "Kimi", region: "CN", color: "bg-rose-500", textColor: "text-rose-500" },
+  { key: "minimax", name: "MiniMax", nameEn: "MiniMax", region: "CN", color: "bg-orange-500", textColor: "text-orange-500" },
 ];
 
 const SOCIAL_PLATFORMS = {
@@ -72,7 +72,7 @@ export default function HomePage() {
   const [selectedGenModel, setSelectedGenModel] = useState<Model | null>(null);
 
   const [showShare, setShowShare] = useState(false);
-  const [sharePrompt, setSharePrompt] = useState("");
+  const [shareContent, setShareContent] = useState("");
   const [copied, setCopied] = useState(false);
   const [generatedContent, setGeneratedContent] = useState("");
 
@@ -134,24 +134,34 @@ export default function HomePage() {
     if (!selectedGenModel) return;
     setIsGenerating(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
-    setGeneratedContent(`基于选择的模型 ${MODELS.find(m => m.key === selectedGenModel)?.name}，生成的内容将显示在这里...\n\n这是一段示例生成内容，包含了根据提示词AI生成的实际内容展示。`);
+    
+    const content = `【${MODELS.find(m => m.key === selectedGenModel)?.name}】基于选择的提示词，生成以下创意内容：
+
+1. 标题：xxx
+2. 正文内容：xxx
+3. 结尾引导：xxx
+
+这是一段AI生成的创意内容示例，展示了根据提示词进行二次创作的能力。`;
+    
+    setGeneratedContent(content);
+    setCredits((prev) => Math.max(0, prev - 10));
     setIsGenerating(false);
   };
 
-  const handleShare = (prompt: string) => {
-    setSharePrompt(prompt);
+  const handleShare = (content: string) => {
+    setShareContent(content);
     setShowShare(true);
     setCopied(false);
   };
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(sharePrompt);
+    await navigator.clipboard.writeText(shareContent || generatedContent);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleDownload = () => {
-    const blob = new Blob([sharePrompt], { type: "text/plain" });
+    const blob = new Blob([shareContent || generatedContent], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -168,7 +178,6 @@ export default function HomePage() {
   ];
 
   const currentTags = TAG_OPTIONS[contentType];
-  // 显示8-12个维度
   const displayTags = currentTags.slice(0, 10);
   const socialPlatforms = SOCIAL_PLATFORMS[language];
   const selectedCount = Object.values(cardModels).filter(Boolean).length;
@@ -197,7 +206,7 @@ export default function HomePage() {
       <div className="glass-card rounded-xl p-3 mb-3">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-semibold text-slate-700">上传内容</h3>
-          <span className="text-xs px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 flex items-center gap-1">
+          <span className="text-xs px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 flex items-center gap-1">
             <Sparkles className="w-2.5 h-2.5" />
             AI
           </span>
@@ -227,14 +236,14 @@ export default function HomePage() {
         <div>
           <h4 className="text-xs font-medium text-slate-500 mb-2">提示词维度：</h4>
           <div className="grid grid-cols-5 gap-1.5">
-            {displayTags.map((tag, idx) => (
+            {displayTags.map((tag) => (
               <button
                 key={tag}
                 onClick={() => handleDimensionClick(tag)}
                 className={cn(
                   "px-2 py-1.5 text-xs rounded transition-all text-center",
                   selectedDimensions.includes(tag)
-                    ? "bg-blue-500 text-white font-medium"
+                    ? "bg-emerald-500 text-white font-medium"
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:border-slate-300 border border-transparent"
                 )}
               >
@@ -309,7 +318,7 @@ export default function HomePage() {
         })}
       </div>
 
-      {/* 开始分析按钮 - 更醒目 */}
+      {/* 开始分析按钮 */}
       <div className="flex items-center gap-2 mb-3">
         <button
           onClick={handleAnalyze}
@@ -317,7 +326,7 @@ export default function HomePage() {
           className={cn(
             "flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg font-medium transition-all",
             selectedCount > 0 && !isAnalyzing
-              ? "bg-blue-600 text-white hover:bg-blue-700 shadow-md"
+              ? "bg-emerald-500 text-white hover:bg-emerald-600 shadow-md"
               : "bg-slate-300 text-slate-500 cursor-not-allowed"
           )}
         >
@@ -350,107 +359,117 @@ export default function HomePage() {
         <div className="text-xs text-slate-400 mt-1">0 字符</div>
       </div>
 
-      {/* 创意生成 + 模型选择 - 更醒目 */}
+      {/* 创意生成 + 模型选择 */}
       <div className="glass-card rounded-xl p-3 mb-3">
-        <div className="flex items-center gap-2">
-          {/* 创意生成按钮 - 更醒目 */}
-          <button
-            onClick={handleCreativeGenerate}
-            disabled={!selectedGenModel || isGenerating}
-            className={cn(
-              "flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg font-medium transition-all",
-              selectedGenModel && !isGenerating
-                ? "bg-purple-600 text-white hover:bg-purple-700 shadow-md"
-                : "bg-slate-300 text-slate-500 cursor-not-allowed"
-            )}
-          >
-            {isGenerating ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-            创意生成
-          </button>
-
-          {/* 模型选择下拉 */}
-          <div className="relative" ref={dropdownRef}>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            {/* 创意生成按钮 */}
             <button
-              onClick={() => setOpenGenDropdown(!openGenDropdown)}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg hover:bg-slate-50 font-medium text-slate-700"
-            >
-              {selectedGenModel ? (
-                <>
-                  <span className={cn("w-2 h-2 rounded-full", MODELS.find(m => m.key === selectedGenModel)?.color)} />
-                  {MODELS.find(m => m.key === selectedGenModel)?.name}
-                </>
-              ) : (
-                <span className="text-slate-400">选择模型</span>
+              onClick={handleCreativeGenerate}
+              disabled={!selectedGenModel || isGenerating}
+              className={cn(
+                "flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg font-medium transition-all",
+                selectedGenModel && !isGenerating
+                  ? "bg-orange-500 text-white hover:bg-orange-600 shadow-md"
+                  : "bg-slate-300 text-slate-500 cursor-not-allowed"
               )}
-              <ChevronDown className="w-3 h-3 text-slate-400" />
+            >
+              {isGenerating ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+              创意生成
             </button>
 
-            {openGenDropdown && (
-              <div className="dropdown-menu" style={{ left: 0, minWidth: '140px' }}>
-                {MODELS.map((m) => (
-                  <div
-                    key={m.key}
-                    className={cn("dropdown-item", selectedGenModel === m.key && "active")}
-                    onClick={() => { setSelectedGenModel(m.key); setOpenGenDropdown(false); }}
-                  >
-                    <span className={cn("w-2 h-2 rounded-full inline-block mr-2", m.color)} />
-                    {m.name}
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* 模型选择下拉 */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setOpenGenDropdown(!openGenDropdown)}
+                className="flex items-center gap-1.5 px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg hover:bg-slate-50 font-medium text-slate-700"
+              >
+                {selectedGenModel ? (
+                  <>
+                    <span className={cn("w-2 h-2 rounded-full", MODELS.find(m => m.key === selectedGenModel)?.color)} />
+                    {MODELS.find(m => m.key === selectedGenModel)?.name}
+                  </>
+                ) : (
+                  <span className="text-slate-400">选择模型</span>
+                )}
+                <ChevronDown className="w-3 h-3 text-slate-400" />
+              </button>
+
+              {openGenDropdown && (
+                <div className="dropdown-menu" style={{ left: 0, minWidth: '140px' }}>
+                  {MODELS.map((m) => (
+                    <div
+                      key={m.key}
+                      className={cn("dropdown-item", selectedGenModel === m.key && "active")}
+                      onClick={() => { setSelectedGenModel(m.key); setOpenGenDropdown(false); }}
+                    >
+                      <span className={cn("w-2 h-2 rounded-full inline-block mr-2", m.color)} />
+                      {m.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 积分余额显示 */}
+          <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 border border-amber-200 rounded">
+            <Sparkles className="w-3 h-3 text-amber-500" />
+            <span className="text-xs font-medium text-amber-600">余额: {credits}</span>
           </div>
         </div>
       </div>
 
-      {/* 生成内容输出框 - 带社交分享 */}
-      {generatedContent && (
-        <div className="glass-card rounded-xl p-3">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-semibold text-slate-700">生成内容</h3>
+      {/* 生成内容输出框 - 始终显示或条件显示 */}
+      <div className="glass-card rounded-xl p-3">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-semibold text-slate-700">生成内容</h3>
+        </div>
+        <div className="min-h-[120px] bg-slate-50 rounded-lg p-3 text-xs text-slate-700 whitespace-pre-wrap mb-2">
+          {generatedContent || "点击上方「创意生成」按钮生成内容..."}
+        </div>
+        
+        {/* 社交分享按钮 */}
+        <div className="flex items-center justify-between">
+          <div className="flex gap-2">
+            {socialPlatforms.map((platform) => (
+              <button
+                key={platform.key}
+                className={cn("w-8 h-8 rounded-full flex items-center justify-center text-white text-sm transition-transform hover:scale-110", platform.color)}
+                title={platform.name}
+              >
+                {platform.icon}
+              </button>
+            ))}
           </div>
-          <div className="min-h-[120px] bg-slate-50 rounded-lg p-3 text-xs text-slate-700 whitespace-pre-wrap mb-2">
-            {generatedContent}
-          </div>
-          {/* 社交分享按钮 */}
-          <div className="flex items-center justify-between">
-            <div className="flex gap-2">
-              {socialPlatforms.map((platform) => (
-                <button
-                  key={platform.key}
-                  className={cn("w-8 h-8 rounded-full flex items-center justify-center text-white text-sm transition-transform hover:scale-110", platform.color)}
-                  title={platform.name}
-                >
-                  {platform.icon}
-                </button>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleShare(generatedContent)}
-                className="flex items-center gap-1 px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
-              >
-                <Share2 className="w-3 h-3" />
-                分享
-              </button>
-              <button
-                onClick={handleCopy}
-                className="flex items-center gap-1 px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
-              >
-                {copied ? <CheckCircle className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
-                {copied ? "已复制" : "复制"}
-              </button>
-              <button
-                onClick={handleDownload}
-                className="flex items-center gap-1 px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
-              >
-                <Download className="w-3 h-3" />
-                下载
-              </button>
-            </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleShare(generatedContent)}
+              disabled={!generatedContent}
+              className="flex items-center gap-1 px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors disabled:opacity-50"
+            >
+              <Share2 className="w-3 h-3" />
+              分享
+            </button>
+            <button
+              onClick={handleCopy}
+              disabled={!generatedContent}
+              className="flex items-center gap-1 px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors disabled:opacity-50"
+            >
+              {copied ? <CheckCircle className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+              {copied ? "已复制" : "复制"}
+            </button>
+            <button
+              onClick={handleDownload}
+              disabled={!generatedContent}
+              className="flex items-center gap-1 px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors disabled:opacity-50"
+            >
+              <Download className="w-3 h-3" />
+              下载
+            </button>
           </div>
         </div>
-      )}
+      </div>
 
       {/* 社交分享弹窗 */}
       {showShare && (
