@@ -299,7 +299,7 @@ export default function HomePage() {
 
   return (
     <div className="max-w-4xl mx-auto pb-8 relative pt-2">
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+      <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-slate-200/30 to-transparent rounded-full blur-3xl" />
       </div>
       <div className="relative z-10">
