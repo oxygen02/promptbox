@@ -141,3 +141,9 @@ body {
     transform: rotateY(360deg) rotateX(0deg);
   }
 }
+
+/* 月球旋转动画 */
+@keyframes moonRotate {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(360deg); }
+}
