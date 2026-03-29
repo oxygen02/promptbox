@@ -3,11 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  Sparkles, 
-  Globe, 
-} from "lucide-react";
+import dynamic from "next/dynamic";
+import { Sparkles, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+// 动态导入月球组件
+const MoonCanvas = dynamic(() => import("@/components/MoonCanvas"), {
+  ssr: false,
+  loading: () => <div className="w-7 h-7 rounded-full bg-gray-200 animate-pulse" />,
+});
 
 const navItems = [
   { href: "/", zh: "首页", en: "Home" },
@@ -27,16 +31,30 @@ export default function Header() {
     )}>
       <div className="h-full max-w-[1600px] mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center gap-4">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-lg font-bold text-slate-800">PromptBox</span>
-            <span className="text-xs font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">Pro</span>
-          </Link>
+        <Link href="/" className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+            <Sparkles className="w-4 h-4 text-white" />
+          </div>
+          <span className="text-lg font-bold text-slate-800">PromptBox</span>
+          <span className="text-xs font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">Pro</span>
+        </Link>
 
-          
+        {/* 月球 + Slogan */}
+        <div className="hidden md:flex items-center gap-2.5">
+          <MoonCanvas size={32} />
+          <span 
+            className="text-xl font-bold text-slate-800"
+            style={{
+              textShadow: '2px 2px 4px rgba(0,0,0,0.15), 0 0 20px rgba(59,130,246,0.2)',
+              background: 'linear-gradient(135deg, #1e293b 0%, #3b82f6 50%, #1e293b 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              letterSpacing: '0.05em',
+            }}
+          >
+            创作从模仿开始
+          </span>
         </div>
 
         {/* 导航 */}
