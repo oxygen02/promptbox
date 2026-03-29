@@ -133,6 +133,18 @@ export default function HomePage() {
     };
   }, [pathname]);
 
+  // 监听 Sidebar 触发的 content-type-change 事件
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    
+    const handleContentTypeChange = (e: CustomEvent) => {
+      setContentType(e.detail as ContentType);
+    };
+    
+    window.addEventListener("content-type-change", handleContentTypeChange as EventListener);
+    return () => window.removeEventListener("content-type-change", handleContentTypeChange as EventListener);
+  }, []);
+
   const t = I18N[language];
   const [credits] = useState(520);
   const [cardModels, setCardModels] = useState<Record<number, Model | null>>({ 0: null, 1: null, 2: null });
@@ -175,8 +187,11 @@ export default function HomePage() {
   // 同步内容类型到 URL
   const handleContentTypeChange = (type: ContentType) => {
     setContentType(type);
-    // 使用 router.push 触发 Next.js 路由更新，让 Sidebar 能监听到变化
-    router.push(`/?type=${type}`);
+    // 触发自定义事件，让 Sidebar 更新高亮状态
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("content-type-change", { detail: type }));
+      router.push(`/?type=${type}`);
+    }
   };
 
   const handleCardModelSelect = (cardIndex: number, model: Model | null) => {

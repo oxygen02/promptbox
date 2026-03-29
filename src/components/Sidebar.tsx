@@ -74,7 +74,7 @@ export default function Sidebar() {
   const router = useRouter();
   const [contentType, setContentType] = useState<string>("text");
 
-  // 监听 pathname 变化，实现与首页的联动
+  // 监听 pathname 变化和自定义事件，实现与首页的联动
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
@@ -83,7 +83,19 @@ export default function Sidebar() {
     }
   }, [pathname]);
 
-  // 使用 popstate 事件监听浏览器前进/后退按钮
+  // 监听自定义事件（首页触发）
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    
+    const handleContentTypeChange = (e: CustomEvent) => {
+      setContentType(e.detail);
+    };
+    
+    window.addEventListener("content-type-change", handleContentTypeChange as EventListener);
+    return () => window.removeEventListener("content-type-change", handleContentTypeChange as EventListener);
+  }, []);
+
+  // 监听 popstate 事件（浏览器前进/后退）
   useEffect(() => {
     if (typeof window === "undefined") return;
     
@@ -102,6 +114,10 @@ export default function Sidebar() {
       router.push(href);
     } else {
       setContentType(key);
+      // 触发自定义事件，让首页更新选中状态
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("content-type-change", { detail: key }));
+      }
       router.push(`/?type=${key}`);
     }
   };
