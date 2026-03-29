@@ -143,7 +143,7 @@ export default function HomePage() {
           );})}
         </div>
         <div className="flex items-center gap-4 mb-4">
-          <button onClick={handleAnalyze} disabled={isAnalyzing || selectedCount === 0} className={cn("text-base px-8 py-3 rounded-xl font-semibold transition-all shadow-lg bg-slate-800 text-white hover:bg-slate-900", selectedCount === 0 && "opacity-50 cursor-not-allowed")}>{isAnalyzing ? "分析中..." : "开始分析"}</button>
+          <button onClick={handleAnalyze} disabled={isAnalyzing || selectedCount === 0} className={cn("text-sm px-6 py-2 rounded-xl font-semibold transition-all shadow-lg bg-slate-800 text-white hover:bg-slate-900", selectedCount === 0 && "opacity-50 cursor-not-allowed")}>{isAnalyzing ? "分析中..." : "开始分析"}</button>
           <div className="flex items-center gap-2 text-sm"><span className="text-amber-500 font-medium">Credit</span><span className="text-slate-700 font-semibold">{credits}</span></div>
         </div>
         <div className="glass-card rounded-xl p-4 mb-4">
@@ -152,9 +152,9 @@ export default function HomePage() {
           <div className="text-xs text-slate-400 mt-2">0 字符</div>
         </div>
         <div className="flex items-center gap-4 mb-4">
-          <button onClick={handleCreativeGenerate} disabled={!selectedGenModel || isGenerating} className={cn("text-base px-8 py-3 rounded-xl font-semibold transition-all shadow-lg bg-slate-800 text-white hover:bg-slate-900", !selectedGenModel && "opacity-50 cursor-not-allowed")}>{isGenerating ? "生成中..." : "创意生成"}</button>
+          <button onClick={handleCreativeGenerate} disabled={!selectedGenModel || isGenerating} className={cn("text-sm px-6 py-2 rounded-xl font-semibold transition-all shadow-lg bg-slate-800 text-white hover:bg-slate-900", !selectedGenModel && "opacity-50 cursor-not-allowed")}>{isGenerating ? "生成中..." : "创意生成"}</button>
           <div className="relative" ref={dropdownRef}>
-            <button onClick={() => setOpenGenDropdown(!openGenDropdown)} className="flex items-center gap-2 px-4 py-3 text-sm bg-white border border-slate-200 rounded-xl hover:bg-slate-50 font-medium text-slate-700">{selectedGenModel ? <>{MODELS.find(m => m.key === selectedGenModel)?.name}</> : <span className="text-slate-400">选择模型</span>}<ChevronDown className="w-4 h-4 text-slate-400" /></button>
+            <button onClick={() => setOpenGenDropdown(!openGenDropdown)} className="flex items-center gap-2 px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl hover:bg-slate-50 font-medium text-slate-700">{selectedGenModel ? <>{MODELS.find(m => m.key === selectedGenModel)?.name}</> : <span className="text-slate-400">选择模型</span>}<ChevronDown className="w-4 h-4 text-slate-400" /></button>
             {openGenDropdown && (<div className="dropdown-menu" style={{ left: 0, minWidth: '140px' }}>{MODELS.map((m) => (<div key={m.key} className={cn("dropdown-item", selectedGenModel === m.key && "active")} onClick={() => { setSelectedGenModel(m.key); setOpenGenDropdown(false); }}>{m.name}</div>))}</div>)}
           </div>
           <div className="flex items-center gap-2 text-sm"><span className="text-amber-500 font-medium">Credit</span><span className="text-slate-700 font-semibold">{credits}</span></div>

@@ -36,10 +36,10 @@ export default function Header() {
         {/* 月球 + Slogan */}
         <div className="flex items-center gap-3 mx-2 md:mx-4 flex-1 justify-center min-w-0">
           <div className="flex-shrink-0">
-            <MoonCanvas size={28} />
+            <MoonCanvas size={36} />
           </div>
           <span 
-            className="text-lg font-bold whitespace-nowrap text-slate-800"
+            className="text-2xl font-bold whitespace-nowrap text-slate-800"
             style={{
               letterSpacing: '0.05em',
             }}
