@@ -230,6 +230,11 @@ export default function HomePage() {
       </div>
 
       <div className="relative z-10">
+        {/* Slogan */}
+        <div className="text-center mb-4">
+          <h2 className="text-lg font-medium text-slate-700">学习从模仿开始</h2>
+        </div>
+
         {/* 内容分类切换 */}
         <div className="flex gap-2 mb-3">
           {contentTypes.map((type) => (
