@@ -6,9 +6,6 @@ import { usePathname } from "next/navigation";
 import { 
   Sparkles, 
   Globe, 
-  LogIn, 
-  UserPlus,
-  CreditCard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -29,14 +26,35 @@ export default function Header() {
       scrolled ? "glass-nav" : "bg-white/90 backdrop-blur-sm border-b border-slate-200"
     )}>
       <div className="h-full max-w-[1600px] mx-auto px-6 flex items-center justify-between">
-        {/* Logo - 点击返回首页 */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-white" />
+        {/* Logo + Slogan */}
+        <div className="flex items-center gap-4">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-lg font-bold text-slate-800">PromptBox</span>
+            <span className="text-xs font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">Pro</span>
+          </Link>
+
+          {/* Slogan + 月球动画 */}
+          <div className="hidden md:flex items-center gap-2">
+            {/* 月球 - 月食效果 */}
+            <div className="relative w-7 h-7">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-100 to-gray-300 shadow-lg">
+                {/* 陨石坑 */}
+                <div className="absolute top-1 left-1.5 w-1.5 h-1.5 rounded-full bg-gray-400/40"></div>
+                <div className="absolute top-3 left-4 w-2 h-2 rounded-full bg-gray-400/30"></div>
+                <div className="absolute top-5 left-2 w-1 h-1 rounded-full bg-gray-400/50"></div>
+                <div className="absolute top-2 right-3 w-2 h-2 rounded-full bg-gray-400/25"></div>
+                <div className="absolute bottom-3 left-3 w-1.5 h-1.5 rounded-full bg-gray-400/35"></div>
+                <div className="absolute bottom-1.5 right-4 w-1.2 h-1.2 rounded-full bg-gray-400/45"></div>
+              </div>
+              {/* 月食阴影 - 从右向左移动 */}
+              <div className="absolute inset-0 rounded-full bg-black/30 animate-pulse"></div>
+            </div>
+            <span className="text-sm font-medium text-slate-700 drop-shadow-sm">创作从模仿开始</span>
           </div>
-          <span className="text-lg font-bold text-slate-800">PromptBox</span>
-          <span className="text-xs font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">Pro</span>
-        </Link>
+        </div>
 
         {/* 导航 */}
         <nav className="hidden md:flex items-center gap-1">

@@ -230,26 +230,6 @@ export default function HomePage() {
       </div>
 
       <div className="relative z-10">
-        {/* 月球动画 */}
-        <div className="flex justify-center mb-3">
-          <div className="relative w-16 h-16 moon-glow">
-            <div className="moon-container w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-300">
-              {/* 月球表面 - 陨石坑 */}
-              <div className="absolute top-2 left-3 w-3 h-3 rounded-full bg-gray-400/40"></div>
-              <div className="absolute top-6 left-8 w-5 h-5 rounded-full bg-gray-400/30"></div>
-              <div className="absolute top-10 left-4 w-2 h-2 rounded-full bg-gray-400/50"></div>
-              <div className="absolute top-4 right-6 w-4 h-4 rounded-full bg-gray-400/25"></div>
-              <div className="absolute bottom-6 left-6 w-3 h-3 rounded-full bg-gray-400/35"></div>
-              <div className="absolute bottom-3 right-8 w-2.5 h-2.5 rounded-full bg-gray-400/45"></div>
-              <div className="absolute top-8 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-gray-400/20"></div>
-            </div>
-          </div>
-        </div>
-
-        {/* Slogan */}
-        <div className="text-center mb-4">
-          <h2 className="text-lg font-medium text-slate-700">学习从模仿开始</h2>
-        </div>
 
         {/* 内容分类切换 */}
         <div className="flex gap-2 mb-3">
