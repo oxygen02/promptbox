@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Upload,
-  Link2,
   Sparkles,
   Copy,
+  Star,
   Download,
   Share2,
   Check,
@@ -16,437 +16,274 @@ import {
   FileText,
   Video,
   Globe,
-  Star,
+  X,
   RefreshCw,
-  Wand2,
-  CreditCard,
-  Zap,
-  Play,
-  Twitter,
-  Facebook,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type ContentType = "text" | "image" | "video" | "web";
 type Language = "zh" | "en";
-type AIStatus = "ready" | "analyzing" | "generating" | "done";
+type Model = "deepseek" | "kimi" | "minimax";
 
-// 动态分析维度
-const DIMENSIONS: Record<ContentType, { key: string; zh: string; en: string }[]> = {
-  text: [
-    { key: "general", zh: "通用创作", en: "General" },
-    { key: "chatgpt", zh: "ChatGPT长文本", en: "ChatGPT" },
-    { key: "claude", zh: "Claude合规", en: "Claude" },
-    { key: "summary", zh: "核心观点", en: "Summary" },
-    { key: "logic", zh: "逻辑结构", en: "Logic" },
-    { key: "video_script", zh: "口播脚本", en: "Video Script" },
-    { key: "ppt", zh: "PPT大纲", en: "PPT Outline" },
-    { key: "marketing", zh: "营销转化", en: "Marketing" },
-    { key: "academic", zh: "学术润色", en: "Academic" },
-    { key: "code", zh: "代码文档", en: "Code Doc" },
-  ],
-  image: [
-    { key: "midjourney", zh: "Midjourney", en: "Midjourney" },
-    { key: "dalle", zh: "DALL-E 3", en: "DALL-E 3" },
-    { key: "sd", zh: "Stable Diffusion", en: "SD" },
-    { key: "style", zh: "风格提取", en: "Style" },
-    { key: "color", zh: "色彩搭配", en: "Color" },
-    { key: "composition", zh: "构图光影", en: "Composition" },
-    { key: "ecommerce", zh: "电商商品", en: "E-commerce" },
-    { key: "poster", zh: "海报文案", en: "Poster" },
-    { key: "illustration", zh: "插画创作", en: "Illustration" },
-    { key: "photo", zh: "摄影参数", en: "Photo" },
-  ],
-  video: [
-    { key: "pika", zh: "Pika视频", en: "Pika" },
-    { key: "runway", zh: "Runway Gen-4", en: "Runway" },
-    { key: "kling", zh: "可灵AI", en: "Kling" },
-    { key: "shot", zh: "运镜转场", en: "Shot" },
-    { key: "video_style", zh: "画面风格", en: "Style" },
-    { key: "subtitle", zh: "字幕口播", en: "Subtitle" },
-    { key: "story", zh: "剧情脚本", en: "Story" },
-    { key: "storyboard", zh: "分镜设计", en: "Storyboard" },
-    { key: "bgm", zh: "BGM匹配", en: "BGM" },
-    { key: "edit", zh: "AI剪辑", en: "Editing" },
-  ],
-  web: [
-    { key: "v0", zh: "V0建站", en: "V0" },
-    { key: "framed", zh: "Framed网页", en: "Framed" },
-    { key: "structure", zh: "结构组件", en: "Structure" },
-    { key: "design", zh: "设计配色", en: "Design" },
-    { key: "interaction", zh: "交互逻辑", en: "Interaction" },
-    { key: "react", zh: "React组件", en: "React" },
-    { key: "responsive", zh: "响应式", en: "Responsive" },
-    { key: "seo", zh: "SEO优化", en: "SEO" },
-    { key: "landing", zh: "Landing Page", en: "Landing" },
-    { key: "library", zh: "组件库", en: "Library" },
-  ],
+const TAG_OPTIONS: Record<ContentType, string[]> = {
+  text: ["通用创作", "ChatGPT长文本", "Claude合规", "核心观点", "文案逻辑", "短视频脚本", "PPT大纲", "营销转化", "学术润色", "代码文档"],
+  image: ["Midjourney", "DALL-E 3", "Stable Diffusion", "风格提取", "色彩搭配", "构图光影", "电商商品", "海报文案", "插画创作", "摄影参数"],
+  video: ["Pika", "Runway Gen-4", "可灵AI", "运镜转场", "画面风格", "字幕口播", "剧情脚本", "分镜设计", "BGM匹配", "AI剪辑"],
+  web: ["V0建站", "Framed网页", "结构组件", "设计配色", "交互逻辑", "React组件", "响应式适配", "SEO优化", "Landing Page", "组件库"],
 };
 
-// 模型列表
-const MODELS_ZH = [
-  { key: "doubao", name: "豆包", free: true },
-  { key: "kimi", name: "Kimi", free: true },
-  { key: "qwen", name: "Qwen", free: true },
-  { key: "deepseek", name: "DeepSeek", free: true },
-  { key: "tongyi", name: "通义千问", free: true },
-  { key: "gemini", name: "Gemini Flash", free: true },
+const MODELS: { key: Model; name: string; region: string; color: string }[] = [
+  { key: "deepseek", name: "DeepSeek", region: "全球", color: "bg-blue-500" },
+  { key: "kimi", name: "Kimi", region: "国内", color: "bg-indigo-500" },
+  { key: "minimax", name: "MiniMax", region: "国内", color: "bg-purple-500" },
 ];
 
-const MODELS_EN = [
-  { key: "llama", name: "Llama 4", free: true },
-  { key: "mistral", name: "Mistral", free: true },
-  { key: "haiku", name: "Claude Haiku", free: true },
-  { key: "gpt_mini", name: "GPT-4o mini", free: true },
-  { key: "gemini", name: "Gemini Flash", free: true },
-];
-
-const CONTENT_TABS = [
-  { key: "text", zh: "文字文档", en: "Text" },
-  { key: "image", zh: "图片视觉", en: "Image" },
-  { key: "video", zh: "视频解构", en: "Video" },
-  { key: "web", zh: "网页设计", en: "Web" },
-];
-
-function HomeContent() {
+export default function HomePage() {
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const typeParam = searchParams.get("type") || "text";
-
   const [language, setLanguage] = useState<Language>("zh");
-  const [contentType, setContentType] = useState<ContentType>(typeParam as ContentType);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [urlInput, setUrlInput] = useState("");
+  const [contentType, setContentType] = useState<ContentType>((searchParams.get("type") as ContentType) || "text");
   const [selectedDimensions, setSelectedDimensions] = useState<string[]>([]);
-  const [prompt, setPrompt] = useState("");
+  const [selectedModels, setSelectedModels] = useState<Model[]>([]);
+  const [uploadContent, setUploadContent] = useState("");
+  const [uploadUrl, setUploadUrl] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedContent, setGeneratedContent] = useState<string>("");
+  const [prompts, setPrompts] = useState<Record<Model, string>>({
+    deepseek: "",
+    kimi: "",
+    minimax: "",
+  });
   const [credits, setCredits] = useState(520);
-  const [selectedModel, setSelectedModel] = useState("");
-  const [imageCount, setImageCount] = useState(1);
-  const [copied, setCopied] = useState(false);
-  const [showModelDropdown, setShowModelDropdown] = useState(false);
-
-  const models = language === "zh" ? MODELS_ZH : MODELS_EN;
-  const dimensions = DIMENSIONS[contentType];
 
   useEffect(() => {
-    setContentType(typeParam as ContentType);
-  }, [typeParam]);
+    const type = searchParams.get("type") as ContentType;
+    if (type && ["text", "image", "video", "web"].includes(type)) {
+      setContentType(type);
+    }
+  }, [searchParams]);
 
-  useEffect(() => {
-    setSelectedModel(models[0]?.key || "");
-  }, [language]);
-
-  const handleContentTabClick = (key: string) => {
-    setContentType(key as ContentType);
-    setSelectedDimensions([]);
-    setPrompt("");
-    setGeneratedContent("");
-    router.push(`/?type=${key}`);
-  };
-
-  const handleAnalyze = async () => {
-    if (selectedDimensions.length === 0 || credits < 50) return;
-    
-    setIsAnalyzing(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setPrompt(`# AI 生成的提示词\n\n选中维度：${selectedDimensions.map(k => dimensions.find(d => d.key === k)?.zh).join("、")}\n\n这是一段示例提示词内容...`);
-    setCredits(prev => prev - 50);
-    setIsAnalyzing(false);
-  };
-
-  const handleGenerate = async () => {
-    if (credits < 100) return;
-    
-    setIsGenerating(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setGeneratedContent(language === "zh" 
-      ? "这是 AI 生成的创意内容...\n\n基于您的提示词，AI 为您生成了以上方案。您可以直接复制使用，或继续调整提示词重新生成。"
-      : "AI-generated creative content...\n\nBased on your prompt, AI generated the above solution.");
-    
-    setCredits(prev => prev - 100);
-    setIsGenerating(false);
-  };
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(generatedContent || prompt);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const toggleDimension = (key: string) => {
-    setSelectedDimensions(prev => 
-      prev.includes(key) ? prev.filter(d => d !== key) : [...prev, key]
+  const handleDimensionClick = (dim: string) => {
+    setSelectedDimensions((prev) =>
+      prev.includes(dim) ? prev.filter((d) => d !== dim) : [...prev, dim]
     );
   };
 
-  // 社交媒体图标
-  const socialIcons = language === "zh" 
-    ? [
-        { name: "微信", icon: "💬" },
-        { name: "微博", icon: "📢" },
-        { name: "小红书", icon: "📕" },
-        { name: "抖音", icon: "🎵" },
-      ]
-    : [
-        { name: "X", icon: <Twitter className="w-4 h-4" /> },
-        { name: "Facebook", icon: <Facebook className="w-4 h-4" /> },
-        { name: "Reddit", icon: "🔴" },
-        { name: "Pinterest", icon: "📌" },
-      ];
+  const handleModelToggle = (model: Model) => {
+    setSelectedModels((prev) =>
+      prev.includes(model) ? prev.filter((m) => m !== model) : [...prev, model]
+    );
+  };
+
+  const handleAnalyze = async () => {
+    if (!uploadContent && !uploadUrl) return;
+    if (selectedModels.length === 0) return;
+
+    setIsAnalyzing(true);
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    
+    const mockPrompts: Record<Model, string> = {
+      deepseek: `基于上传的${contentType === 'text' ? '文字内容' : contentType === 'image' ? '图片' : contentType === 'video' ? '视频' : '网页'}，请分析以下维度：${selectedDimensions.join('、')}。请生成专业、可复用的AI提示词。`,
+      kimi: `请对以下内容进行深度分析，重点关注：${selectedDimensions.join('、')}。生成高质量提示词，要求逻辑清晰、表达准确。`,
+      minimax: `根据上传的${contentType === 'text' ? '文档' : '素材'}，提取关键信息，生成适用于${selectedDimensions.slice(0, 3).join('、')}等场景的AI提示词。`,
+    };
+
+    setPrompts(mockPrompts);
+    setIsAnalyzing(false);
+    setCredits((prev) => Math.max(0, prev - selectedModels.length * 10));
+  };
+
+  const contentTypes = [
+    { key: "text", label: "文字文档", icon: FileText },
+    { key: "image", label: "图片视觉", icon: ImageIcon },
+    { key: "video", label: "视频解构", icon: Video },
+    { key: "web", label: "网页设计", icon: Globe },
+  ];
+
+  const currentTags = TAG_OPTIONS[contentType];
 
   return (
-    <div className="max-w-4xl mx-auto pb-8">
-      {/* 内容分类切换 - 与左侧联动 */}
+    <div className="max-w-6xl mx-auto pb-8">
+      {/* 内容分类切换 */}
       <div className="flex gap-2 mb-4">
-        {CONTENT_TABS.map(tab => (
+        {contentTypes.map((type) => (
           <button
-            key={tab.key}
-            onClick={() => handleContentTabClick(tab.key)}
+            key={type.key}
+            onClick={() => setContentType(type.key as ContentType)}
             className={cn(
-              "px-3 py-1.5 text-sm font-medium rounded-lg transition-all",
-              contentType === tab.key
+              "px-3 py-1.5 text-sm font-medium rounded-lg transition-all flex items-center gap-1.5",
+              contentType === type.key
                 ? "bg-slate-700 text-white"
                 : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300"
             )}
           >
-            {language === "zh" ? tab.zh : tab.en}
+            <type.icon className="w-3.5 h-3.5" />
+            {type.label}
           </button>
         ))}
       </div>
 
-      {/* 上传区域 */}
+      {/* 上传内容 + 分析维度 */}
       <div className="glass-card rounded-xl p-4 mb-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-slate-700">
-            {language === "zh" ? "上传内容" : "Upload"}
-          </h3>
+          <h3 className="text-sm font-semibold text-slate-700">{language === "zh" ? "上传内容" : "Upload Content"}</h3>
           <span className="text-xs px-2 py-0.5 rounded bg-blue-50 text-blue-600 flex items-center gap-1">
             <Sparkles className="w-3 h-3" />
-            {language === "zh" ? "AI 就绪" : "Ready"}
+            AI {language === "zh" ? "就绪" : "Ready"}
           </span>
         </div>
-        
-        {contentType === "web" ? (
-          <div className="flex gap-2">
-            <input
-              type="url"
-              value={urlInput}
-              onChange={(e) => setUrlInput(e.target.value)}
-              placeholder={language === "zh" ? "粘贴网页 URL" : "Paste URL"}
-              className="input-field flex-1 text-sm py-2"
-            />
-            <button className="btn-primary text-sm px-3 py-2">
-              {language === "zh" ? "获取" : "Fetch"}
-            </button>
-          </div>
-        ) : (
-          <div className="upload-zone py-6">
-            {uploadedFile ? (
-              <div className="flex items-center justify-center gap-3">
-                <FileText className="w-6 h-6 text-slate-400" />
-                <span className="text-sm text-slate-700">{uploadedFile.name}</span>
-                <button onClick={() => setUploadedFile(null)} className="text-xs text-slate-500 hover:text-red-500">✕</button>
-              </div>
-            ) : (
-              <>
-                <Upload className="w-6 h-6 mx-auto text-slate-400 mb-2" />
-                <p className="text-sm text-slate-500">{language === "zh" ? "拖拽或点击上传" : "Drag or click"}</p>
-              </>
-            )}
+
+        {/* 上传区域 */}
+        <div className="mb-4">
+          <div className="upload-zone py-6 mb-3">
+            <Upload className="w-6 h-6 mx-auto text-slate-400 mb-2" />
+            <p className="text-sm text-slate-500">{language === "zh" ? "拖拽或点击上传" : "Drag or click to upload"}</p>
             <input type="file" className="hidden" id="file-upload" />
           </div>
-        )}
-      </div>
-
-      {/* 分析维度 - 两行排列 */}
-      <div className="glass-card rounded-xl p-4 mb-4">
-        <h3 className="text-sm font-semibold text-slate-700 mb-3">
-          {language === "zh" ? "分析维度" : "Dimensions"}
-        </h3>
-        <div className="grid grid-cols-5 gap-1.5">
-          {dimensions.map(dim => (
-            <button
-              key={dim.key}
-              onClick={() => toggleDimension(dim.key)}
-              className={cn(
-                "px-2 py-1.5 text-xs rounded transition-all truncate",
-                selectedDimensions.includes(dim.key)
-                  ? "bg-blue-500 text-white"
-                  : "bg-white text-slate-600 border border-slate-200 hover:border-blue-300"
-              )}
-            >
-              {language === "zh" ? dim.zh : dim.en}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* 提示词编辑区 */}
-      <div className="glass-card rounded-xl p-4 mb-4">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-semibold text-slate-700">
-            {language === "zh" ? "提示词" : "Prompt"}
-          </h3>
-          <div className="flex gap-1.5">
-            <button onClick={copyToClipboard} className="text-xs px-2 py-1 bg-slate-100 rounded hover:bg-slate-200 flex items-center gap-1">
-              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-            </button>
-            <button className="text-xs px-2 py-1 bg-slate-100 rounded hover:bg-slate-200 flex items-center gap-1">
-              <Star className="w-3 h-3" />
-            </button>
+          
+          {/* URL 输入 */}
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder={language === "zh" ? "或输入网页链接..." : "Or enter URL..."}
+              value={uploadUrl}
+              onChange={(e) => setUploadUrl(e.target.value)}
+              className="input-field flex-1 text-sm"
+            />
           </div>
         </div>
-        <textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          className="input-field min-h-[100px] resize-none text-sm"
-          placeholder={language === "zh" ? "AI 将在此生成提示词，您也可以手动编辑..." : "AI will generate prompt here..."}
-        />
-        <div className="text-xs text-slate-400 mt-1">{prompt.length} {language === "zh" ? "字符" : "chars"}</div>
+
+        {/* 分析维度 */}
+        <div>
+          <h4 className="text-xs font-medium text-slate-500 mb-2">{language === "zh" ? "分析维度（可多选）" : "Analysis Dimensions (Multiple)"}</h4>
+          <div className="flex flex-wrap gap-1.5">
+            {currentTags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => handleDimensionClick(tag)}
+                className={cn(
+                  "px-2 py-1.5 text-xs rounded transition-all truncate",
+                  selectedDimensions.includes(tag)
+                    ? "bg-blue-500 text-white"
+                    : "bg-white text-slate-600 border border-slate-200 hover:border-blue-300"
+                )}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* 模型选择 + 开始分析 */}
       <div className="glass-card rounded-xl p-4 mb-4">
         <div className="flex items-center gap-3 flex-wrap">
-          {/* 模型选择 */}
-          <div className="relative">
-            <button 
-              onClick={() => setShowModelDropdown(!showModelDropdown)}
-              className="btn-secondary flex items-center gap-1.5 text-sm px-3 py-2"
-            >
-              {models.find(m => m.key === selectedModel)?.name || "选择模型"}
-              <span className="text-xs text-green-600">免费</span>
-            </button>
-            
-            {showModelDropdown && (
-              <div className="absolute top-full left-0 mt-1 w-40 bg-white border rounded-lg shadow-lg z-10 py-1">
-                {models.map(model => (
-                  <button
-                    key={model.key}
-                    onClick={() => { setSelectedModel(model.key); setShowModelDropdown(false); }}
-                    className={cn(
-                      "w-full text-left px-3 py-1.5 text-sm hover:bg-slate-50 flex items-center justify-between",
-                      selectedModel === model.key && "bg-blue-50"
-                    )}
-                  >
-                    {model.name}
-                    {model.free && <span className="text-xs text-green-600">免费</span>}
-                  </button>
-                ))}
-              </div>
-            )}
+          <span className="text-sm font-medium text-slate-600">{language === "zh" ? "选择模型" : "Select Models"}:</span>
+          
+          <div className="flex gap-2">
+            {MODELS.map((model) => (
+              <button
+                key={model.key}
+                onClick={() => handleModelToggle(model.key)}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm transition-all",
+                  selectedModels.includes(model.key)
+                    ? `${model.color} text-white border-transparent`
+                    : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
+                )}
+              >
+                <Check className={cn("w-3 h-3", selectedModels.includes(model.key) ? "opacity-100" : "opacity-0")} />
+                {model.name}
+                <span className="text-xs opacity-70">{model.region}</span>
+              </button>
+            ))}
           </div>
 
-          {/* 图片张数 */}
-          {contentType === "image" && (
-            <div className="flex items-center gap-1">
-              {[1, 2, 3, 4].map(n => (
-                <button
-                  key={n}
-                  onClick={() => setImageCount(n)}
-                  className={cn(
-                    "w-6 h-6 text-xs rounded font-medium",
-                    imageCount === n ? "bg-blue-500 text-white" : "bg-slate-100 text-slate-600"
-                  )}
-                >
-                  {n}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* 开始分析 */}
           <button
             onClick={handleAnalyze}
-            disabled={selectedDimensions.length === 0 || isAnalyzing}
-            className="btn-primary flex items-center gap-1.5 text-sm px-4 py-2"
-          >
-            {isAnalyzing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-            {language === "zh" ? "开始分析" : "Analyze"}
-          </button>
-
-          {/* 创意生成 */}
-          <button
-            onClick={handleGenerate}
-            disabled={isGenerating || !prompt}
+            disabled={isAnalyzing || !uploadContent && !uploadUrl || selectedModels.length === 0}
             className="btn-primary flex items-center gap-1.5 text-sm px-4 py-2 ml-auto"
           >
-            {isGenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
-            {language === "zh" ? "创意生成" : "Generate"}
+            {isAnalyzing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+            {language === "zh" ? "开始分析" : "Start Analysis"}
           </button>
 
-          {/* 积分 */}
           <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 border border-amber-200 rounded">
-            <Zap className="w-3 h-3 text-amber-500" />
+            <Sparkles className="w-3 h-3 text-amber-500" />
             <span className="text-xs font-medium text-amber-600">{credits}</span>
           </div>
         </div>
       </div>
 
-      {/* 生成内容框 - 常驻 */}
-      <div className="glass-card rounded-xl p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-slate-700">
-            {language === "zh" ? "生成内容" : "Generated Content"}
-          </h3>
-          <div className="flex items-center gap-2">
-            {/* 社交分享 */}
-            <div className="flex items-center gap-1">
-              {socialIcons.map((s, i) => (
-                <button key={i} className="w-7 h-7 bg-slate-100 rounded flex items-center justify-center hover:bg-slate-200 text-sm">
-                  {typeof s.icon === 'string' ? s.icon : s.icon}
-                </button>
-              ))}
+      {/* 三个模型生成的提示词卡片 */}
+      <div className="grid grid-cols-3 gap-3 mb-4">
+        {MODELS.map((model) => {
+          const isSelected = selectedModels.includes(model.key);
+          const prompt = prompts[model.key];
+          
+          return (
+            <div
+              key={model.key}
+              className={cn(
+                "glass-card rounded-xl p-3 transition-all",
+                !isSelected && "opacity-40",
+                !prompt && "min-h-[180px]"
+              )}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <div className={cn("w-2 h-2 rounded-full", model.color)} />
+                  <span className="text-sm font-medium text-slate-700">{model.name}</span>
+                </div>
+                {prompt && (
+                  <div className="flex gap-1">
+                    <button className="p-1 hover:bg-slate-100 rounded">
+                      <Copy className="w-3 h-3 text-slate-400" />
+                    </button>
+                    <button className="p-1 hover:bg-slate-100 rounded">
+                      <Star className="w-3 h-3 text-slate-400" />
+                    </button>
+                  </div>
+                )}
+              </div>
+              
+              {prompt ? (
+                <div className="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">
+                  {prompt}
+                </div>
+              ) : (
+                <div className="h-full flex items-center justify-center text-xs text-slate-400">
+                  {isSelected ? (language === "zh" ? "等待生成..." : "Waiting...") : (language === "zh" ? "请先选择模型" : "Select model first")}
+                </div>
+              )}
+              
+              {/* 字符计数 */}
+              {prompt && (
+                <div className="text-xs text-slate-400 mt-2">
+                  {prompt.length} {language === "zh" ? "字符" : "chars"}
+                </div>
+              )}
             </div>
-            {/* 下载 */}
-            <button className="btn-secondary flex items-center gap-1 text-xs px-2 py-1.5">
-              <Download className="w-3 h-3" />
-              {language === "zh" ? "下载" : "Download"}
-            </button>
-          </div>
-        </div>
-        
-        <div className="min-h-[200px] bg-slate-50 rounded-lg p-4 border border-slate-200">
-          {generatedContent ? (
-            <pre className="whitespace-pre-wrap text-sm text-slate-700">{generatedContent}</pre>
-          ) : (
-            <div className="h-full flex items-center justify-center text-slate-400 text-sm">
-              {language === "zh" ? "生成内容将显示在这里..." : "Generated content will appear here..."}
-            </div>
-          )}
-        </div>
-
-        {/* 二次创作按钮 */}
-        {generatedContent && (
-          <div className="flex gap-2 mt-3 pt-3 border-t border-slate-200">
-            <button className="btn-secondary flex items-center gap-1 text-xs px-3 py-1.5">
-              <RefreshCw className="w-3 h-3" />
-              {language === "zh" ? "重新生成" : "Regenerate"}
-            </button>
-            <button className="btn-secondary flex items-center gap-1 text-xs px-3 py-1.5">
-              <Wand2 className="w-3 h-3" />
-              {language === "zh" ? "换风格" : "Change Style"}
-            </button>
-          </div>
-        )}
+          );
+        })}
       </div>
+
+      {/* 创意生成按钮 */}
+      {prompts.deepseek || prompts.kimi || prompts.minimax ? (
+        <div className="glass-card rounded-xl p-4">
+          <div className="flex items-center gap-3">
+            <button disabled={isGenerating} className="btn-primary flex items-center gap-1.5 text-sm px-4 py-2">
+              {isGenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+              {language === "zh" ? "创意生成" : "Creative Generate"}
+            </button>
+            
+            <span className="text-xs text-slate-500">
+              {language === "zh" ? "基于生成的提示词进行二次创作" : "Generate variations based on prompts"}
+            </span>
+          </div>
+        </div>
+      ) : null}
     </div>
-  );
-}
-
-export default function HomePage() {
-  return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
-      </div>
-    }>
-      <HomeContent />
-    </Suspense>
   );
 }
