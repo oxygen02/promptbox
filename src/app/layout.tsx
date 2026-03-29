@@ -21,9 +21,9 @@ export default function RootLayout({
     <html lang="zh">
       <body className={inter.className}>
         <Header />
-        <div className="flex pt-16 min-h-screen" style={{ background: '#f0f4f8' }}>
+        <div className="flex pt-16 min-h-screen overflow-visible" style={{ background: '#f0f4f8' }}>
           <Sidebar />
-          <main className="flex-1 md:ml-[160px] min-h-[calc(100vh-4rem)] p-3 md:p-4 transition-all duration-300">
+          <main className="flex-1 md:ml-[160px] min-h-[calc(100vh-4rem)] p-3 md:p-4 transition-all duration-300 overflow-visible">
             <Suspense fallback={
               <div className="flex items-center justify-center min-h-[50vh]">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
