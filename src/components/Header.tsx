@@ -3,75 +3,88 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sparkles, Globe, User, LogIn } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { 
+  Sparkles, 
+  Globe, 
+  LogIn, 
+  UserPlus,
+  Zap,
+  CreditCard
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const navItems = [
+  { href: "/", label: "首页", labelEn: "Home" },
+  { href: "/pricing", label: "定价", labelEn: "Pricing" },
+  { href: "/about", label: "关于", labelEn: "About" },
+];
 
 export default function Header() {
   const pathname = usePathname();
   const [language, setLanguage] = useState<"zh" | "en">("zh");
 
-  const navItems = [
-    { href: "/", label: "首页", labelEn: "Home" },
-    { href: "/pricing", label: "定价", labelEn: "Pricing" },
-    { href: "/about", label: "关于", labelEn: "About" },
-  ];
-
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-50">
-      <div className="h-full max-w-7xl mx-auto px-4 flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 h-16 glass-nav z-50">
+      <div className="h-full max-w-[1600px] mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-slate-700 to-slate-900 rounded-lg flex items-center justify-center">
+        <Link href="/" className="flex items-center gap-2.5">
+          <div className="w-9 h-9 bg-gradient-to-br from-slate-600 to-slate-800 rounded-xl flex items-center justify-center shadow-lg">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <span className="text-xl font-bold text-slate-800">PromptBox</span>
+          <span className="text-xs font-medium text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Pro</span>
         </Link>
 
-        {/* Navigation */}
+        {/* 导航 */}
         <nav className="hidden md:flex items-center gap-1">
-          {navItems.map((item) => (
+          {navItems.map(item => (
             <Link
               key={item.href}
               href={item.href}
-              className={`px-4 py-2 text-base font-medium rounded-lg transition-colors ${
+              className={cn(
+                "px-4 py-2 text-sm font-medium rounded-xl transition-all duration-200",
                 pathname === item.href
                   ? "bg-slate-100 text-slate-900"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-              }`}
+              )}
             >
               {language === "zh" ? item.label : item.labelEn}
             </Link>
           ))}
         </nav>
 
-        {/* Actions */}
-        <div className="flex items-center gap-2">
-          {/* Language Toggle */}
-          <Button
-            variant="ghost"
-            size="sm"
+        {/* 右侧功能 */}
+        <div className="flex items-center gap-3">
+          {/* 语言切换 */}
+          <button
             onClick={() => setLanguage(language === "zh" ? "en" : "zh")}
-            className="flex items-center gap-1"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-slate-600 hover:bg-slate-100 transition-colors"
           >
             <Globe className="w-4 h-4" />
-            <span className="text-sm">{language === "zh" ? "EN" : "中文"}</span>
-          </Button>
+            <span className="font-medium">{language === "zh" ? "EN" : "中"}</span>
+          </button>
 
-          {/* Login */}
-          <Link href="/login">
-            <Button variant="ghost" size="sm" className="flex items-center gap-1">
-              <LogIn className="w-4 h-4" />
-              <span className="text-sm">{language === "zh" ? "登录" : "Login"}</span>
-            </Button>
-          </Link>
+          {/* 积分显示 */}
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-100">
+            <Zap className="w-4 h-4 text-amber-500" />
+            <span className="text-sm font-semibold text-amber-700">520</span>
+          </div>
 
-          {/* Register */}
-          <Link href="/register">
-            <Button size="sm" className="bg-slate-800 hover:bg-slate-700">
-              <User className="w-4 h-4 mr-1" />
+          {/* 登录/注册 */}
+          <div className="flex items-center gap-2">
+            <Link
+              href="/login"
+              className="px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+            >
+              {language === "zh" ? "登录" : "Login"}
+            </Link>
+            <Link
+              href="/register"
+              className="px-4 py-1.5 text-sm font-medium text-white bg-slate-700 hover:bg-slate-800 rounded-lg transition-colors"
+            >
               {language === "zh" ? "注册" : "Sign Up"}
-            </Button>
-          </Link>
+            </Link>
+          </div>
         </div>
       </div>
     </header>
