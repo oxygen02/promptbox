@@ -308,10 +308,8 @@ export default function HomePage() {
               onClick={handleAnalyze}
               disabled={isAnalyzing || selectedCount === 0}
               className={cn(
-                "text-base px-7 py-2.5 rounded-xl font-bold transition-all shadow-xl",
-                selectedCount > 0 && !isAnalyzing 
-                  ? "bg-blue-500 hover:bg-blue-600 text-white" 
-                  : "bg-slate-300 text-slate-500 cursor-not-allowed"
+                "text-base px-7 py-2.5 rounded-xl font-bold transition-all shadow-xl bg-blue-500 hover:bg-blue-600 text-white",
+                selectedCount === 0 && "opacity-50"
               )}
             >
               {isAnalyzing ? "分析中..." : "开始分析"}
@@ -341,10 +339,8 @@ export default function HomePage() {
               onClick={handleCreativeGenerate} 
               disabled={!selectedGenModel || isGenerating} 
               className={cn(
-                "text-base px-7 py-2.5 rounded-xl font-bold transition-all shadow-xl",
-                selectedGenModel && !isGenerating 
-                  ? "bg-blue-500 hover:bg-blue-600 text-white" 
-                  : "bg-slate-300 text-slate-500 cursor-not-allowed"
+                "text-base px-7 py-2.5 rounded-xl font-bold transition-all shadow-xl bg-blue-500 hover:bg-blue-600 text-white",
+                !selectedGenModel && "opacity-50"
               )}
             >
               {isGenerating ? "生成中..." : "创意生成"}
