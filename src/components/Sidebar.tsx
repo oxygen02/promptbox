@@ -74,6 +74,7 @@ export default function Sidebar() {
   const router = useRouter();
   const [contentType, setContentType] = useState<string>("text");
 
+  // 监听 pathname 变化，实现与首页的联动
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
@@ -81,6 +82,20 @@ export default function Sidebar() {
       setContentType(type);
     }
   }, [pathname]);
+
+  // 使用 popstate 事件监听浏览器前进/后退按钮
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const type = params.get("type") || "text";
+      setContentType(type);
+    };
+    
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
 
   const handleContentClick = (key: string, href?: string) => {
     if (href) {

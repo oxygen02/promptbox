@@ -90,11 +90,8 @@ export default function HomePage() {
   // 同步内容类型到 URL
   const handleContentTypeChange = (type: ContentType) => {
     setContentType(type);
-    if (typeof window !== "undefined") {
-      const url = new URL(window.location.href);
-      url.searchParams.set("type", type);
-      window.history.pushState({}, "", url);
-    }
+    // 使用 router.push 触发 Next.js 路由更新，让 Sidebar 能监听到变化
+    router.push(`/?type=${type}`);
   };
 
   const handleCardModelSelect = (cardIndex: number, model: Model | null) => {
