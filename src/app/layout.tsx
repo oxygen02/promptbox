@@ -10,7 +10,6 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "PromptBox Pro - AI 提示词分析与生成工具",
   description: "多模态提示词分析与生成工具，支持文字、图片、视频、网页内容分析，AI 智能生成可复用提示词",
-  keywords: "AI, 提示词, Prompt, 生成, 分析, DeepSeek, Kimi, MiniMax",
 };
 
 export default function RootLayout({
@@ -22,12 +21,12 @@ export default function RootLayout({
     <html lang="zh">
       <body className={inter.className}>
         <Header />
-        <div className="flex pt-16">
+        <div className="flex pt-16 min-h-screen" style={{ background: '#f0f4f8' }}>
           <Sidebar />
-          <main className="flex-1 md:ml-60 min-h-[calc(100vh-4rem)] p-8">
+          <main className="flex-1 md:ml-[260px] min-h-[calc(100vh-4rem)] p-6">
             <Suspense fallback={
               <div className="flex items-center justify-center min-h-[50vh]">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
               </div>
             }>
               {children}
