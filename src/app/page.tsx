@@ -27,22 +27,22 @@ const TAG_OPTIONS: Record<ContentType, string[]> = {
   web: ["V0建站", "Framed网页", "结构组件", "设计配色", "交互逻辑", "React组件", "响应式适配", "SEO优化", "Landing Page", "组件库"],
 };
 
-const MODELS: { key: Model; name: string; nameEn: string; region: string; color: string }[] = [
-  { key: "deepseek", name: "DeepSeek", nameEn: "DeepSeek", region: "Global", color: "bg-blue-500" },
-  { key: "kimi", name: "Kimi", nameEn: "Kimi", region: "CN", color: "bg-indigo-500" },
-  { key: "minimax", name: "MiniMax", nameEn: "MiniMax", region: "CN", color: "bg-purple-500" },
+const MODELS: { key: Model; name: string; nameEn: string; region: string; color: string; textColor: string }[] = [
+  { key: "deepseek", name: "DeepSeek", nameEn: "DeepSeek", region: "Global", color: "bg-blue-600", textColor: "text-blue-600" },
+  { key: "kimi", name: "Kimi", nameEn: "Kimi", region: "CN", color: "bg-indigo-600", textColor: "text-indigo-600" },
+  { key: "minimax", name: "MiniMax", nameEn: "MiniMax", region: "CN", color: "bg-purple-600", textColor: "text-purple-600" },
 ];
 
 const SOCIAL_PLATFORMS = {
   zh: [
-    { key: "wechat", name: "微信", icon: "💬", color: "bg-green-500" },
-    { key: "weibo", name: "微博", icon: "🌐", color: "bg-red-500" },
-    { key: "douyin", name: "抖音", icon: "🎵", color: "bg-black" },
+    { key: "wechat", name: "微信", icon: "💬", color: "bg-green-500 hover:bg-green-600" },
+    { key: "weibo", name: "微博", icon: "🌐", color: "bg-red-500 hover:bg-red-600" },
+    { key: "douyin", name: "抖音", icon: "🎵", color: "bg-black hover:bg-gray-800" },
   ],
   en: [
-    { key: "twitter", name: "Twitter/X", icon: "𝕏", color: "bg-black" },
-    { key: "facebook", name: "Facebook", icon: "f", color: "bg-blue-600" },
-    { key: "instagram", name: "Instagram", icon: "📷", color: "bg-pink-500" },
+    { key: "twitter", name: "Twitter/X", icon: "𝕏", color: "bg-black hover:bg-gray-800" },
+    { key: "facebook", name: "Facebook", icon: "f", color: "bg-blue-600 hover:bg-blue-700" },
+    { key: "instagram", name: "Instagram", icon: "📷", color: "bg-pink-500 hover:bg-pink-600" },
   ],
 };
 
@@ -74,14 +74,11 @@ export default function HomePage() {
   const [showShare, setShowShare] = useState(false);
   const [sharePrompt, setSharePrompt] = useState("");
   const [copied, setCopied] = useState(false);
-
-  // 生成的内容
   const [generatedContent, setGeneratedContent] = useState("");
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // 从URL读取type参数
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const type = params.get("type");
@@ -171,6 +168,8 @@ export default function HomePage() {
   ];
 
   const currentTags = TAG_OPTIONS[contentType];
+  // 显示8-12个维度
+  const displayTags = currentTags.slice(0, 10);
   const socialPlatforms = SOCIAL_PLATFORMS[language];
   const selectedCount = Object.values(cardModels).filter(Boolean).length;
 
@@ -205,7 +204,6 @@ export default function HomePage() {
         </div>
 
         <div className="flex gap-2 mb-3">
-          {/* 拖拽上传 - 居中 */}
           <div className="flex-1">
             <div className="upload-zone py-4 h-full flex flex-col items-center justify-center min-h-[80px]">
               <Upload className="w-5 h-5 text-slate-400 mb-1" />
@@ -214,7 +212,6 @@ export default function HomePage() {
             </div>
           </div>
           
-          {/* URL输入 */}
           <div className="flex-1">
             <input
               type="text"
@@ -226,19 +223,19 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* 提示词维度 */}
+        {/* 提示词维度 - 两行布局 */}
         <div>
           <h4 className="text-xs font-medium text-slate-500 mb-2">提示词维度：</h4>
-          <div className="flex flex-wrap gap-1.5">
-            {currentTags.slice(0, 6).map((tag) => (
+          <div className="grid grid-cols-5 gap-1.5">
+            {displayTags.map((tag, idx) => (
               <button
                 key={tag}
                 onClick={() => handleDimensionClick(tag)}
                 className={cn(
-                  "px-2 py-1 text-xs rounded transition-all",
+                  "px-2 py-1.5 text-xs rounded transition-all text-center",
                   selectedDimensions.includes(tag)
-                    ? "bg-blue-500 text-white"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    ? "bg-blue-500 text-white font-medium"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:border-slate-300 border border-transparent"
                 )}
               >
                 {tag}
@@ -312,12 +309,17 @@ export default function HomePage() {
         })}
       </div>
 
-      {/* 开始分析按钮 */}
+      {/* 开始分析按钮 - 更醒目 */}
       <div className="flex items-center gap-2 mb-3">
         <button
           onClick={handleAnalyze}
           disabled={isAnalyzing || selectedCount === 0}
-          className="btn-primary flex items-center gap-1.5 text-xs px-3 py-1.5"
+          className={cn(
+            "flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg font-medium transition-all",
+            selectedCount > 0 && !isAnalyzing
+              ? "bg-blue-600 text-white hover:bg-blue-700 shadow-md"
+              : "bg-slate-300 text-slate-500 cursor-not-allowed"
+          )}
         >
           {isAnalyzing ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
           开始分析
@@ -348,14 +350,19 @@ export default function HomePage() {
         <div className="text-xs text-slate-400 mt-1">0 字符</div>
       </div>
 
-      {/* 创意生成 + 模型选择 */}
+      {/* 创意生成 + 模型选择 - 更醒目 */}
       <div className="glass-card rounded-xl p-3 mb-3">
         <div className="flex items-center gap-2">
-          {/* 创意生成按钮 */}
+          {/* 创意生成按钮 - 更醒目 */}
           <button
             onClick={handleCreativeGenerate}
             disabled={!selectedGenModel || isGenerating}
-            className="btn-primary flex items-center gap-1.5 text-xs px-3 py-1.5"
+            className={cn(
+              "flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg font-medium transition-all",
+              selectedGenModel && !isGenerating
+                ? "bg-purple-600 text-white hover:bg-purple-700 shadow-md"
+                : "bg-slate-300 text-slate-500 cursor-not-allowed"
+            )}
           >
             {isGenerating ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
             创意生成
@@ -365,7 +372,7 @@ export default function HomePage() {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setOpenGenDropdown(!openGenDropdown)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg hover:bg-slate-50"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg hover:bg-slate-50 font-medium text-slate-700"
             >
               {selectedGenModel ? (
                 <>
@@ -396,22 +403,51 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* 生成内容输出框 */}
+      {/* 生成内容输出框 - 带社交分享 */}
       {generatedContent && (
         <div className="glass-card rounded-xl p-3">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-semibold text-slate-700">生成内容</h3>
-            <div className="flex items-center gap-1">
-              <button onClick={() => handleShare(generatedContent)} className="p-1.5 hover:bg-slate-100 rounded">
-                <Share2 className="w-3.5 h-3.5 text-slate-400" />
+          </div>
+          <div className="min-h-[120px] bg-slate-50 rounded-lg p-3 text-xs text-slate-700 whitespace-pre-wrap mb-2">
+            {generatedContent}
+          </div>
+          {/* 社交分享按钮 */}
+          <div className="flex items-center justify-between">
+            <div className="flex gap-2">
+              {socialPlatforms.map((platform) => (
+                <button
+                  key={platform.key}
+                  className={cn("w-8 h-8 rounded-full flex items-center justify-center text-white text-sm transition-transform hover:scale-110", platform.color)}
+                  title={platform.name}
+                >
+                  {platform.icon}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleShare(generatedContent)}
+                className="flex items-center gap-1 px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+              >
+                <Share2 className="w-3 h-3" />
+                分享
               </button>
-              <button className="p-1.5 hover:bg-slate-100 rounded">
-                <Download className="w-3.5 h-3.5 text-slate-400" />
+              <button
+                onClick={handleCopy}
+                className="flex items-center gap-1 px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+              >
+                {copied ? <CheckCircle className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+                {copied ? "已复制" : "复制"}
+              </button>
+              <button
+                onClick={handleDownload}
+                className="flex items-center gap-1 px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+              >
+                <Download className="w-3 h-3" />
+                下载
               </button>
             </div>
-          </div>
-          <div className="min-h-[120px] bg-slate-50 rounded-lg p-3 text-xs text-slate-600 whitespace-pre-wrap">
-            {generatedContent}
           </div>
         </div>
       )}
@@ -431,7 +467,7 @@ export default function HomePage() {
               {socialPlatforms.map((platform) => (
                 <button
                   key={platform.key}
-                  className={cn("w-10 h-10 rounded-full flex items-center justify-center text-white text-sm", platform.color)}
+                  className={cn("w-12 h-12 rounded-full flex items-center justify-center text-white text-lg transition-transform hover:scale-110", platform.color)}
                 >
                   {platform.icon}
                 </button>
