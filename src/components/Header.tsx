@@ -27,13 +27,39 @@ export default function Header() {
     )}>
       <div className="h-full max-w-[1600px] mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-white" />
+        <div className="flex items-center gap-4">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-lg font-bold text-slate-800">PromptBox</span>
+            <span className="text-xs font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">Pro</span>
+          </Link>
+
+          {/* 月球 + Slogan */}
+          <div className="hidden md:flex items-center gap-2">
+            {/* 月球 - 真实月球缓慢移动效果 */}
+            <div className="relative w-8 h-8 overflow-hidden rounded-full"
+                 style={{
+                   background: 'radial-gradient(circle at 30% 30%, #e2e8f0, #94a3b8 50%, #475569)',
+                   boxShadow: 'inset -4px -4px 10px rgba(0,0,0,0.3), inset 2px 2px 5px rgba(255,255,255,0.5), 0 2px 8px rgba(0,0,0,0.2)'
+                 }}>
+              {/* 陨石坑 - 随动画缓慢移动 */}
+              <div className="absolute inset-0 animate-[moonLibration_20s_ease-in-out_infinite]">
+                <div className="absolute top-1.5 left-2 w-2 h-1.8 rounded-full bg-gray-400/50" style={{boxShadow: 'inset 0.5px 0.5px 1px rgba(0,0,0,0.4)'}}></div>
+                <div className="absolute top-4 left-5 w-2.5 h-2 rounded-full bg-gray-500/40" style={{boxShadow: 'inset 0.5px 0.5px 1px rgba(0,0,0,0.4)'}}></div>
+                <div className="absolute top-6 left-1.5 w-1.5 h-1.5 rounded-full bg-gray-400/55" style={{boxShadow: 'inset 0.5px 0.5px 1px rgba(0,0,0,0.4)'}}></div>
+                <div className="absolute top-2 right-3 w-2 h-1.8 rounded-full bg-gray-450/45" style={{boxShadow: 'inset 0.5px 0.5px 1px rgba(0,0,0,0.4)'}}></div>
+                <div className="absolute bottom-3 left-3 w-1.8 h-1.5 rounded-full bg-gray-400/50" style={{boxShadow: 'inset 0.5px 0.5px 1px rgba(0,0,0,0.4)'}}></div>
+                <div className="absolute bottom-1.5 right-3 w-1.5 h-1.5 rounded-full bg-gray-500/55" style={{boxShadow: 'inset 0.5px 0.5px 1px rgba(0,0,0,0.4)'}}></div>
+                <div className="absolute top-5 right-1.5 w-1.3 h-1.3 rounded-full bg-gray-400/40" style={{boxShadow: 'inset 0.5px 0.5px 1px rgba(0,0,0,0.4)'}}></div>
+              </div>
+              {/* 暗部 */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-transparent to-black/15"></div>
+            </div>
+            <span className="text-lg font-medium text-slate-700 drop-shadow-sm">创作从模仿开始</span>
           </div>
-          <span className="text-lg font-bold text-slate-800">PromptBox</span>
-          <span className="text-xs font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">Pro</span>
-        </Link>
+        </div>
 
         {/* 导航 */}
         <nav className="hidden md:flex items-center gap-1">
