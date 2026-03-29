@@ -42,6 +42,8 @@ export default function Header() {
       const url = new URL(window.location.href);
       url.searchParams.set("lang", newLang);
       router.push(url.toString());
+      // 触发自定义事件通知其他组件
+      window.dispatchEvent(new CustomEvent("language-change", { detail: newLang }));
     }
   };
 

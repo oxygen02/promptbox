@@ -180,6 +180,18 @@ export default function HomePage() {
     };
   }, [pathname]);
 
+  // 监听 Header 触发的语言切换事件
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    
+    const handleLanguageChange = (e: CustomEvent) => {
+      setLanguage(e.detail);
+    };
+    
+    window.addEventListener("language-change", handleLanguageChange as EventListener);
+    return () => window.removeEventListener("language-change", handleLanguageChange as EventListener);
+  }, []);
+
   // 监听 Sidebar 触发的 content-type-change 事件
   useEffect(() => {
     if (typeof window === "undefined") return;
