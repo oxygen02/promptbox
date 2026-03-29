@@ -111,17 +111,6 @@ export default function Sidebar() {
     window.addEventListener("popstate", handleLangChange);
     return () => window.removeEventListener("popstate", handleLangChange);
   }, []);
-    if (typeof window === "undefined") return;
-    
-    const handlePopState = () => {
-      const params = new URLSearchParams(window.location.search);
-      const type = params.get("type") || "text";
-      setContentType(type);
-    };
-    
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, []);
 
   const handleContentClick = (key: string, href?: string) => {
     if (href) {
