@@ -73,13 +73,16 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [contentType, setContentType] = useState<string>("text");
+  const [language, setLanguage] = useState<"zh" | "en">("zh");
 
-  // 监听 pathname 变化和自定义事件，实现与首页的联动
+  // 监听 pathname 和语言参数变化
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const type = params.get("type") || "text";
+      const lang = params.get("lang") || "zh";
       setContentType(type);
+      setLanguage(lang as "zh" | "en");
     }
   }, [pathname]);
 
@@ -95,8 +98,19 @@ export default function Sidebar() {
     return () => window.removeEventListener("content-type-change", handleContentTypeChange as EventListener);
   }, []);
 
-  // 监听 popstate 事件（浏览器前进/后退）
+  // 监听语言切换事件
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    
+    const handleLangChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      const lang = params.get("lang") || "zh";
+      setLanguage(lang as "zh" | "en");
+    };
+    
+    window.addEventListener("popstate", handleLangChange);
+    return () => window.removeEventListener("popstate", handleLangChange);
+  }, []);
     if (typeof window === "undefined") return;
     
     const handlePopState = () => {
@@ -135,7 +149,7 @@ export default function Sidebar() {
             {/* 一级标题 */}
             <div className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-800">
               <section.icon className="w-5 h-5 text-slate-600" />
-              <span>{section.zh}</span>
+              <span>{language === "zh" ? section.zh : section.en}</span>
             </div>
             
             {/* 二级项目 */}
@@ -152,7 +166,7 @@ export default function Sidebar() {
                   }`}
                 >
                   <item.icon className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">{item.zh}</span>
+                  <span className="truncate">{language === "zh" ? item.zh : item.en}</span>
                 </button>
               );
             })}
@@ -167,7 +181,7 @@ export default function Sidebar() {
             <User className="w-4 h-4 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium text-slate-800 truncate">游客用户</div>
+            <div className="text-sm font-medium text-slate-800 truncate">{language === "zh" ? "游客用户" : "Guest"}</div>
             <div className="text-xs text-slate-500">Lv.1</div>
           </div>
         </div>

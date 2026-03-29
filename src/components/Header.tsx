@@ -61,14 +61,25 @@ export default function Header() {
           <div className="flex-shrink-0">
             <MoonCanvas size={36} />
           </div>
-          <span 
-            className="text-2xl font-bold whitespace-nowrap text-slate-800"
-            style={{
-              letterSpacing: '0.05em',
-            }}
-          >
-            创作从模仿开始
-          </span>
+          <div className="flex flex-col">
+            <span 
+              className="text-2xl font-bold whitespace-nowrap text-slate-800"
+              style={{
+                letterSpacing: '0.05em',
+              }}
+            >
+              {language === "zh" ? "创作从模仿开始" : "Creation Starts from Imitation"}
+            </span>
+            <span 
+              className="text-sm font-medium whitespace-nowrap text-slate-500"
+              style={{
+                letterSpacing: '0.03em',
+                fontSize: 'calc(1rem * 0.7)',
+              }}
+            >
+              {language === "zh" ? "逆向倒推多模态提示词" : "Reverse-engineer Multimodal Prompts"}
+            </span>
+          </div>
         </div>
 
         {/* 导航 */}
