@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   Upload,
   Sparkles,
@@ -42,12 +42,98 @@ const MODELS: { key: Model; name: string; region: string }[] = [
   { key: "spark", name: "讯飞星火", region: "CN" },
 ];
 
+// 国际化文本
+const I18N = {
+  zh: {
+    contentTypes: [
+      { key: "text", label: "文字文档" },
+      { key: "image", label: "图片视觉" },
+      { key: "video", label: "视频解构" },
+      { key: "web", label: "网页设计" },
+    ],
+    uploadContent: "上传内容",
+    aiReady: "AI 就绪",
+    selectModel: "选择模型",
+    generating: "生成中...",
+    creativeGenerate: "创意生成",
+    generatedPlaceholder: "点击上方「创意生成」按钮生成内容...",
+    tagSelect: "标签选择",
+    dimensionSelect: "维度选择",
+    creativeOutput: "创意输出",
+    promptCards: "提示词卡片",
+    copy: "复制",
+    favorite: "收藏",
+    download: "下载",
+    share: "分享",
+  },
+  en: {
+    contentTypes: [
+      { key: "text", label: "Text" },
+      { key: "image", label: "Image" },
+      { key: "video", label: "Video" },
+      { key: "web", label: "Web" },
+    ],
+    uploadContent: "Upload Content",
+    aiReady: "AI Ready",
+    selectModel: "Select Model",
+    generating: "Generating...",
+    creativeGenerate: "Generate",
+    generatedPlaceholder: "Click 'Generate' button to create content...",
+    tagSelect: "Tags",
+    dimensionSelect: "Dimensions",
+    creativeOutput: "Creative Output",
+    promptCards: "Prompt Cards",
+    copy: "Copy",
+    favorite: "Favorite",
+    download: "Download",
+    share: "Share",
+  },
+};
+
 export default function HomePage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const [language, setLanguage] = useState<"zh" | "en">("zh");
   const [contentType, setContentType] = useState<ContentType>("text");
   const [selectedDimensions, setSelectedDimensions] = useState<string[]>([]);
   const [uploadUrl, setUploadUrl] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // 从 URL 读取语言设置，并监听变化
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const lang = params.get("lang");
+      if (lang === "zh" || lang === "en") {
+        setLanguage(lang);
+      }
+    }
+    
+    // 监听语言参数变化
+    const handleLangChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      const lang = params.get("lang");
+      if (lang === "zh" || lang === "en") {
+        setLanguage(lang);
+      }
+    };
+    
+    window.addEventListener("popstate", handleLangChange);
+    // 监听 pushState 触发的更新
+    const originalPushState = window.history.pushState;
+    window.history.pushState = function(...args) {
+      originalPushState.apply(window.history, args);
+      handleLangChange();
+    };
+    
+    return () => {
+      window.removeEventListener("popstate", handleLangChange);
+      window.history.pushState = originalPushState;
+    };
+  }, [pathname]);
+
+  const t = I18N[language];
   const [credits] = useState(520);
   const [cardModels, setCardModels] = useState<Record<number, Model | null>>({ 0: null, 1: null, 2: null });
   const [cardPrompts, setCardPrompts] = useState<Record<number, string>>({ 0: "", 1: "", 2: "" });
@@ -127,7 +213,7 @@ export default function HomePage() {
   const handleCopy = async () => { await navigator.clipboard.writeText(shareContent || generatedContent); setCopied(true); setTimeout(() => setCopied(false), 2000); };
   const handleDownload = () => { const blob = new Blob([shareContent || generatedContent], { type: "text/plain" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "prompt.txt"; a.click(); URL.revokeObjectURL(url); };
 
-  const contentTypes = [{ key: "text", label: "文字文档" }, { key: "image", label: "图片视觉" }, { key: "video", label: "视频解构" }, { key: "web", label: "网页设计" }];
+  const contentTypes = t.contentTypes;
   const uploadTypes = [{ key: "text", label: "文字", icon: FileText }, { key: "doc", label: "文档", icon: File }, { key: "image", label: "图片", icon: Image }, { key: "video", label: "视频", icon: Video }];
   const currentTags = TAG_OPTIONS[contentType].slice(0, 12);
   const selectedCount = Object.values(cardModels).filter(Boolean).length;
@@ -145,8 +231,8 @@ export default function HomePage() {
         </div>
         <div className="glass-card rounded-2xl p-5 mb-4">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-slate-700">上传内容</h3>
-            <span className="text-xs px-3 py-1 rounded-full bg-slate-100 text-slate-500 flex items-center gap-1.5"><Sparkles className="w-3.5 h-3.5" />AI 就绪</span>
+            <h3 className="text-sm font-semibold text-slate-700">{t.uploadContent}</h3>
+            <span className="text-xs px-3 py-1 rounded-full bg-slate-100 text-slate-500 flex items-center gap-1.5"><Sparkles className="w-3.5 h-3.5" />{t.aiReady}</span>
           </div>
           <div className="flex justify-center gap-6 mb-4">
             {uploadTypes.map((type) => (<button key={type.key} className="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-slate-50 transition-colors"><type.icon className="w-5 h-5 text-slate-400" /><span className="text-xs text-slate-500">{type.label}</span></button>))}
@@ -161,7 +247,7 @@ export default function HomePage() {
           {[0, 1, 2].map((index) => { const model = cardModels[index]; const prompt = cardPrompts[index]; const modelInfo = MODELS.find((m) => m.key === model); return (
             <div key={index} className="glass-card rounded-xl p-4 relative">
               <div className="relative" ref={dropdownRef}>
-                <button onClick={() => setOpenDropdown(openDropdown === index ? null : index)} className="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"><span className={model ? "text-slate-700 font-medium" : "text-slate-400"}>{model ? modelInfo?.name : "选择模型"}</span><ChevronDown className="w-4 h-4 text-slate-400" /></button>
+                <button onClick={() => setOpenDropdown(openDropdown === index ? null : index)} className="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"><span className={model ? "text-slate-700 font-medium" : "text-slate-400"}>{model ? modelInfo?.name : t.selectModel}</span><ChevronDown className="w-4 h-4 text-slate-400" /></button>
                 {openDropdown === index && (<div className="dropdown-menu" style={{ left: 0, right: 0 }}><div className={cn("dropdown-item", !model && "active")} onClick={() => handleCardModelSelect(index, null)}>— 未选中 —</div>{MODELS.map((m) => (<div key={m.key} className={cn("dropdown-item", model === m.key && "active")} onClick={() => handleCardModelSelect(index, m.key)}>{m.name} ({m.region})</div>))}</div>)}
               </div>
               <div className="mt-3 min-h-[70px] text-sm text-slate-600 whitespace-pre-wrap">{prompt || "等待生成..."}</div>
@@ -179,16 +265,16 @@ export default function HomePage() {
           <div className="text-xs text-slate-400 mt-2">0 字符</div>
         </div>
         <div className="flex items-center gap-4 mb-4">
-          <button onClick={handleCreativeGenerate} disabled={!selectedGenModel || isGenerating} className={cn("text-sm px-6 py-2 rounded-xl font-semibold transition-all shadow-lg bg-slate-800 text-white hover:bg-slate-900", !selectedGenModel && "opacity-50 cursor-not-allowed")}>{isGenerating ? "生成中..." : "创意生成"}</button>
+          <button onClick={handleCreativeGenerate} disabled={!selectedGenModel || isGenerating} className={cn("text-sm px-6 py-2 rounded-xl font-semibold transition-all shadow-lg bg-slate-800 text-white hover:bg-slate-900", !selectedGenModel && "opacity-50 cursor-not-allowed")}>{isGenerating ? t.generating : t.creativeGenerate}</button>
           <div className="relative" ref={dropdownRef}>
-            <button onClick={() => setOpenGenDropdown(!openGenDropdown)} className="flex items-center gap-2 px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl hover:bg-slate-50 font-medium text-slate-700">{selectedGenModel ? <>{MODELS.find(m => m.key === selectedGenModel)?.name}</> : <span className="text-slate-400">选择模型</span>}<ChevronDown className="w-4 h-4 text-slate-400" /></button>
+            <button onClick={() => setOpenGenDropdown(!openGenDropdown)} className="flex items-center gap-2 px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl hover:bg-slate-50 font-medium text-slate-700">{selectedGenModel ? <>{MODELS.find(m => m.key === selectedGenModel)?.name}</> : <span className="text-slate-400">{t.selectModel}</span>}<ChevronDown className="w-4 h-4 text-slate-400" /></button>
             {openGenDropdown && (<div className="dropdown-menu" style={{ left: 0, minWidth: '140px' }}>{MODELS.map((m) => (<div key={m.key} className={cn("dropdown-item", selectedGenModel === m.key && "active")} onClick={() => { setSelectedGenModel(m.key); setOpenGenDropdown(false); }}>{m.name}</div>))}</div>)}
           </div>
           <div className="flex items-center gap-2 text-sm"><span className="text-amber-500 font-medium">Credit</span><span className="text-slate-700 font-semibold">{credits}</span></div>
         </div>
         <div className="glass-card rounded-xl p-5">
           <div className="flex items-center justify-between mb-4"><h3 className="text-sm font-semibold text-slate-700">生成内容</h3></div>
-          <div className="min-h-[140px] bg-slate-50 rounded-xl p-4 text-sm text-slate-700 whitespace-pre-wrap mb-4">{generatedContent || "点击上方「创意生成」按钮生成内容..."}</div>
+          <div className="min-h-[140px] bg-slate-50 rounded-xl p-4 text-sm text-slate-700 whitespace-pre-wrap mb-4">{generatedContent || t.generatedPlaceholder}</div>
           <div className="flex items-center justify-end gap-3"><div className="flex gap-2">
               <button className="w-9 h-9 rounded-full bg-slate-700 hover:bg-slate-800 flex items-center justify-center text-white"><svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348z"/></svg></button>
               <button className="w-9 h-9 rounded-full bg-slate-700 hover:bg-slate-800 flex items-center justify-center text-white"><svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.05-.2-.06-.06-.16-.04-.23-.02-.1.02-1.59 1.01-4.49 2.98-.42.29-.8.43-1.14.42-.38-.01-1.1-.22-1.64-.4-.66-.23-1.19-.35-1.14-.74.02-.2.29-.41.79-.63 3.12-1.36 5.2-2.26 6.24-2.7 2.97-1.24 3.59-1.45 3.99-1.46.09 0 .28.02.41.12.11.08.14.19.16.27-.01.06.01.24 0 .38z"/></svg></button>
