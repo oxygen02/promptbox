@@ -310,7 +310,7 @@ export default function HomePage() {
               className={cn(
                 "text-base px-7 py-2.5 rounded-xl font-bold transition-all shadow-xl",
                 selectedCount > 0 && !isAnalyzing 
-                  ? "bg-gradient-to-r from-slate-700 to-slate-900 text-blue-500 hover:from-slate-800 hover:to-slate-950" 
+                  ? "bg-blue-500 hover:bg-blue-600 text-white" 
                   : "bg-slate-300 text-slate-500 cursor-not-allowed"
               )}
             >
@@ -343,7 +343,7 @@ export default function HomePage() {
               className={cn(
                 "text-base px-7 py-2.5 rounded-xl font-bold transition-all shadow-xl",
                 selectedGenModel && !isGenerating 
-                  ? "bg-gradient-to-r from-slate-700 to-slate-900 text-blue-500 hover:from-slate-800 hover:to-slate-950" 
+                  ? "bg-blue-500 hover:bg-blue-600 text-white" 
                   : "bg-slate-300 text-slate-500 cursor-not-allowed"
               )}
             >
