@@ -299,7 +299,7 @@ export default function HomePage() {
         </div>
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[0, 1, 2].map((index) => { const model = cardModels[index]; const prompt = cardPrompts[index]; const modelInfo = MODELS.find((m) => m.key === model); return (
-            <div key={index} className="glass-card rounded-xl p-4 relative">
+            <div key={index} className="glass-card rounded-xl p-4">
               <div className="relative" ref={dropdownRef}>
                 <button onClick={() => setOpenDropdown(openDropdown === index ? null : index)} className="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"><span className={model ? "text-slate-700 font-medium" : "text-slate-400"}>{model ? modelInfo?.name : t.selectModel}</span><ChevronDown className="w-4 h-4 text-slate-400" /></button>
                 {openDropdown === index && (<div className="dropdown-menu" style={{ left: 0, right: 0 }}><div className={cn("dropdown-item", !model && "active")} onClick={() => handleCardModelSelect(index, null)}>— 未选中 —</div>{MODELS.map((m) => (<div key={m.key} className={cn("dropdown-item", model === m.key && "active")} onClick={() => handleCardModelSelect(index, m.key)}>{m.name} ({m.region})</div>))}</div>)}
