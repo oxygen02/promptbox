@@ -304,17 +304,24 @@ export default function HomePage() {
         </div>
 
         <div className="flex items-center justify-between mb-3">
-          <button
-            onClick={handleAnalyze}
-            disabled={isAnalyzing || selectedCount === 0}
-            className={cn("flex items-center gap-2 text-sm px-5 py-2 rounded-lg font-medium transition-all", selectedCount > 0 && !isAnalyzing ? "bg-slate-700 text-white hover:bg-slate-800 shadow-lg" : "bg-slate-200 text-slate-400 cursor-not-allowed")}
-          >
-            {isAnalyzing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-            开始分析
-          </button>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg">
-            <Sparkles className="w-3.5 h-3.5 text-slate-500" />
-            <span className="text-sm font-medium text-slate-600">{credits}</span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleAnalyze}
+              disabled={isAnalyzing || selectedCount === 0}
+              className={cn(
+                "flex items-center gap-2 text-base px-6 py-2.5 rounded-xl font-semibold transition-all shadow-lg transform hover:scale-105",
+                selectedCount > 0 && !isAnalyzing 
+                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700" 
+                  : "bg-slate-200 text-slate-400 cursor-not-allowed"
+              )}
+            >
+              {isAnalyzing ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
+              开始分析
+            </button>
+            <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-lg">
+              <span className="text-sm font-bold text-amber-600">{credits}</span>
+              <span className="text-xs font-medium text-amber-500">Credit</span>
+            </div>
           </div>
         </div>
 
@@ -331,15 +338,24 @@ export default function HomePage() {
         </div>
 
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <button onClick={handleCreativeGenerate} disabled={!selectedGenModel || isGenerating} className={cn("flex items-center gap-2 text-sm px-5 py-2 rounded-lg font-medium transition-all", selectedGenModel && !isGenerating ? "bg-slate-700 text-white hover:bg-slate-800 shadow-lg" : "bg-slate-200 text-slate-400 cursor-not-allowed")}>
-              {isGenerating ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={handleCreativeGenerate} 
+              disabled={!selectedGenModel || isGenerating} 
+              className={cn(
+                "flex items-center gap-2 text-base px-6 py-2.5 rounded-xl font-semibold transition-all shadow-lg transform hover:scale-105",
+                selectedGenModel && !isGenerating 
+                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700" 
+                  : "bg-slate-200 text-slate-400 cursor-not-allowed"
+              )}
+            >
+              {isGenerating ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
               创意生成
             </button>
             <div className="relative" ref={dropdownRef}>
-              <button onClick={() => setOpenGenDropdown(!openGenDropdown)} className="flex items-center gap-2 px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg hover:bg-slate-50 font-medium text-slate-700">
+              <button onClick={() => setOpenGenDropdown(!openGenDropdown)} className="flex items-center gap-2 px-4 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl hover:bg-slate-50 font-semibold text-slate-700">
                 {selectedGenModel ? <>{MODELS.find(m => m.key === selectedGenModel)?.name}</> : <span className="text-slate-400">选择模型</span>}
-                <ChevronDown className="w-3 h-3 text-slate-400" />
+                <ChevronDown className="w-4 h-4 text-slate-400" />
               </button>
               {openGenDropdown && (
                 <div className="dropdown-menu" style={{ left: 0, minWidth: '140px' }}>
@@ -347,10 +363,10 @@ export default function HomePage() {
                 </div>
               )}
             </div>
-          </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg">
-            <Sparkles className="w-3.5 h-3.5 text-slate-500" />
-            <span className="text-sm font-medium text-slate-600">{credits}</span>
+            <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-lg">
+              <span className="text-sm font-bold text-amber-600">{credits}</span>
+              <span className="text-xs font-medium text-amber-500">Credit</span>
+            </div>
           </div>
         </div>
 
