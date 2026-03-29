@@ -76,7 +76,7 @@ export default function Sidebar() {
   const router = useRouter();
   const [language, setLanguage] = useState<"zh" | "en">("zh");
   const [contentType, setContentType] = useState<string>("text");
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -101,43 +101,47 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-16 bottom-0 w-[220px] glass-sidebar overflow-y-auto hidden md:block z-40">
+    <aside 
+      className={cn(
+        "fixed left-0 top-16 bottom-0 glass-sidebar overflow-hidden hidden md:block transition-all duration-300 z-40",
+        isExpanded ? "w-[200px]" : "w-[56px]"
+      )}
+      onMouseEnter={() => setIsExpanded(true)}
+      onMouseLeave={() => setIsExpanded(false)}
+    >
       <nav className="py-4">
         {navSections.map((section) => (
-          <div key={section.key} className="mb-4">
+          <div key={section.key} className="mb-3">
             {/* 一级标题 */}
-            <div className="flex items-center gap-2.5 px-4 py-2 text-sm font-semibold text-slate-800">
-              <section.icon className="w-5 h-5 text-slate-600" />
-              <span>{language === "zh" ? section.zh : section.en}</span>
+            <div className={cn(
+              "flex items-center gap-2.5 px-3 py-2 mx-2 text-sm font-semibold text-slate-800 transition-all duration-200",
+              isExpanded ? "justify-start" : "justify-center"
+            )}>
+              <section.icon className="w-5 h-5 text-slate-600 flex-shrink-0" />
+              {isExpanded && <span className="truncate">{language === "zh" ? section.zh : section.en}</span>}
             </div>
             
             {/* 二级项目 */}
-            <div className="mt-1 space-y-0.5">
+            <div className={cn(
+              "transition-all duration-200",
+              isExpanded ? "opacity-100" : "opacity-100"
+            )}>
               {section.items.map((item) => {
                 const active = isActive(item.key, item.href);
                 return (
                   <button
                     key={item.key}
                     onClick={() => handleContentClick(item.key, item.href)}
-                    onMouseEnter={() => setHoveredItem(item.key)}
-                    onMouseLeave={() => setHoveredItem(null)}
                     className={cn(
-                      "w-full flex items-center gap-2.5 px-4 py-2 text-sm rounded-lg transition-all duration-200 relative",
+                      "flex items-center gap-2.5 px-3 py-2 mx-2 text-sm rounded-lg transition-all duration-200 relative w-full",
+                      isExpanded ? "justify-start" : "justify-center",
                       active
                         ? "bg-blue-50 text-blue-600 before:absolute before:left-0 before:top-2 before:bottom-2 before:w-[3px] before:bg-blue-500 before:rounded-r"
-                        : "text-slate-600 hover:bg-slate-50",
-                      !active && hoveredItem === item.key && "bg-slate-50"
+                        : "text-slate-600 hover:bg-slate-50"
                     )}
                   >
                     <item.icon className="w-4 h-4 flex-shrink-0" />
-                    <span className="truncate">{language === "zh" ? item.zh : item.en}</span>
-                    
-                    {/* 悬停时显示完整名称（可选） */}
-                    {hoveredItem === item.key && (
-                      <span className="ml-auto text-xs text-slate-400">
-                        {language === "zh" ? item.zh : item.en}
-                      </span>
-                    )}
+                    {isExpanded && <span className="truncate">{language === "zh" ? item.zh : item.en}</span>}
                   </button>
                 );
               })}
@@ -146,17 +150,25 @@ export default function Sidebar() {
         ))}
         
         {/* 底部用户信息 */}
-        <div className="px-4 py-3 mt-6 glass-card rounded-xl mx-2">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center flex-shrink-0">
+        <div className={cn(
+          "mt-6 transition-all duration-200 overflow-hidden",
+          isExpanded ? "px-3" : "px-0"
+        )}>
+          <div className={cn(
+            "glass-card rounded-xl mx-2 flex items-center gap-3",
+            isExpanded ? "p-3" : "p-2 justify-center"
+          )}>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center flex-shrink-0">
               <User className="w-4 h-4 text-white" />
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-slate-800 truncate">
-                {language === "zh" ? "游客用户" : "Guest"}
+            {isExpanded && (
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium text-slate-800 truncate">
+                  {language === "zh" ? "游客用户" : "Guest"}
+                </div>
+                <div className="text-xs text-slate-500">Lv.1</div>
               </div>
-              <div className="text-xs text-slate-500">Lv.1</div>
-            </div>
+            )}
           </div>
         </div>
       </nav>
