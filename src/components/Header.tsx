@@ -38,19 +38,20 @@ export default function Header() {
 
           {/* Slogan + 月球动画 */}
           <div className="hidden md:flex items-center gap-2">
-            {/* 月球 - 月食效果 */}
-            <div className="relative w-7 h-7">
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-100 to-gray-300 shadow-lg">
-                {/* 陨石坑 */}
-                <div className="absolute top-1 left-1.5 w-1.5 h-1.5 rounded-full bg-gray-400/40"></div>
-                <div className="absolute top-3 left-4 w-2 h-2 rounded-full bg-gray-400/30"></div>
-                <div className="absolute top-5 left-2 w-1 h-1 rounded-full bg-gray-400/50"></div>
-                <div className="absolute top-2 right-3 w-2 h-2 rounded-full bg-gray-400/25"></div>
-                <div className="absolute bottom-3 left-3 w-1.5 h-1.5 rounded-full bg-gray-400/35"></div>
-                <div className="absolute bottom-1.5 right-4 w-1.2 h-1.2 rounded-full bg-gray-400/45"></div>
+            {/* 月球 - 转动效果 */}
+            <div className="relative w-8 h-8 overflow-hidden rounded-full bg-gradient-to-br from-gray-100 to-gray-300 shadow-lg">
+              {/* 转动的月球表面 */}
+              <div className="absolute inset-0 animate-[spin_12s_linear_infinite]">
+                {/* 陨石坑 - 分布在不同位置 */}
+                <div className="absolute top-1 left-2 w-2 h-2 rounded-full bg-gray-400/50"></div>
+                <div className="absolute top-4 left-5 w-2.5 h-2.5 rounded-full bg-gray-400/40"></div>
+                <div className="absolute top-6 left-1.5 w-1.5 h-1.5 rounded-full bg-gray-400/60"></div>
+                <div className="absolute top-2 right-4 w-2 h-2 rounded-full bg-gray-400/35"></div>
+                <div className="absolute bottom-3 left-3 w-1.8 h-1.8 rounded-full bg-gray-400/45"></div>
+                <div className="absolute bottom-5 right-2 w-1.2 h-1.2 rounded-full bg-gray-400/55"></div>
+                <div className="absolute top-5 right-6 w-1.4 h-1.4 rounded-full bg-gray-400/30"></div>
+                <div className="absolute bottom-2 left-6 w-1.6 h-1.6 rounded-full bg-gray-400/40"></div>
               </div>
-              {/* 月食阴影 - 从右向左移动 */}
-              <div className="absolute inset-0 rounded-full bg-black/30 animate-pulse"></div>
             </div>
             <span className="text-sm font-medium text-slate-700 drop-shadow-sm">创作从模仿开始</span>
           </div>
