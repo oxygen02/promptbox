@@ -36,31 +36,7 @@ export default function Header() {
             <span className="text-xs font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">Pro</span>
           </Link>
 
-          {/* 月球 + Slogan */}
-          <div className="hidden md:flex items-center gap-2">
-            {/* 3D月球球体 */}
-            <div className="relative w-9 h-9" style={{perspective: '300px'}}>
-              {/* 球体 */}
-              <div className="w-full h-full animate-[moon3D_12s_linear_infinite]" style={{transformStyle: 'preserve-3d'}}>
-                <div className="absolute inset-0 rounded-full"
-                     style={{
-                       background: 'radial-gradient(circle at 35% 35%, #f8fafc 0%, #cbd5e1 20%, #64748b 50%, #334155 80%, #1e293b 100%)',
-                       boxShadow: 'inset -6px -6px 15px rgba(0,0,0,0.5), inset 3px 3px 8px rgba(255,255,255,0.3), 0 8px 20px rgba(0,0,0,0.4)',
-                     }}>
-                  {/* 陨石坑 */}
-                  <div className="absolute top-2 left-3 w-2.5 h-2 rounded-full bg-gray-500/40" style={{boxShadow: 'inset 1px 1px 2px rgba(0,0,0,0.5)'}}></div>
-                  <div className="absolute top-5 left-6 w-3 h-2.5 rounded-full bg-gray-600/35" style={{boxShadow: 'inset 1px 1px 2px rgba(0,0,0,0.5)'}}></div>
-                  <div className="absolute top-7 left-2 w-2 h-2 rounded-full bg-gray-500/45" style={{boxShadow: 'inset 1px 1px 2px rgba(0,0,0,0.5)'}}></div>
-                  <div className="absolute top-3 right-4 w-2.5 h-2 rounded-full bg-gray-550/40" style={{boxShadow: 'inset 1px 1px 2px rgba(0,0,0,0.5)'}}></div>
-                  <div className="absolute bottom-4 left-4 w-2 h-2 rounded-full bg-gray-500/40" style={{boxShadow: 'inset 1px 1px 2px rgba(0,0,0,0.5)'}}></div>
-                  <div className="absolute bottom-2 right-5 w-1.8 h-1.8 rounded-full bg-gray-600/45" style={{boxShadow: 'inset 1px 1px 2px rgba(0,0,0,0.5)'}}></div>
-                  <div className="absolute top-6 right-2 w-1.5 h-1.5 rounded-full bg-gray-500/35" style={{boxShadow: 'inset 1px 1px 2px rgba(0,0,0,0.5)'}}></div>
-                  <div className="absolute bottom-6 left-2 w-1.8 h-1.8 rounded-full bg-gray-550/40" style={{boxShadow: 'inset 1px 1px 2px rgba(0,0,0,0.5)'}}></div>
-                </div>
-              </div>
-            </div>
-            <span className="text-lg font-medium text-slate-700 drop-shadow-sm">创作从模仿开始</span>
-          </div>
+          
         </div>
 
         {/* 导航 */}
