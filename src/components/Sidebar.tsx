@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { 
@@ -76,8 +76,6 @@ export default function Sidebar() {
   const router = useRouter();
   const [language, setLanguage] = useState<"zh" | "en">("zh");
   const [contentType, setContentType] = useState<string>("text");
-  const [isExpanded, setIsExpanded] = useState(false);
-  const sidebarRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -102,91 +100,60 @@ export default function Sidebar() {
   };
 
   return (
-    <div 
-      className="fixed left-0 top-16 bottom-0 z-40"
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
-    >
-      {/* 侧边栏 */}
-      <aside 
-        ref={sidebarRef}
-        className={cn(
-          "h-full glass-sidebar hidden md:block transition-all duration-300 ease-out",
-          isExpanded ? "w-[200px]" : "w-[56px]"
-        )}
-      >
-        <nav className="py-4 h-full overflow-hidden">
+    <>
+      {/* 透明触发层 - 覆盖整个侧边栏区域 */}
+      <div 
+        className="fixed left-0 top-16 bottom-0 w-[56px] z-40 group hover:w-[200px] transition-all duration-300"
+      />
+      
+      {/* 侧边栏 - 永远渲染，但宽度由外层控制 */}
+      <aside className="fixed left-0 top-16 bottom-0 w-[56px] hover:w-[200px] glass-sidebar hidden md:block z-30 transition-all duration-300 group-hover:w-[200px]">
+        <nav className="py-4">
           {navSections.map((section) => (
             <div key={section.key} className="mb-2">
               {/* 一级标题 */}
-              <div className={cn(
-                "flex items-center gap-2.5 px-3 py-2 mx-2 text-sm font-semibold text-slate-800 transition-all duration-300",
-                isExpanded ? "justify-start" : "justify-center"
-              )}>
-                <section.icon className={cn(
-                  "w-5 h-5 flex-shrink-0 transition-transform duration-300",
-                  isExpanded && "scale-110"
-                )} />
-                <span className={cn(
-                  "whitespace-nowrap transition-all duration-300 overflow-hidden",
-                  isExpanded ? "opacity-100 max-w-[120px]" : "opacity-0 max-w-0"
-                )}>
+              <div className="flex items-center gap-2.5 px-3 py-2 mx-2 text-sm font-semibold text-slate-800 group-hover:justify-start justify-center transition-all duration-300">
+                <section.icon className="w-5 h-5 text-slate-600 flex-shrink-0 group-hover:scale-110 scale-100 transition-transform duration-300" />
+                <span className="whitespace-nowrap overflow-hidden max-w-0 group-hover:max-w-[120px] opacity-0 group-hover:opacity-100 transition-all duration-300">
                   {language === "zh" ? section.zh : section.en}
                 </span>
               </div>
               
               {/* 二级项目 */}
-              <div className="overflow-hidden transition-all duration-300">
-                {section.items.map((item) => {
-                  const active = isActive(item.key, item.href);
-                  return (
-                    <button
-                      key={item.key}
-                      onClick={() => handleContentClick(item.key, item.href)}
-                      className={cn(
-                        "flex items-center gap-2.5 px-3 py-2 mx-2 text-sm rounded-lg transition-all duration-300 relative w-full",
-                        isExpanded ? "justify-start" : "justify-center",
-                        active
-                          ? "bg-blue-50 text-blue-600 before:absolute before:left-0 before:top-2 before:bottom-2 before:w-[3px] before:bg-blue-500 before:rounded-r"
-                          : "text-slate-600 hover:bg-slate-50"
-                      )}
-                    >
-                      <item.icon className={cn(
-                        "w-4 h-4 flex-shrink-0 transition-transform duration-300",
-                        isExpanded && "scale-110"
-                      )} />
-                      <span className={cn(
-                        "whitespace-nowrap transition-all duration-300 overflow-hidden",
-                        isExpanded ? "opacity-100 max-w-[120px]" : "opacity-0 max-w-0"
-                      )}>
-                        {language === "zh" ? item.zh : item.en}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+              {section.items.map((item) => {
+                const active = isActive(item.key, item.href);
+                return (
+                  <button
+                    key={item.key}
+                    onClick={() => handleContentClick(item.key, item.href)}
+                    className={cn(
+                      "flex items-center gap-2.5 px-3 py-2 mx-2 text-sm rounded-lg transition-all duration-300 relative w-full",
+                      "group-hover:justify-start justify-center",
+                      active
+                        ? "bg-blue-50 text-blue-600 before:absolute before:left-0 before:top-2 before:bottom-2 before:w-[3px] before:bg-blue-500 before:rounded-r"
+                        : "text-slate-600 hover:bg-slate-50"
+                    )}
+                  >
+                    <item.icon className="w-4 h-4 flex-shrink-0 group-hover:scale-110 scale-100 transition-transform duration-300" />
+                    <span className="whitespace-nowrap overflow-hidden max-w-0 group-hover:max-w-[120px] opacity-0 group-hover:opacity-100 transition-all duration-300">
+                      {language === "zh" ? item.zh : item.en}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           ))}
           
           {/* 底部用户信息 */}
-          <div className={cn(
-            "mt-6 mx-2 transition-all duration-300 overflow-hidden",
-            isExpanded ? "px-3" : "px-0"
-          )}>
+          <div className="mt-6 mx-2">
             <div className={cn(
               "glass-card rounded-xl flex items-center gap-3 transition-all duration-300",
-              isExpanded ? "p-3 justify-start" : "p-2 justify-center"
+              "group-hover:p-3 group-hover:justify-start justify-center p-2"
             )}>
-              <div className={cn(
-                "rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center flex-shrink-0 transition-all duration-300",
-                isExpanded ? "w-9 h-9" : "w-8 h-8"
-              )}>
-                <User className={cn("text-white", isExpanded ? "w-4 h-4" : "w-4 h-4")} />
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center flex-shrink-0 group-hover:w-9 group-hover:h-9 transition-all duration-300">
+                <User className="w-4 h-4 text-white" />
               </div>
-              <div className={cn(
-                "transition-all duration-300 overflow-hidden whitespace-nowrap",
-                isExpanded ? "opacity-100 max-w-[100px]" : "opacity-0 max-w-0"
-              )}>
+              <div className="whitespace-nowrap overflow-hidden max-w-0 group-hover:max-w-[100px] opacity-0 group-hover:opacity-100 transition-all duration-300">
                 <div className="text-sm font-medium text-slate-800">
                   {language === "zh" ? "游客用户" : "Guest"}
                 </div>
@@ -196,14 +163,6 @@ export default function Sidebar() {
           </div>
         </nav>
       </aside>
-      
-      {/* 悬停触发区域 - 左侧 56px */}
-      <div 
-        className={cn(
-          "absolute left-0 top-0 bottom-0 w-[56px] hover:bg-transparent",
-          !isExpanded && "cursor-pointer"
-        )}
-      />
-    </div>
+    </>
   );
 }
