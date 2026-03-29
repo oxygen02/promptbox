@@ -112,8 +112,8 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-16 bottom-0 w-[160px] glass-sidebar overflow-y-auto hidden md:block z-40 border-r border-slate-200">
-      <nav className="py-4">
+    <aside className="fixed left-0 top-16 bottom-0 w-[160px] glass-sidebar hidden md:flex flex-col z-40 border-r border-slate-200">
+      <nav className="flex-1 py-4 overflow-y-auto">
         {navSections.map((section) => (
           <div key={section.key} className="mb-4">
             {/* 一级标题 */}
@@ -142,20 +142,20 @@ export default function Sidebar() {
             })}
           </div>
         ))}
-        
-        {/* 底部用户信息 */}
-        <div className="px-4 py-3 mt-4 glass-card rounded-xl mx-2">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center flex-shrink-0">
-              <User className="w-4 h-4 text-white" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-slate-800 truncate">游客用户</div>
-              <div className="text-xs text-slate-500">Lv.1</div>
-            </div>
+      </nav>
+      
+      {/* 底部用户信息 - 固定在左下角 */}
+      <div className="px-4 py-3 border-t border-slate-200/50">
+        <div className="flex items-center gap-3 p-2 glass-card rounded-xl">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center flex-shrink-0">
+            <User className="w-4 h-4 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-medium text-slate-800 truncate">游客用户</div>
+            <div className="text-xs text-slate-500">Lv.1</div>
           </div>
         </div>
-      </nav>
+      </div>
     </aside>
   );
 }

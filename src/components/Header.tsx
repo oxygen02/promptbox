@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Sparkles, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -20,7 +20,30 @@ const navItems = [
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const [language, setLanguage] = useState<"zh" | "en">("zh");
+
+  // 从 URL 参数读取语言设置
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const lang = params.get("lang");
+      if (lang === "zh" || lang === "en") {
+        setLanguage(lang);
+      }
+    }
+  }, [pathname]);
+
+  // 切换语言并更新 URL
+  const toggleLanguage = () => {
+    const newLang = language === "zh" ? "en" : "zh";
+    setLanguage(newLang);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("lang", newLang);
+      router.push(url.toString());
+    }
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 h-16 z-50 bg-white/95 backdrop-blur-sm border-b border-slate-200/50">
@@ -70,7 +93,7 @@ export default function Header() {
         <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
           {/* 语言切换 */}
           <button
-            onClick={() => setLanguage(language === "zh" ? "en" : "zh")}
+            onClick={toggleLanguage}
             className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm text-slate-500 hover:bg-slate-100 transition-colors"
           >
             <Globe className="w-4 h-4" />
