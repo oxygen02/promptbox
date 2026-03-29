@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import {
   Upload,
   Sparkles,
@@ -58,6 +59,7 @@ export default function HomePage() {
   const [copied, setCopied] = useState(false);
   const [generatedContent, setGeneratedContent] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     // 从 URL 参数读取内容类型，实现左侧导航联动
@@ -69,8 +71,6 @@ export default function HomePage() {
       }
     }
   }, []);
-
-  useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setOpenDropdown(null);
@@ -83,6 +83,16 @@ export default function HomePage() {
 
   const handleDimensionClick = (dim: string) => {
     setSelectedDimensions((prev) => prev.includes(dim) ? prev.filter((d) => d !== dim) : [...prev, dim]);
+  };
+
+  // 同步内容类型到 URL
+  const handleContentTypeChange = (type: ContentType) => {
+    setContentType(type);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("type", type);
+      window.history.pushState({}, "", url);
+    }
   };
 
   const handleCardModelSelect = (cardIndex: number, model: Model | null) => {
@@ -131,7 +141,7 @@ export default function HomePage() {
       <div className="relative z-10">
         <div className="flex gap-2 mb-4">
           {contentTypes.map((type) => (
-            <button key={type.key} onClick={() => setContentType(type.key as ContentType)} className={cn("px-4 py-2 text-sm font-medium rounded-lg transition-all", contentType === type.key ? "bg-slate-800 text-white shadow-lg" : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300")}>{type.label}</button>
+            <button key={type.key} onClick={() => handleContentTypeChange(type.key as ContentType)} className={cn("px-4 py-2 text-sm font-medium rounded-lg transition-all", contentType === type.key ? "bg-slate-800 text-white shadow-lg" : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300")}>{type.label}</button>
           ))}
         </div>
         <div className="glass-card rounded-2xl p-5 mb-4">
