@@ -145,7 +145,6 @@ export default function HomePage() {
   const [copied, setCopied] = useState(false);
   const [generatedContent, setGeneratedContent] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
   useEffect(() => {
     // 从 URL 参数读取内容类型，实现左侧导航联动
