@@ -1,6 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useState, useEffect, useRef } from "react";
 import {
   Upload,
@@ -20,13 +19,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// 动态导入 Three.js 月球组件，禁用 SSR
-const MoonCanvas = dynamic(() => import("@/components/MoonCanvas"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse" />
-  ),
-});
+
 
 type ContentType = "text" | "image" | "video" | "web";
 type Model = "deepseek" | "kimi" | "minimax";
@@ -196,11 +189,6 @@ export default function HomePage() {
       </div>
 
       <div className="relative z-10">
-        <div className="flex items-center gap-3 mb-3">
-          <MoonCanvas size={42} />
-          <span className="text-lg font-medium text-slate-700 drop-shadow-sm">创作从模仿开始</span>
-        </div>
-
         <div className="flex gap-2 mb-3">
           {contentTypes.map((type) => (
             <button
