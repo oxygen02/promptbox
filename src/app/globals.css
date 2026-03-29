@@ -123,19 +123,16 @@ body {
   @apply bg-slate-100 text-slate-900 font-medium;
 }
 
-/* 月球动画 */
-@keyframes moon-eclipse {
-  0% { 
-    transform: translateX(100%);
-  }
-  50% {
-    transform: translateX(0%);
+/* 月球3D转动动画 */
+@keyframes moonSpin {
+  0% {
+    transform: rotateY(0deg) rotateX(5deg);
   }
   100% {
-    transform: translateX(-100%);
+    transform: rotateY(360deg) rotateX(5deg);
   }
 }
 
-.moon-shadow {
-  animation: moon-eclipse 8s ease-in-out infinite;
+.perspective-500 {
+  perspective: 500px;
 }

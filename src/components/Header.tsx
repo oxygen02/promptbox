@@ -38,19 +38,27 @@ export default function Header() {
 
           {/* Slogan + 月球动画 */}
           <div className="hidden md:flex items-center gap-2">
-            {/* 月球 - 转动效果 */}
-            <div className="relative w-8 h-8 overflow-hidden rounded-full bg-gradient-to-br from-gray-100 to-gray-300 shadow-lg">
-              {/* 转动的月球表面 */}
-              <div className="absolute inset-0 animate-[spin_12s_linear_infinite]">
-                {/* 陨石坑 - 分布在不同位置 */}
-                <div className="absolute top-1 left-2 w-2 h-2 rounded-full bg-gray-400/50"></div>
-                <div className="absolute top-4 left-5 w-2.5 h-2.5 rounded-full bg-gray-400/40"></div>
-                <div className="absolute top-6 left-1.5 w-1.5 h-1.5 rounded-full bg-gray-400/60"></div>
-                <div className="absolute top-2 right-4 w-2 h-2 rounded-full bg-gray-400/35"></div>
-                <div className="absolute bottom-3 left-3 w-1.8 h-1.8 rounded-full bg-gray-400/45"></div>
-                <div className="absolute bottom-5 right-2 w-1.2 h-1.2 rounded-full bg-gray-400/55"></div>
-                <div className="absolute top-5 right-6 w-1.4 h-1.4 rounded-full bg-gray-400/30"></div>
-                <div className="absolute bottom-2 left-6 w-1.6 h-1.6 rounded-full bg-gray-400/40"></div>
+            {/* 月球 - 3D立体转动 */}
+            <div className="relative w-10 h-10 perspective-500">
+              <div className="relative w-full h-full animate-[moonSpin_10s_linear_infinite]">
+                {/* 月球主体 */}
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-100 via-gray-200 to-gray-400 shadow-xl"
+                     style={{
+                       background: 'radial-gradient(circle at 30% 30%, #e2e8f0, #94a3b8 50%, #475569)',
+                       boxShadow: 'inset -8px -8px 20px rgba(0,0,0,0.3), inset 4px 4px 10px rgba(255,255,255,0.5), 0 4px 15px rgba(0,0,0,0.3)'
+                     }}>
+                  {/* 陨石坑 - 边缘粗糙感 */}
+                  <div className="absolute top-2 left-3 w-3 h-2.5 rounded-full bg-gray-400/60" style="box-shadow: inset 1px 1px 2px rgba(0,0,0,0.4)"></div>
+                  <div className="absolute top-5 left-7 w-4 h-3 rounded-full bg-gray-500/50" style="box-shadow: inset 1px 1px 2px rgba(0,0,0,0.4)"></div>
+                  <div className="absolute top-8 left-2 w-2 h-2 rounded-full bg-gray-400/70" style="box-shadow: inset 1px 1px 2px rgba(0,0,0,0.4)"></div>
+                  <div className="absolute top-3 right-4 w-3 h-2.5 rounded-full bg-gray-450/55" style="box-shadow: inset 1px 1px 2px rgba(0,0,0,0.4)"></div>
+                  <div className="absolute bottom-4 left-5 w-2.5 h-2 rounded-full bg-gray-400/60" style="box-shadow: inset 1px 1px 2px rgba(0,0,0,0.4)"></div>
+                  <div className="absolute bottom-2 right-5 w-2 h-2 rounded-full bg-gray-500/65" style="box-shadow: inset 1px 1px 2px rgba(0,0,0,0.4)"></div>
+                  <div className="absolute top-6 right-2 w-1.8 h-1.8 rounded-full bg-gray-400/50" style="box-shadow: inset 1px 1px 2px rgba(0,0,0,0.4)"></div>
+                  <div className="absolute bottom-6 left-2 w-1.5 h-1.5 rounded-full bg-gray-450/55" style="box-shadow: inset 1px 1px 2px rgba(0,0,0,0.4)"></div>
+                  {/* 暗部阴影 */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-transparent to-black/20"></div>
+                </div>
               </div>
             </div>
             <span className="text-lg font-medium text-slate-700 drop-shadow-sm">创作从模仿开始</span>
