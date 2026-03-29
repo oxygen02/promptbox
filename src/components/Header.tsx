@@ -53,7 +53,7 @@ export default function Header() {
                 <div className="absolute bottom-2 left-6 w-1.6 h-1.6 rounded-full bg-gray-400/40"></div>
               </div>
             </div>
-            <span className="text-sm font-medium text-slate-700 drop-shadow-sm">创作从模仿开始</span>
+            <span className="text-lg font-medium text-slate-700 drop-shadow-sm">创作从模仿开始</span>
           </div>
         </div>
 
