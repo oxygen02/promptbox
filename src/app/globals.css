@@ -123,18 +123,21 @@ body {
   @apply bg-slate-100 text-slate-900 font-medium;
 }
 
-/* 月球缓慢移动动画 - 模拟真实月球的天平动 */
-@keyframes moonLibration {
-  0%, 100% {
-    transform: translateX(0) translateY(0);
+/* 3D月球球体转动动画 */
+@keyframes moon3D {
+  0% {
+    transform: rotateY(0deg) rotateX(0deg);
   }
   25% {
-    transform: translateX(2px) translateY(-1px);
+    transform: rotateY(90deg) rotateX(5deg);
   }
   50% {
-    transform: translateX(0) translateY(-2px);
+    transform: rotateY(180deg) rotateX(0deg);
   }
   75% {
-    transform: translateX(-2px) translateY(-1px);
+    transform: rotateY(270deg) rotateX(-5deg);
+  }
+  100% {
+    transform: rotateY(360deg) rotateX(0deg);
   }
 }
