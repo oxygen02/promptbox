@@ -70,6 +70,12 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
+/* 侧边栏 */
+.glass-sidebar {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+}
+
 /* 下拉菜单 */
 .dropdown-menu {
   position: absolute;

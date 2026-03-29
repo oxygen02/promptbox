@@ -97,7 +97,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-16 bottom-0 w-[160px] glass-sidebar overflow-y-auto hidden md:block z-40">
+    <aside className="fixed left-0 top-16 bottom-0 w-[160px] glass-sidebar overflow-y-auto hidden md:block z-40 border-r border-slate-200">
       <nav className="py-4">
         {navSections.map((section) => (
           <div key={section.key} className="mb-4">

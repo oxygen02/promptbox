@@ -19,7 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 
 type ContentType = "text" | "image" | "video" | "web";
-type Model = "deepseek" | "kimi" | "minimax";
+type Model = "deepseek" | "kimi" | "minimax" | "gpt4o" | "claude" | "gemini" | "qwen" | "zhipu" | "yi" | "spark";
 
 const TAG_OPTIONS: Record<ContentType, string[]> = {
   text: ["通用创作", "ChatGPT长文本", "Claude合规", "核心观点", "文案逻辑", "短视频脚本", "PPT大纲", "营销转化", "学术润色", "代码文档", "小说续写", "公文模板"],
@@ -32,6 +32,13 @@ const MODELS: { key: Model; name: string; region: string }[] = [
   { key: "deepseek", name: "DeepSeek", region: "Global" },
   { key: "kimi", name: "Kimi", region: "CN" },
   { key: "minimax", name: "MiniMax", region: "CN" },
+  { key: "gpt4o", name: "GPT-4o", region: "Global" },
+  { key: "claude", name: "Claude 3.5", region: "Global" },
+  { key: "gemini", name: "Gemini Pro", region: "Global" },
+  { key: "qwen", name: "通义千问", region: "CN" },
+  { key: "zhipu", name: "智谱清言", region: "CN" },
+  { key: "yi", name: "Yi", region: "CN" },
+  { key: "spark", name: "讯飞星火", region: "CN" },
 ];
 
 export default function HomePage() {
@@ -51,6 +58,17 @@ export default function HomePage() {
   const [copied, setCopied] = useState(false);
   const [generatedContent, setGeneratedContent] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // 从 URL 参数读取内容类型，实现左侧导航联动
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const type = params.get("type");
+      if (type && ["text", "image", "video", "web"].includes(type)) {
+        setContentType(type as ContentType);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
