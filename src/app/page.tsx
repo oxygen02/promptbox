@@ -71,6 +71,8 @@ export default function HomePage() {
       }
     }
   }, []);
+
+  useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setOpenDropdown(null);
