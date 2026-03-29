@@ -72,6 +72,8 @@ const I18N = {
     selectModel: "选择模型",
     generating: "生成中...",
     creativeGenerate: "创意生成",
+    startAnalyze: "开始分析",
+    analyzing: "分析中...",
     generatedPlaceholder: "点击上方「创意生成」按钮生成内容...",
     promptDimensions: "提示词维度（可多选）",
     dragOrClick: "拖拽或点击上传",
@@ -104,6 +106,8 @@ const I18N = {
     selectModel: "Select Model",
     generating: "Generating...",
     creativeGenerate: "Generate",
+    startAnalyze: "Analyze",
+    analyzing: "Analyzing...",
     generatedPlaceholder: "Click 'Generate' button to create content...",
     promptDimensions: "Prompt Dimensions (Multi-select)",
     dragOrClick: "Drag or click to upload",
@@ -306,7 +310,7 @@ export default function HomePage() {
           );})}
         </div>
         <div className="flex items-center gap-4 mb-4">
-          <button onClick={handleAnalyze} disabled={isAnalyzing || selectedCount === 0} className={cn("text-sm px-6 py-2 rounded-xl font-semibold transition-all shadow-lg bg-slate-800 text-white hover:bg-slate-900", selectedCount === 0 && "opacity-50 cursor-not-allowed")}>{isAnalyzing ? "分析中..." : "开始分析"}</button>
+          <button onClick={handleAnalyze} disabled={isAnalyzing || selectedCount === 0} className={cn("text-sm px-6 py-2 rounded-xl font-semibold transition-all shadow-lg bg-slate-800 text-white hover:bg-slate-900", selectedCount === 0 && "opacity-50 cursor-not-allowed")}>{isAnalyzing ? t.analyzing : t.startAnalyze}</button>
           <div className="flex items-center gap-2 text-sm"><span className="text-amber-500 font-medium">Credit</span><span className="text-slate-700 font-semibold">{credits}</span></div>
         </div>
         <div className="glass-card rounded-xl p-4 mb-4">

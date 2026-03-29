@@ -86,6 +86,30 @@ export default function Sidebar() {
     }
   }, [pathname]);
 
+  // 监听语言变化事件
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    
+    const handleLanguageChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      const lang = params.get("lang") || "zh";
+      setLanguage(lang as "zh" | "en");
+    };
+    
+    window.addEventListener("popstate", handleLanguageChange);
+    // 监听 pushState 变化
+    const originalPushState = window.history.pushState;
+    window.history.pushState = function(...args) {
+      originalPushState.apply(window.history, args);
+      handleLanguageChange();
+    };
+    
+    return () => {
+      window.removeEventListener("popstate", handleLanguageChange);
+      window.history.pushState = originalPushState;
+    };
+  }, []);
+
   // 监听自定义事件（首页触发）
   useEffect(() => {
     if (typeof window === "undefined") return;
