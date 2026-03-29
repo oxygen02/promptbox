@@ -308,17 +308,17 @@ export default function HomePage() {
               onClick={handleAnalyze}
               disabled={isAnalyzing || selectedCount === 0}
               className={cn(
-                "text-base px-7 py-2.5 rounded-xl font-bold transition-all shadow-xl animate-pulse-glow",
+                "text-base px-7 py-2.5 rounded-xl font-bold transition-all shadow-xl",
                 selectedCount > 0 && !isAnalyzing 
-                  ? "bg-gradient-to-r from-slate-700 to-slate-900 text-white hover:from-slate-800 hover:to-slate-950" 
-                  : "bg-slate-300 text-slate-500 cursor-not-allowed animate-none"
+                  ? "bg-gradient-to-r from-slate-700 to-slate-900 text-blue-500 hover:from-slate-800 hover:to-slate-950" 
+                  : "bg-slate-300 text-slate-500 cursor-not-allowed"
               )}
             >
               {isAnalyzing ? "分析中..." : "开始分析"}
             </button>
             <div className="flex items-center gap-1">
               <span className="text-xs font-bold text-amber-500">Credit</span>
-              <span className="text-base font-bold text-slate-800">{credits}</span>
+              <span className="text-xs font-bold text-slate-800">{credits}</span>
             </div>
           </div>
         </div>
@@ -343,7 +343,7 @@ export default function HomePage() {
               className={cn(
                 "text-base px-7 py-2.5 rounded-xl font-bold transition-all shadow-xl",
                 selectedGenModel && !isGenerating 
-                  ? "bg-gradient-to-r from-slate-700 to-slate-900 text-white hover:from-slate-800 hover:to-slate-950" 
+                  ? "bg-gradient-to-r from-slate-700 to-slate-900 text-blue-500 hover:from-slate-800 hover:to-slate-950" 
                   : "bg-slate-300 text-slate-500 cursor-not-allowed"
               )}
             >
@@ -362,7 +362,7 @@ export default function HomePage() {
             </div>
             <div className="flex items-center gap-1">
               <span className="text-xs font-bold text-amber-500">Credit</span>
-              <span className="text-base font-bold text-slate-800">{credits}</span>
+              <span className="text-xs font-bold text-slate-800">{credits}</span>
             </div>
           </div>
         </div>
