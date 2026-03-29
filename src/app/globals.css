@@ -78,8 +78,7 @@ body {
 
 /* 下拉菜单 */
 .dropdown-menu {
-  position: absolute;
-  top: calc(100% + 4px);
+  position: fixed;
   z-index: 99999;
   min-width: 180px;
   background: white;
