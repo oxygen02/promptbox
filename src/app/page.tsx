@@ -17,6 +17,7 @@ import {
   Image,
   Video,
 } from "lucide-react";
+import MoonCanvas from "@/components/MoonCanvas";
 import { cn } from "@/lib/utils";
 
 type ContentType = "text" | "image" | "video" | "web";
@@ -231,40 +232,10 @@ export default function HomePage() {
 
       <div className="relative z-10">
         {/* 月球 + Slogan - 与上传内容左对齐 */}
-        <div className="flex items-center gap-2 mb-3">
-          {/* 真实3D月球球体 */}
-          <div className="relative w-10 h-10" style={{perspective: '600px'}}>
-            <div className="w-full h-full animate-[moonSphere_10s_linear_infinite]" style={{transformStyle: 'preserve-3d'}}>
-              {/* 外层球面 */}
-              <div className="absolute inset-0 rounded-full"
-                   style={{
-                     background: 'radial-gradient(circle at 35% 35%, #f1f5f9, #94a3b8 25%, #64748b 50%, #334155 75%, #1e293b 100%)',
-                     boxShadow: 'inset -10px -10px 25px rgba(0,0,0,0.7), inset 5px 5px 15px rgba(255,255,255,0.2), 0 0 20px rgba(0,0,0,0.5)',
-                   }}>
-                {/* 陨石坑层 */}
-                <div className="absolute inset-0" style={{transform: 'translateZ(1px)'}}>
-                  {/* 多个陨石坑，大小不一，模拟立体感 */}
-                  <div className="absolute top-1.5 left-2 w-2.5 h-2 rounded-full bg-gray-500/30" style={{boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.5)'}}></div>
-                  <div className="absolute top-4 left-5 w-3 h2.5 rounded-full bg-gray-600/25" style={{boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.5)'}}></div>
-                  <div className="absolute top-6 left-1.5 w-2 h-2 rounded-full bg-gray-500/35" style={{boxShadow: 'inset 1px 1px 3px rgba(0,0,0,0.5)'}}></div>
-                  <div className="absolute top-2.5 right-3 w-2.5 h-2 rounded-full bg-gray-550/30" style={{boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.5)'}}></div>
-                  <div className="absolute bottom-3.5 left-3.5 w-2 h-2 rounded-full bg-gray-500/30" style={{boxShadow: 'inset 1px 1px 3px rgba(0,0,0,0.5)'}}></div>
-                  <div className="absolute bottom-1.5 right-4 w-1.8 h-1.8 rounded-full bg-gray-600/35" style={{boxShadow: 'inset 1px 1px 3px rgba(0,0,0,0.5)'}}></div>
-                  <div className="absolute top-5 right-1.5 w-1.5 h-1.5 rounded-full bg-gray-500/25" style={{boxShadow: 'inset 1px 1px 2px rgba(0,0,0,0.5)'}}></div>
-                  <div className="absolute bottom-5 left-2 w-1.8 h-1.8 rounded-full bg-gray-550/30" style={{boxShadow: 'inset 1px 1px 3px rgba(0,0,0,0.5)'}}></div>
-                </div>
-                {/* 球体边缘光晕 */}
-                <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-white/10 via-transparent to-black/40"></div>
-              </div>
-              {/* 背面层 - 增加立体感 */}
-              <div className="absolute inset-0 rounded-full"
-                   style={{
-                     background: 'radial-gradient(circle at 50% 50%, #1e293b, #0f172a)',
-                     transform: 'translateZ(-5px)',
-                     opacity: 0.3,
-                   }}>
-              </div>
-            </div>
+        <div className="flex items-center gap-3 mb-3">
+          {/* 真实3D月球 - Three.js WebGL */}
+          <div className="flex-shrink-0">
+            <MoonCanvas size={42} />
           </div>
           <span className="text-lg font-medium text-slate-700 drop-shadow-sm">创作从模仿开始</span>
         </div>
