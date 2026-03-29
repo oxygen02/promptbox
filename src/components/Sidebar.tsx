@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { 
@@ -76,6 +76,8 @@ export default function Sidebar() {
   const router = useRouter();
   const [language, setLanguage] = useState<"zh" | "en">("zh");
   const [contentType, setContentType] = useState<string>("text");
+  const [hover, setHover] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -99,70 +101,93 @@ export default function Sidebar() {
     return contentType === key && pathname === "/";
   };
 
+  const expanded = hover;
+
   return (
-    <>
-      {/* 透明触发层 - 覆盖整个侧边栏区域 */}
-      <div 
-        className="fixed left-0 top-16 bottom-0 w-[56px] z-40 group hover:w-[200px] transition-all duration-300"
-      />
-      
-      {/* 侧边栏 - 永远渲染，但宽度由外层控制 */}
-      <aside className="fixed left-0 top-16 bottom-0 w-[56px] hover:w-[200px] glass-sidebar hidden md:block z-30 transition-all duration-300 group-hover:w-[200px]">
-        <nav className="py-4">
-          {navSections.map((section) => (
-            <div key={section.key} className="mb-2">
-              {/* 一级标题 */}
-              <div className="flex items-center gap-2.5 px-3 py-2 mx-2 text-sm font-semibold text-slate-800 group-hover:justify-start justify-center transition-all duration-300">
-                <section.icon className="w-5 h-5 text-slate-600 flex-shrink-0 group-hover:scale-110 scale-100 transition-transform duration-300" />
-                <span className="whitespace-nowrap overflow-hidden max-w-0 group-hover:max-w-[120px] opacity-0 group-hover:opacity-100 transition-all duration-300">
+    <div 
+      ref={sidebarRef}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      className={cn(
+        "fixed left-0 top-16 bottom-0 glass-sidebar hidden md:block z-40 transition-all duration-300 ease-out",
+        expanded ? "w-[200px]" : "w-[56px]"
+      )}
+    >
+      <nav className="py-4">
+        {navSections.map((section) => (
+          <div key={section.key} className="mb-2">
+            {/* 一级标题 */}
+            <div className={cn(
+              "flex items-center gap-2.5 px-3 py-2 mx-2 text-sm font-semibold text-slate-800 transition-all duration-300",
+              expanded ? "justify-start" : "justify-center"
+            )}>
+              <section.icon className={cn(
+                "w-5 h-5 flex-shrink-0 transition-transform duration-300",
+                expanded && "scale-110"
+              )} />
+              {expanded && (
+                <span className="whitespace-nowrap">
                   {language === "zh" ? section.zh : section.en}
                 </span>
-              </div>
-              
-              {/* 二级项目 */}
-              {section.items.map((item) => {
-                const active = isActive(item.key, item.href);
-                return (
-                  <button
-                    key={item.key}
-                    onClick={() => handleContentClick(item.key, item.href)}
-                    className={cn(
-                      "flex items-center gap-2.5 px-3 py-2 mx-2 text-sm rounded-lg transition-all duration-300 relative w-full",
-                      "group-hover:justify-start justify-center",
-                      active
-                        ? "bg-blue-50 text-blue-600 before:absolute before:left-0 before:top-2 before:bottom-2 before:w-[3px] before:bg-blue-500 before:rounded-r"
-                        : "text-slate-600 hover:bg-slate-50"
-                    )}
-                  >
-                    <item.icon className="w-4 h-4 flex-shrink-0 group-hover:scale-110 scale-100 transition-transform duration-300" />
-                    <span className="whitespace-nowrap overflow-hidden max-w-0 group-hover:max-w-[120px] opacity-0 group-hover:opacity-100 transition-all duration-300">
+              )}
+            </div>
+            
+            {/* 二级项目 */}
+            {section.items.map((item) => {
+              const active = isActive(item.key, item.href);
+              return (
+                <button
+                  key={item.key}
+                  onClick={() => handleContentClick(item.key, item.href)}
+                  className={cn(
+                    "flex items-center gap-2.5 px-3 py-2 mx-2 text-sm rounded-lg transition-all duration-300 relative w-full",
+                    expanded ? "justify-start" : "justify-center",
+                    active
+                      ? "bg-blue-50 text-blue-600 before:absolute before:left-0 before:top-2 before:bottom-2 before:w-[3px] before:bg-blue-500 before:rounded-r"
+                      : "text-slate-600 hover:bg-slate-50"
+                  )}
+                >
+                  <item.icon className={cn(
+                    "w-4 h-4 flex-shrink-0 transition-transform duration-300",
+                    expanded && "scale-110"
+                  )} />
+                  {expanded && (
+                    <span className="whitespace-nowrap">
                       {language === "zh" ? item.zh : item.en}
                     </span>
-                  </button>
-                );
-              })}
-            </div>
-          ))}
-          
-          {/* 底部用户信息 */}
-          <div className="mt-6 mx-2">
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        ))}
+        
+        {/* 底部用户信息 */}
+        <div className={cn(
+          "mt-6 mx-2 transition-all duration-300",
+          expanded ? "px-3" : "px-0"
+        )}>
+          <div className={cn(
+            "glass-card rounded-xl flex items-center gap-3 transition-all duration-300",
+            expanded ? "p-3 justify-start" : "p-2 justify-center"
+          )}>
             <div className={cn(
-              "glass-card rounded-xl flex items-center gap-3 transition-all duration-300",
-              "group-hover:p-3 group-hover:justify-start justify-center p-2"
+              "rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center flex-shrink-0 transition-all duration-300",
+              expanded ? "w-9 h-9" : "w-8 h-8"
             )}>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center flex-shrink-0 group-hover:w-9 group-hover:h-9 transition-all duration-300">
-                <User className="w-4 h-4 text-white" />
-              </div>
-              <div className="whitespace-nowrap overflow-hidden max-w-0 group-hover:max-w-[100px] opacity-0 group-hover:opacity-100 transition-all duration-300">
+              <User className="text-white w-4 h-4" />
+            </div>
+            {expanded && (
+              <div className="whitespace-nowrap">
                 <div className="text-sm font-medium text-slate-800">
                   {language === "zh" ? "游客用户" : "Guest"}
                 </div>
                 <div className="text-xs text-slate-500">Lv.1</div>
               </div>
-            </div>
+            )}
           </div>
-        </nav>
-      </aside>
-    </>
+        </div>
+      </nav>
+    </div>
   );
 }
