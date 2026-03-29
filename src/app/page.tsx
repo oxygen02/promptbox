@@ -222,7 +222,7 @@ export default function HomePage() {
   const selectedCount = Object.values(cardModels).filter(Boolean).length;
 
   return (
-    <div className="max-w-5xl mx-auto pb-8 relative">
+    <div className="max-w-4xl mx-auto pb-8 relative">
       {/* 动态背景 */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-20 -left-32 w-96 h-96 bg-gradient-to-br from-slate-200/40 to-transparent rounded-full blur-3xl animate-pulse" />
