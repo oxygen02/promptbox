@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
 import {
   Upload,
   Sparkles,
@@ -15,7 +14,6 @@ import {
   RefreshCw,
   CheckCircle,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type ContentType = "text" | "image" | "video" | "web";
@@ -30,12 +28,11 @@ const TAG_OPTIONS: Record<ContentType, string[]> = {
 };
 
 const MODELS: { key: Model; name: string; nameEn: string; region: string; color: string }[] = [
-  { key: "deepseek", name: "DeepSeek", nameEn: "DeepSeek", region: "全球", color: "bg-blue-500" },
-  { key: "kimi", name: "Kimi", nameEn: "Kimi", region: "国内", color: "bg-indigo-500" },
-  { key: "minimax", name: "MiniMax", nameEn: "MiniMax", region: "国内", color: "bg-purple-500" },
+  { key: "deepseek", name: "DeepSeek", nameEn: "DeepSeek", region: "Global", color: "bg-blue-500" },
+  { key: "kimi", name: "Kimi", nameEn: "Kimi", region: "CN", color: "bg-indigo-500" },
+  { key: "minimax", name: "MiniMax", nameEn: "MiniMax", region: "CN", color: "bg-purple-500" },
 ];
 
-// 社交平台配置
 const SOCIAL_PLATFORMS = {
   zh: [
     { key: "wechat", name: "微信", icon: "💬", color: "bg-green-500" },
@@ -50,50 +47,49 @@ const SOCIAL_PLATFORMS = {
 };
 
 export default function HomePage() {
-  const searchParams = useSearchParams();
   const [language, setLanguage] = useState<Language>("zh");
-  const [contentType, setContentType] = useState<ContentType>((searchParams.get("type") as ContentType) || "text");
+  const [contentType, setContentType] = useState<ContentType>("text");
   const [selectedDimensions, setSelectedDimensions] = useState<string[]>([]);
-  const [uploadContent, setUploadContent] = useState("");
   const [uploadUrl, setUploadUrl] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [credits, setCredits] = useState(520);
 
-  // 每个卡片的模型选择
   const [cardModels, setCardModels] = useState<Record<number, Model | null>>({
     0: null,
     1: null,
     2: null,
   });
 
-  // 每个卡片的提示词
   const [cardPrompts, setCardPrompts] = useState<Record<number, string>>({
     0: "",
     1: "",
     2: "",
   });
 
-  // 下拉菜单状态
   const [openDropdown, setOpenDropdown] = useState<number | null>(null);
   const [openGenDropdown, setOpenGenDropdown] = useState(false);
-
-  // 选中的生成模型
   const [selectedGenModel, setSelectedGenModel] = useState<Model | null>(null);
 
-  // 社交分享弹窗
   const [showShare, setShowShare] = useState(false);
   const [sharePrompt, setSharePrompt] = useState("");
   const [copied, setCopied] = useState(false);
 
+  // 生成的内容
+  const [generatedContent, setGeneratedContent] = useState("");
+
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const type = searchParams.get("type") as ContentType;
-    if (type && ["text", "image", "video", "web"].includes(type)) {
-      setContentType(type);
+    // 从URL读取type参数
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const type = params.get("type");
+      if (type && ["text", "image", "video", "web"].includes(type)) {
+        setContentType(type as ContentType);
+      }
     }
-  }, [searchParams]);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -118,19 +114,17 @@ export default function HomePage() {
   };
 
   const handleAnalyze = async () => {
-    if (!uploadContent && !uploadUrl) return;
-    
     const selectedCount = Object.values(cardModels).filter(Boolean).length;
     if (selectedCount === 0) return;
 
     setIsAnalyzing(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
     const newPrompts: Record<number, string> = {};
     Object.entries(cardModels).forEach(([index, model]) => {
       if (model) {
         const modelInfo = MODELS.find((m) => m.key === model);
-        newPrompts[Number(index)] = `【${modelInfo?.name}】基于上传的${contentType === 'text' ? '文字内容' : contentType === 'image' ? '图片' : contentType === 'video' ? '视频' : '网页'}，请分析：${selectedDimensions.join('、')}。生成专业提示词。`;
+        newPrompts[Number(index)] = `【${modelInfo?.name}】分析维度：${selectedDimensions.join('、')}。生成专业提示词内容...`;
       }
     });
 
@@ -142,7 +136,8 @@ export default function HomePage() {
   const handleCreativeGenerate = async () => {
     if (!selectedGenModel) return;
     setIsGenerating(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setGeneratedContent(`基于选择的模型 ${MODELS.find(m => m.key === selectedGenModel)?.name}，生成的内容将显示在这里...\n\n这是一段示例生成内容，包含了根据提示词AI生成的实际内容展示。`);
     setIsGenerating(false);
   };
 
@@ -169,14 +164,15 @@ export default function HomePage() {
   };
 
   const contentTypes = [
-    { key: "text", label: "文字文档", icon: "📄" },
-    { key: "image", label: "图片视觉", icon: "🖼️" },
-    { key: "video", label: "视频解构", icon: "🎬" },
-    { key: "web", label: "网页设计", icon: "🌐" },
+    { key: "text", label: "文字文档" },
+    { key: "image", label: "图片视觉" },
+    { key: "video", label: "视频解构" },
+    { key: "web", label: "网页设计" },
   ];
 
   const currentTags = TAG_OPTIONS[contentType];
   const socialPlatforms = SOCIAL_PLATFORMS[language];
+  const selectedCount = Object.values(cardModels).filter(Boolean).length;
 
   return (
     <div className="max-w-5xl mx-auto pb-8">
@@ -187,54 +183,62 @@ export default function HomePage() {
             key={type.key}
             onClick={() => setContentType(type.key as ContentType)}
             className={cn(
-              "px-2.5 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center gap-1.5",
+              "px-3 py-1.5 text-xs font-medium rounded-lg transition-all",
               contentType === type.key
                 ? "bg-slate-700 text-white"
                 : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300"
             )}
           >
-            <span>{type.icon}</span>
             {type.label}
           </button>
         ))}
       </div>
 
-      {/* 上传内容（紧凑） */}
+      {/* 上传内容 */}
       <div className="glass-card rounded-xl p-3 mb-3">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-semibold text-slate-700">{language === "zh" ? "上传内容" : "Upload"}</h3>
+          <h3 className="text-sm font-semibold text-slate-700">上传内容</h3>
           <span className="text-xs px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 flex items-center gap-1">
             <Sparkles className="w-2.5 h-2.5" />
             AI
           </span>
         </div>
 
-        <div className="flex gap-2 mb-2">
-          <div className="upload-zone flex-1 py-3">
-            <Upload className="w-4 h-4 mx-auto text-slate-400 mb-1" />
-            <p className="text-xs text-slate-400">{language === "zh" ? "拖拽上传" : "Upload"}</p>
+        <div className="flex gap-2 mb-3">
+          {/* 拖拽上传 - 居中 */}
+          <div className="flex-1">
+            <div className="upload-zone py-4 h-full flex flex-col items-center justify-center min-h-[80px]">
+              <Upload className="w-5 h-5 text-slate-400 mb-1" />
+              <p className="text-xs text-slate-400">拖拽或点击上传文件</p>
+              <input type="file" className="hidden" id="file-upload" />
+            </div>
           </div>
-          <input
-            type="text"
-            placeholder={language === "zh" ? "或链接..." : "Or URL..."}
-            value={uploadUrl}
-            onChange={(e) => setUploadUrl(e.target.value)}
-            className="input-field flex-1 text-xs py-2"
-          />
+          
+          {/* URL输入 */}
+          <div className="flex-1">
+            <input
+              type="text"
+              placeholder="请输入网页链接 URL"
+              value={uploadUrl}
+              onChange={(e) => setUploadUrl(e.target.value)}
+              className="input-field w-full text-xs py-3"
+            />
+          </div>
         </div>
 
-        {/* 分析维度 */}
+        {/* 提示词维度 */}
         <div>
-          <div className="flex flex-wrap gap-1">
+          <h4 className="text-xs font-medium text-slate-500 mb-2">提示词维度：</h4>
+          <div className="flex flex-wrap gap-1.5">
             {currentTags.slice(0, 6).map((tag) => (
               <button
                 key={tag}
                 onClick={() => handleDimensionClick(tag)}
                 className={cn(
-                  "px-1.5 py-0.5 text-xs rounded transition-all",
+                  "px-2 py-1 text-xs rounded transition-all",
                   selectedDimensions.includes(tag)
                     ? "bg-blue-500 text-white"
-                    : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 )}
               >
                 {tag}
@@ -253,14 +257,13 @@ export default function HomePage() {
 
           return (
             <div key={index} className="glass-card rounded-xl p-2.5 relative">
-              {/* 模型选择下拉 */}
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setOpenDropdown(openDropdown === index ? null : index)}
                   className="w-full flex items-center justify-between px-2 py-1.5 text-xs bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
                 >
-                  <span className={model ? `text-slate-700` : `text-slate-400`}>
-                    {model ? modelInfo?.name : (language === "zh" ? "选择模型" : "Select model")}
+                  <span className={model ? "text-slate-700" : "text-slate-400"}>
+                    {model ? modelInfo?.name : "选择模型"}
                   </span>
                   <ChevronDown className="w-3 h-3 text-slate-400" />
                 </button>
@@ -271,7 +274,7 @@ export default function HomePage() {
                       className={cn("dropdown-item", !model && "active")}
                       onClick={() => handleCardModelSelect(index, null)}
                     >
-                      {language === "zh" ? "— 未选中 —" : "— None —"}
+                      — 未选中 —
                     </div>
                     {MODELS.map((m) => (
                       <div
@@ -280,19 +283,17 @@ export default function HomePage() {
                         onClick={() => handleCardModelSelect(index, m.key)}
                       >
                         <span className={cn("w-2 h-2 rounded-full inline-block mr-2", m.color)} />
-                        {language === "zh" ? m.name : m.nameEn} ({m.region})
+                        {m.name} ({m.region})
                       </div>
                     ))}
                   </div>
                 )}
               </div>
 
-              {/* 提示词内容 */}
               <div className="mt-2 min-h-[60px] text-xs text-slate-600 whitespace-pre-wrap">
-                {prompt || (language === "zh" ? "等待生成..." : "Waiting...")}
+                {prompt || "等待生成..."}
               </div>
 
-              {/* 操作按钮 */}
               {prompt && (
                 <div className="flex items-center gap-1 mt-2 pt-2 border-t border-slate-100">
                   <button onClick={() => handleShare(prompt)} className="p-1 hover:bg-slate-100 rounded">
@@ -315,11 +316,11 @@ export default function HomePage() {
       <div className="flex items-center gap-2 mb-3">
         <button
           onClick={handleAnalyze}
-          disabled={isAnalyzing || (!uploadContent && !uploadUrl) || !Object.values(cardModels).some(Boolean)}
+          disabled={isAnalyzing || selectedCount === 0}
           className="btn-primary flex items-center gap-1.5 text-xs px-3 py-1.5"
         >
           {isAnalyzing ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-          {language === "zh" ? "开始分析" : "Analyze"}
+          开始分析
         </button>
         <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 border border-amber-200 rounded">
           <Sparkles className="w-3 h-3 text-amber-500" />
@@ -330,7 +331,7 @@ export default function HomePage() {
       {/* 提示词编辑框 */}
       <div className="glass-card rounded-xl p-3 mb-3">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-semibold text-slate-700">{language === "zh" ? "提示词编辑" : "Edit Prompt"}</h3>
+          <h3 className="text-sm font-semibold text-slate-700">提示词编辑</h3>
           <div className="flex gap-1">
             <button className="text-xs px-2 py-1 bg-slate-100 rounded hover:bg-slate-200 flex items-center gap-1">
               <Copy className="w-3 h-3" />
@@ -342,14 +343,24 @@ export default function HomePage() {
         </div>
         <textarea
           className="input-field min-h-[80px] resize-none text-xs"
-          placeholder={language === "zh" ? "编辑提示词..." : "Edit prompt..."}
+          placeholder="编辑提示词..."
         />
-        <div className="text-xs text-slate-400 mt-1">0 {language === "zh" ? "字符" : "chars"}</div>
+        <div className="text-xs text-slate-400 mt-1">0 字符</div>
       </div>
 
-      {/* 创意生成 */}
-      <div className="glass-card rounded-xl p-3">
+      {/* 创意生成 + 模型选择 */}
+      <div className="glass-card rounded-xl p-3 mb-3">
         <div className="flex items-center gap-2">
+          {/* 创意生成按钮 */}
+          <button
+            onClick={handleCreativeGenerate}
+            disabled={!selectedGenModel || isGenerating}
+            className="btn-primary flex items-center gap-1.5 text-xs px-3 py-1.5"
+          >
+            {isGenerating ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+            创意生成
+          </button>
+
           {/* 模型选择下拉 */}
           <div className="relative" ref={dropdownRef}>
             <button
@@ -362,7 +373,7 @@ export default function HomePage() {
                   {MODELS.find(m => m.key === selectedGenModel)?.name}
                 </>
               ) : (
-                <span className="text-slate-400">{language === "zh" ? "选择模型" : "Select"}</span>
+                <span className="text-slate-400">选择模型</span>
               )}
               <ChevronDown className="w-3 h-3 text-slate-400" />
             </button>
@@ -376,36 +387,46 @@ export default function HomePage() {
                     onClick={() => { setSelectedGenModel(m.key); setOpenGenDropdown(false); }}
                   >
                     <span className={cn("w-2 h-2 rounded-full inline-block mr-2", m.color)} />
-                    {language === "zh" ? m.name : m.nameEn}
+                    {m.name}
                   </div>
                 ))}
               </div>
             )}
           </div>
-
-          <button
-            onClick={handleCreativeGenerate}
-            disabled={!selectedGenModel || isGenerating}
-            className="btn-primary flex items-center gap-1.5 text-xs px-3 py-1.5"
-          >
-            {isGenerating ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-            {language === "zh" ? "创意生成" : "Generate"}
-          </button>
         </div>
       </div>
+
+      {/* 生成内容输出框 */}
+      {generatedContent && (
+        <div className="glass-card rounded-xl p-3">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-semibold text-slate-700">生成内容</h3>
+            <div className="flex items-center gap-1">
+              <button onClick={() => handleShare(generatedContent)} className="p-1.5 hover:bg-slate-100 rounded">
+                <Share2 className="w-3.5 h-3.5 text-slate-400" />
+              </button>
+              <button className="p-1.5 hover:bg-slate-100 rounded">
+                <Download className="w-3.5 h-3.5 text-slate-400" />
+              </button>
+            </div>
+          </div>
+          <div className="min-h-[120px] bg-slate-50 rounded-lg p-3 text-xs text-slate-600 whitespace-pre-wrap">
+            {generatedContent}
+          </div>
+        </div>
+      )}
 
       {/* 社交分享弹窗 */}
       {showShare && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowShare(false)}>
           <div className="glass-card rounded-xl p-4 w-80" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-slate-700">{language === "zh" ? "分享" : "Share"}</h3>
+              <h3 className="text-sm font-semibold text-slate-700">分享</h3>
               <button onClick={() => setShowShare(false)} className="p-1 hover:bg-slate-100 rounded">
                 <X className="w-4 h-4 text-slate-400" />
               </button>
             </div>
 
-            {/* 社交平台 */}
             <div className="flex justify-center gap-3 mb-4">
               {socialPlatforms.map((platform) => (
                 <button
@@ -417,21 +438,20 @@ export default function HomePage() {
               ))}
             </div>
 
-            {/* 复制/下载 */}
             <div className="flex gap-2">
               <button
                 onClick={handleCopy}
                 className="flex-1 btn-secondary flex items-center justify-center gap-1 text-xs py-2"
               >
                 {copied ? <CheckCircle className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
-                {copied ? (language === "zh" ? "已复制" : "Copied") : (language === "zh" ? "复制" : "Copy")}
+                {copied ? "已复制" : "复制"}
               </button>
               <button
                 onClick={handleDownload}
                 className="flex-1 btn-secondary flex items-center justify-center gap-1 text-xs py-2"
               >
                 <Download className="w-3 h-3" />
-                {language === "zh" ? "下载" : "Download"}
+                下载
               </button>
             </div>
           </div>
