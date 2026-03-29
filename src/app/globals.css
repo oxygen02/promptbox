@@ -174,3 +174,17 @@ body {
 .animate-pulse-glow.violet {
   animation: pulse-glow-violet 2s ease-in-out infinite;
 }
+
+/* 按钮呼吸动画 - 深灰色版本 */
+@keyframes pulse-glow-gray {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(30, 41, 59, 0.4), 0 0 30px rgba(30, 41, 59, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(30, 41, 59, 0.6), 0 0 50px rgba(30, 41, 59, 0.3);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow-gray 2s ease-in-out infinite;
+}

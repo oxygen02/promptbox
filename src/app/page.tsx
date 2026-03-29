@@ -310,15 +310,15 @@ export default function HomePage() {
               className={cn(
                 "text-base px-7 py-2.5 rounded-xl font-bold transition-all shadow-xl animate-pulse-glow",
                 selectedCount > 0 && !isAnalyzing 
-                  ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700" 
+                  ? "bg-gradient-to-r from-slate-700 to-slate-900 text-white hover:from-slate-800 hover:to-slate-950" 
                   : "bg-slate-300 text-slate-500 cursor-not-allowed animate-none"
               )}
             >
               {isAnalyzing ? "分析中..." : "开始分析"}
             </button>
-            <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-amber-100 to-yellow-100 border-2 border-amber-400 rounded-lg shadow-sm">
-              <span className="text-xs font-bold text-amber-700">Credit</span>
-              <span className="text-base font-bold text-amber-600">{credits}</span>
+            <div className="flex items-center gap-1">
+              <span className="text-xs font-bold text-amber-500">Credit</span>
+              <span className="text-base font-bold text-slate-800">{credits}</span>
             </div>
           </div>
         </div>
@@ -341,10 +341,10 @@ export default function HomePage() {
               onClick={handleCreativeGenerate} 
               disabled={!selectedGenModel || isGenerating} 
               className={cn(
-                "text-base px-7 py-2.5 rounded-xl font-bold transition-all shadow-xl animate-pulse-glow",
+                "text-base px-7 py-2.5 rounded-xl font-bold transition-all shadow-xl",
                 selectedGenModel && !isGenerating 
-                  ? "bg-gradient-to-r from-violet-500 to-violet-600 text-white hover:from-violet-600 hover:to-violet-700" 
-                  : "bg-slate-300 text-slate-500 cursor-not-allowed animate-none"
+                  ? "bg-gradient-to-r from-slate-700 to-slate-900 text-white hover:from-slate-800 hover:to-slate-950" 
+                  : "bg-slate-300 text-slate-500 cursor-not-allowed"
               )}
             >
               {isGenerating ? "生成中..." : "创意生成"}
@@ -360,9 +360,9 @@ export default function HomePage() {
                 </div>
               )}
             </div>
-            <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-amber-100 to-yellow-100 border-2 border-amber-400 rounded-lg shadow-sm">
-              <span className="text-xs font-bold text-amber-700">Credit</span>
-              <span className="text-base font-bold text-amber-600">{credits}</span>
+            <div className="flex items-center gap-1">
+              <span className="text-xs font-bold text-amber-500">Credit</span>
+              <span className="text-base font-bold text-slate-800">{credits}</span>
             </div>
           </div>
         </div>
