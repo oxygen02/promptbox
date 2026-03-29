@@ -116,7 +116,7 @@ export default function Sidebar() {
                   onClick={() => handleContentClick(item.key, item.href)}
                   className={`w-full flex items-center gap-2 px-3 py-1.5 text-xs transition-all duration-200 relative ${
                     active
-                      ? "bg-emerald-50 text-emerald-600 before:absolute before:left-0 before:top-1 before:bottom-1 before:w-[2px] before:bg-emerald-500 before:rounded-r"
+                      ? "bg-slate-100 text-slate-900 before:absolute before:left-0 before:top-1 before:bottom-1 before:w-[2px] before:bg-slate-700 before:rounded-r"
                       : "text-slate-500 hover:bg-slate-50"
                   }`}
                 >
@@ -131,7 +131,7 @@ export default function Sidebar() {
         {/* 底部用户信息 */}
         <div className="px-3 py-2 mt-4 glass-card rounded-lg mx-2">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center flex-shrink-0">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center flex-shrink-0">
               <User className="w-3.5 h-3.5 text-white" />
             </div>
             <div className="flex-1 min-w-0">

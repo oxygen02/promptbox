@@ -27,22 +27,24 @@ const TAG_OPTIONS: Record<ContentType, string[]> = {
   web: ["V0建站", "Framed网页", "结构组件", "设计配色", "交互逻辑", "React组件", "响应式适配", "SEO优化", "Landing Page", "组件库"],
 };
 
-const MODELS: { key: Model; name: string; nameEn: string; region: string; color: string; textColor: string }[] = [
-  { key: "deepseek", name: "DeepSeek", nameEn: "DeepSeek", region: "Global", color: "bg-emerald-500", textColor: "text-emerald-500" },
-  { key: "kimi", name: "Kimi", nameEn: "Kimi", region: "CN", color: "bg-rose-500", textColor: "text-rose-500" },
-  { key: "minimax", name: "MiniMax", nameEn: "MiniMax", region: "CN", color: "bg-orange-500", textColor: "text-orange-500" },
+const MODELS: { key: Model; name: string; region: string }[] = [
+  { key: "deepseek", name: "DeepSeek", region: "Global" },
+  { key: "kimi", name: "Kimi", region: "CN" },
+  { key: "minimax", name: "MiniMax", region: "CN" },
 ];
 
+// 社交平台 - 使用原生UI图标
 const SOCIAL_PLATFORMS = {
   zh: [
-    { key: "wechat", name: "微信", icon: "💬", color: "bg-green-500 hover:bg-green-600" },
-    { key: "weibo", name: "微博", icon: "🌐", color: "bg-red-500 hover:bg-red-600" },
-    { key: "douyin", name: "抖音", icon: "🎵", color: "bg-black hover:bg-gray-800" },
+    { key: "wechat", name: "微信", icon: "V", color: "bg-green-500 hover:bg-green-600", bg: "bg-green-100", text: "text-green-600" },
+    { key: "xiaohongshu", name: "小红书", icon: "R", color: "bg-red-500 hover:bg-red-600", bg: "bg-red-100", text: "text-red-600" },
+    { key: "douyin", name: "抖音", icon: "D", color: "bg-gray-800 hover:bg-gray-900", bg: "bg-gray-100", text: "text-gray-600" },
   ],
   en: [
-    { key: "twitter", name: "Twitter/X", icon: "𝕏", color: "bg-black hover:bg-gray-800" },
-    { key: "facebook", name: "Facebook", icon: "f", color: "bg-blue-600 hover:bg-blue-700" },
-    { key: "instagram", name: "Instagram", icon: "📷", color: "bg-pink-500 hover:bg-pink-600" },
+    { key: "youtube", name: "YouTube", icon: "▶", color: "bg-red-600 hover:bg-red-700", bg: "bg-red-100", text: "text-red-600" },
+    { key: "tiktok", name: "TikTok", icon: "♪", color: "bg-gray-800 hover:bg-gray-900", bg: "bg-gray-100", text: "text-gray-600" },
+    { key: "facebook", name: "Facebook", icon: "f", color: "bg-blue-600 hover:bg-blue-700", bg: "bg-blue-100", text: "text-blue-600" },
+    { key: "linkedin", name: "LinkedIn", icon: "in", color: "bg-blue-700 hover:bg-blue-800", bg: "bg-blue-100", text: "text-blue-700" },
   ],
 };
 
@@ -141,7 +143,7 @@ export default function HomePage() {
 2. 正文内容：xxx
 3. 结尾引导：xxx
 
-这是一段AI生成的创意内容示例，展示了根据提示词进行二次创作的能力。`;
+这是一段AI生成的创意内容示例。`;
     
     setGeneratedContent(content);
     setCredits((prev) => Math.max(0, prev - 10));
@@ -206,7 +208,7 @@ export default function HomePage() {
       <div className="glass-card rounded-xl p-3 mb-3">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-semibold text-slate-700">上传内容</h3>
-          <span className="text-xs px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 flex items-center gap-1">
+          <span className="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 flex items-center gap-1">
             <Sparkles className="w-2.5 h-2.5" />
             AI
           </span>
@@ -232,7 +234,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* 提示词维度 - 两行布局 */}
+        {/* 提示词维度 */}
         <div>
           <h4 className="text-xs font-medium text-slate-500 mb-2">提示词维度：</h4>
           <div className="grid grid-cols-5 gap-1.5">
@@ -243,8 +245,8 @@ export default function HomePage() {
                 className={cn(
                   "px-2 py-1.5 text-xs rounded transition-all text-center",
                   selectedDimensions.includes(tag)
-                    ? "bg-emerald-500 text-white font-medium"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:border-slate-300 border border-transparent"
+                    ? "bg-slate-700 text-white font-medium"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-transparent"
                 )}
               >
                 {tag}
@@ -288,7 +290,6 @@ export default function HomePage() {
                         className={cn("dropdown-item", model === m.key && "active")}
                         onClick={() => handleCardModelSelect(index, m.key)}
                       >
-                        <span className={cn("w-2 h-2 rounded-full inline-block mr-2", m.color)} />
                         {m.name} ({m.region})
                       </div>
                     ))}
@@ -326,16 +327,16 @@ export default function HomePage() {
           className={cn(
             "flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg font-medium transition-all",
             selectedCount > 0 && !isAnalyzing
-              ? "bg-emerald-500 text-white hover:bg-emerald-600 shadow-md"
-              : "bg-slate-300 text-slate-500 cursor-not-allowed"
+              ? "bg-slate-700 text-white hover:bg-slate-800 shadow-md"
+              : "bg-slate-200 text-slate-400 cursor-not-allowed"
           )}
         >
           {isAnalyzing ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
           开始分析
         </button>
-        <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 border border-amber-200 rounded">
-          <Sparkles className="w-3 h-3 text-amber-500" />
-          <span className="text-xs font-medium text-amber-600">{credits}</span>
+        <div className="flex items-center gap-1 px-2 py-1 bg-slate-100 border border-slate-200 rounded">
+          <Sparkles className="w-3 h-3 text-slate-500" />
+          <span className="text-xs font-medium text-slate-600">{credits}</span>
         </div>
       </div>
 
@@ -370,8 +371,8 @@ export default function HomePage() {
               className={cn(
                 "flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg font-medium transition-all",
                 selectedGenModel && !isGenerating
-                  ? "bg-orange-500 text-white hover:bg-orange-600 shadow-md"
-                  : "bg-slate-300 text-slate-500 cursor-not-allowed"
+                  ? "bg-slate-700 text-white hover:bg-slate-800 shadow-md"
+                  : "bg-slate-200 text-slate-400 cursor-not-allowed"
               )}
             >
               {isGenerating ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
@@ -385,10 +386,7 @@ export default function HomePage() {
                 className="flex items-center gap-1.5 px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg hover:bg-slate-50 font-medium text-slate-700"
               >
                 {selectedGenModel ? (
-                  <>
-                    <span className={cn("w-2 h-2 rounded-full", MODELS.find(m => m.key === selectedGenModel)?.color)} />
-                    {MODELS.find(m => m.key === selectedGenModel)?.name}
-                  </>
+                  <>{MODELS.find(m => m.key === selectedGenModel)?.name}</>
                 ) : (
                   <span className="text-slate-400">选择模型</span>
                 )}
@@ -403,7 +401,6 @@ export default function HomePage() {
                       className={cn("dropdown-item", selectedGenModel === m.key && "active")}
                       onClick={() => { setSelectedGenModel(m.key); setOpenGenDropdown(false); }}
                     >
-                      <span className={cn("w-2 h-2 rounded-full inline-block mr-2", m.color)} />
                       {m.name}
                     </div>
                   ))}
@@ -412,15 +409,15 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* 积分余额显示 */}
-          <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 border border-amber-200 rounded">
-            <Sparkles className="w-3 h-3 text-amber-500" />
-            <span className="text-xs font-medium text-amber-600">余额: {credits}</span>
+          {/* 积分余额 - 紧贴右侧 */}
+          <div className="flex items-center gap-1 px-2 py-1 bg-slate-100 border border-slate-200 rounded">
+            <Sparkles className="w-3 h-3 text-slate-500" />
+            <span className="text-xs font-medium text-slate-600">余额: {credits}</span>
           </div>
         </div>
       </div>
 
-      {/* 生成内容输出框 - 始终显示或条件显示 */}
+      {/* 生成内容输出框 */}
       <div className="glass-card rounded-xl p-3">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-semibold text-slate-700">生成内容</h3>
@@ -429,20 +426,20 @@ export default function HomePage() {
           {generatedContent || "点击上方「创意生成」按钮生成内容..."}
         </div>
         
-        {/* 社交分享按钮 */}
-        <div className="flex items-center justify-between">
+        {/* 社交分享按钮 - 右侧 */}
+        <div className="flex items-center justify-end gap-2">
           <div className="flex gap-2">
             {socialPlatforms.map((platform) => (
               <button
                 key={platform.key}
-                className={cn("w-8 h-8 rounded-full flex items-center justify-center text-white text-sm transition-transform hover:scale-110", platform.color)}
+                className={cn("w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold transition-transform hover:scale-110", platform.color)}
                 title={platform.name}
               >
                 {platform.icon}
               </button>
             ))}
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 border-l border-slate-200 pl-3">
             <button
               onClick={() => handleShare(generatedContent)}
               disabled={!generatedContent}
@@ -486,7 +483,7 @@ export default function HomePage() {
               {socialPlatforms.map((platform) => (
                 <button
                   key={platform.key}
-                  className={cn("w-12 h-12 rounded-full flex items-center justify-center text-white text-lg transition-transform hover:scale-110", platform.color)}
+                  className={cn("w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold transition-transform hover:scale-110", platform.color)}
                 >
                   {platform.icon}
                 </button>
@@ -496,14 +493,14 @@ export default function HomePage() {
             <div className="flex gap-2">
               <button
                 onClick={handleCopy}
-                className="flex-1 btn-secondary flex items-center justify-center gap-1 text-xs py-2"
+                className="flex-1 flex items-center justify-center gap-1 text-xs py-2 bg-slate-100 hover:bg-slate-200 rounded-lg"
               >
                 {copied ? <CheckCircle className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
                 {copied ? "已复制" : "复制"}
               </button>
               <button
                 onClick={handleDownload}
-                className="flex-1 btn-secondary flex items-center justify-center gap-1 text-xs py-2"
+                className="flex-1 flex items-center justify-center gap-1 text-xs py-2 bg-slate-100 hover:bg-slate-200 rounded-lg"
               >
                 <Download className="w-3 h-3" />
                 下载
