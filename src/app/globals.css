@@ -2,150 +2,79 @@
 @tailwind components;
 @tailwind utilities;
 
-/* PromptBox Pro - 液态玻璃设计系统 */
-
 :root {
-  /* 页面背景 */
-  --bg-page: #f0f4f8;
-  
-  /* 液态玻璃卡片 */
-  --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-blur: 12px;
-  
-  /* 文本颜色 */
-  --text-primary: #1e293b;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
-  
-  /* 主色 */
   --primary: #3b82f6;
-  --primary-hover: #2563eb;
-  --primary-light: #eff6ff;
-  
-  /* 强调色 */
-  --accent: #0ea5e9;
-  
-  /* 边框 */
-  --border: #e2e8f0;
-  
-  /* 悬浮态 */
-  --hover-bg: #f1f5f9;
-  
-  /* 积分色 */
-  --credit: #f59e0b;
-  --credit-light: #fef3c7;
+  --primary-dark: #2563eb;
 }
 
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: var(--bg-page);
-  color: var(--text-primary);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background-color: #f0f4f8;
+  color: #1e293b;
 }
 
-/* 液态玻璃效果 */
-.glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-.glass-nav {
+/* 玻璃效果卡片 */
+.glass-card {
   background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .glass-sidebar {
   background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-right: 1px solid var(--border);
-}
-
-.glass-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 2px 12px -2px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 /* 按钮样式 */
 .btn-primary {
-  @apply px-5 py-2.5 rounded-lg font-medium text-white transition-all duration-200;
-  background: var(--primary);
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: var(--primary-hover);
-  transform: scale(1.02);
-}
-
-.btn-primary:disabled {
-  @apply opacity-50 cursor-not-allowed;
+  @apply bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-all duration-200;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-blue-300;
 }
 
 .btn-secondary {
-  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
-  background: white;
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-}
-
-.btn-secondary:hover {
-  background: var(--hover-bg);
-  border-color: var(--primary);
-}
-
-/* 标签 */
-.tag {
-  @apply px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-all duration-200;
-  background: white;
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-}
-
-.tag:hover {
-  background: var(--hover-bg);
-  transform: scale(1.02);
-}
-
-.tag.active {
-  background: var(--primary-light);
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
-/* 上传区域 */
-.upload-zone {
-  @apply border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-300;
-  border-color: var(--border);
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.upload-zone:hover {
-  border-color: var(--primary);
-  background: rgba(255, 255, 255, 0.8);
+  @apply bg-white hover:bg-slate-50 text-slate-700 font-medium rounded-lg border border-slate-200 transition-all duration-200;
 }
 
 /* 输入框 */
 .input-field {
-  @apply w-full px-4 py-3 rounded-lg border transition-all duration-200 outline-none;
-  border-color: var(--border);
-  background: white;
+  @apply w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-800 text-sm;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400;
+  @apply placeholder:text-slate-400;
 }
 
-.input-field:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+/* 上传区域 */
+.upload-zone {
+  @apply border-2 border-dashed border-slate-300 rounded-lg cursor-pointer transition-all duration-200;
+  @apply hover:border-blue-400 hover:bg-blue-50/30;
+}
+
+/* 动画 */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateX(-5px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out forwards;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
 }
 
 /* 滚动条 */
@@ -167,38 +96,16 @@ body {
   background: #94a3b8;
 }
 
-/* 动画 */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+/* 下拉菜单 */
+.dropdown-menu {
+  @apply absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50;
+  min-width: 160px;
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out forwards;
+.dropdown-item {
+  @apply px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer transition-colors;
 }
 
-/* 选中态 - 左侧蓝条 */
-.active-item {
-  position: relative;
-}
-
-.active-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: var(--primary);
-  border-radius: 0 2px 2px 0;
-}
-
-.active-item {
-  background: var(--primary-light) !important;
-  color: var(--primary) !important;
-}
-
-/* Hover 态 */
-.hover-item:hover {
-  background: var(--hover-bg);
+.dropdown-item.active {
+  @apply bg-blue-50 text-blue-600;
 }
