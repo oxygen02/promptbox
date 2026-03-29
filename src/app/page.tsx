@@ -10,7 +10,6 @@ import {
   Share2,
   ChevronDown,
   X,
-  RefreshCw,
   CheckCircle,
   FileText,
   File,
@@ -309,18 +308,17 @@ export default function HomePage() {
               onClick={handleAnalyze}
               disabled={isAnalyzing || selectedCount === 0}
               className={cn(
-                "flex items-center gap-2 text-base px-6 py-2.5 rounded-xl font-semibold transition-all shadow-lg transform hover:scale-105",
+                "text-base px-7 py-2.5 rounded-xl font-bold transition-all shadow-xl animate-pulse-glow",
                 selectedCount > 0 && !isAnalyzing 
-                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700" 
-                  : "bg-slate-200 text-slate-400 cursor-not-allowed"
+                  ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700" 
+                  : "bg-slate-300 text-slate-500 cursor-not-allowed animate-none"
               )}
             >
-              {isAnalyzing ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
-              开始分析
+              {isAnalyzing ? "分析中..." : "开始分析"}
             </button>
-            <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-lg">
-              <span className="text-sm font-bold text-amber-600">{credits}</span>
-              <span className="text-xs font-medium text-amber-500">Credit</span>
+            <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-amber-100 to-yellow-100 border-2 border-amber-400 rounded-lg shadow-sm">
+              <span className="text-xs font-bold text-amber-700">Credit</span>
+              <span className="text-base font-bold text-amber-600">{credits}</span>
             </div>
           </div>
         </div>
@@ -343,14 +341,13 @@ export default function HomePage() {
               onClick={handleCreativeGenerate} 
               disabled={!selectedGenModel || isGenerating} 
               className={cn(
-                "flex items-center gap-2 text-base px-6 py-2.5 rounded-xl font-semibold transition-all shadow-lg transform hover:scale-105",
+                "text-base px-7 py-2.5 rounded-xl font-bold transition-all shadow-xl animate-pulse-glow",
                 selectedGenModel && !isGenerating 
-                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700" 
-                  : "bg-slate-200 text-slate-400 cursor-not-allowed"
+                  ? "bg-gradient-to-r from-violet-500 to-violet-600 text-white hover:from-violet-600 hover:to-violet-700" 
+                  : "bg-slate-300 text-slate-500 cursor-not-allowed animate-none"
               )}
             >
-              {isGenerating ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
-              创意生成
+              {isGenerating ? "生成中..." : "创意生成"}
             </button>
             <div className="relative" ref={dropdownRef}>
               <button onClick={() => setOpenGenDropdown(!openGenDropdown)} className="flex items-center gap-2 px-4 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl hover:bg-slate-50 font-semibold text-slate-700">
@@ -363,9 +360,9 @@ export default function HomePage() {
                 </div>
               )}
             </div>
-            <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-lg">
-              <span className="text-sm font-bold text-amber-600">{credits}</span>
-              <span className="text-xs font-medium text-amber-500">Credit</span>
+            <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-amber-100 to-yellow-100 border-2 border-amber-400 rounded-lg shadow-sm">
+              <span className="text-xs font-bold text-amber-700">Credit</span>
+              <span className="text-base font-bold text-amber-600">{credits}</span>
             </div>
           </div>
         </div>
