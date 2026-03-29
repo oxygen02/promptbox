@@ -234,7 +234,9 @@ export default function HomePage() {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      const target = e.target as HTMLElement;
+      // 如果点击的不是下拉按钮或下拉菜单，则关闭下拉菜单
+      if (!target.closest('.dropdown-menu') && !target.closest('button')) {
         setOpenDropdown(null);
         setOpenGenDropdown(false);
       }
