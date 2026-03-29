@@ -87,6 +87,12 @@ const I18N = {
     copied: "已复制",
     download: "下载",
     copyText: "复制",
+    uploadTypes: [
+      { key: "text", label: "文字" },
+      { key: "doc", label: "文档" },
+      { key: "image", label: "图片" },
+      { key: "video", label: "视频" },
+    ],
   },
   en: {
     contentTypes: [
@@ -122,6 +128,12 @@ const I18N = {
     copied: "Copied",
     download: "Download",
     copyText: "Copy",
+    uploadTypes: [
+      { key: "text", label: "Text" },
+      { key: "doc", label: "Doc" },
+      { key: "image", label: "Image" },
+      { key: "video", label: "Video" },
+    ],
   },
 };
 
