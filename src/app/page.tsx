@@ -332,33 +332,27 @@ export default function HomePage() {
               {/* 文件上传 */}
               <div className="mb-3">
                 <div 
-                  className="upload-zone py-3 flex flex-col items-center justify-center min-h-[70px] border-2 border-dashed border-slate-200 rounded-xl bg-slate-50"
+                  className="upload-zone py-2 px-3 flex items-center justify-between border border-slate-200 rounded-lg bg-white"
                   onPaste={(e) => {
                     e.preventDefault();
                     const text = e.clipboardData.getData('text');
                     if (text) {
                       setPastedContent(text);
                       setUploadUrl(text);
-                      alert(`已粘贴内容: ${text.substring(0, 50)}${text.length > 50 ? '...' : ''}`);
                     }
                   }}
                   tabIndex={0}
                 >
-                  {pastedContent ? (
-                    <div className="text-sm text-green-600 font-medium">✓ 已粘贴内容</div>
-                  ) : (
-                    <>
-                      <Upload className="w-6 h-6 text-slate-300 mb-1" />
-                      <p className="text-xs text-slate-500 mb-1">{t.dragOrClick}</p>
-                    </>
-                  )}
-                  <label className="px-3 py-1.5 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-colors cursor-pointer">
-                    📂 选择文件
+                  <span className="text-sm text-slate-500">{pastedContent || t.dragOrClick}</span>
+                  <label className="px-3 py-1.5 text-xs text-slate-600 hover:text-slate-800 cursor-pointer">
+                    点击上传
                     <input 
                       type="file" 
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
+                          setPastedContent(file.name);
+                          setUploadUrl(file.name);
                           alert(`已选择文件: ${file.name}\n大小: ${(file.size/1024).toFixed(2)} KB`);
                         }
                       }} 
@@ -376,12 +370,12 @@ export default function HomePage() {
             {/* 右侧：维度选择 */}
             <div className="flex-1">
               <h4 className="text-xs font-medium text-slate-500 mb-2">{t.promptDimensions}</h4>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="grid grid-cols-4 gap-1.5">
                 {currentTags.map((tag) => (
                   <button 
                     key={tag} 
                     onClick={() => handleDimensionClick(tag)} 
-                    className={cn("px-2 py-1 text-xs rounded-lg transition-all", selectedDimensions.includes(tag) ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}
+                    className={cn("px-2 py-1.5 text-xs rounded-lg transition-all text-center", selectedDimensions.includes(tag) ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}
                   >
                     {tag}
                   </button>
