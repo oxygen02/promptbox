@@ -465,11 +465,7 @@ ${promptContent}
             {/* 左侧：上传区域 */}
             <div className="w-1/2">
               <div 
-                className="upload-zone py-4 px-3 flex flex-col justify-center border border-slate-200 rounded-lg bg-white cursor-pointer hover:border-blue-400 min-h-[100px]"
-                onClick={() => {
-                  const input = document.getElementById('pb-file-input');
-                  if (input) input.click();
-                }}
+                className="upload-zone py-4 px-3 flex flex-col justify-center items-center border border-slate-200 rounded-lg bg-white hover:border-blue-400 hover:bg-blue-50 min-h-[100px] transition-all"
                 onPaste={(e) => {
                   e.preventDefault();
                   const text = e.clipboardData.getData('text');
@@ -479,8 +475,17 @@ ${promptContent}
                 }}
                 tabIndex={0}
               >
-                <span className="text-sm text-slate-500">{pastedContent || t.dragOrClick}</span>
-                <span className="text-xs text-slate-400 mt-1">点击上传或Ctrl+V粘贴</span>
+                <span className="text-sm text-slate-500 mb-2">{pastedContent || t.dragOrClick}</span>
+                <button 
+                  type="button"
+                  onClick={() => {
+                    const input = document.getElementById('pb-file-input');
+                    if (input) input.click();
+                  }}
+                  className="px-4 py-2 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  点击选择文件
+                </button>
               </div>
               <input type="text" placeholder="输入网页URL" value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-2 text-sm mt-2" />
               
