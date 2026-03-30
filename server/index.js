@@ -28,13 +28,14 @@ app.use('/api/history', require('./routes/history'));
 app.use('/api/favorite', require('./routes/favorite'));
 app.use('/api/points', require('./routes/points'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/codingplan', require('./routes/codingplan'));
 
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'ok', 
     timestamp: new Date().toISOString(),
-    version: '1.0.2',
+    version: '1.0.3',
     uptime: process.uptime()
   });
 });
