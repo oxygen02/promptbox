@@ -64,9 +64,9 @@ const I18N = {
     ],
     tags: {
       text: ["通用创作", "ChatGPT长文本", "Claude合规", "核心观点", "文案逻辑", "短视频脚本", "PPT大纲", "营销转化", "学术润色", "代码文档", "小说续写", "公文模板"],
-      image: ["Midjourney", "DALL-E 3", "Stable Diffusion", "风格提取", "色彩搭配", "构图光影", "电商商品", "海报文案", "插画创作", "摄影参数", "建筑渲染", "UI设计"],
-      video: ["Pika", "Runway Gen-4", "可灵AI", "运镜转场", "画面风格", "字幕口播", "剧情脚本", "分镜设计", "BGM匹配", "AI剪辑", "特效合成", "动态海报"],
-      web: ["V0建站", "Framed网页", "结构组件", "设计配色", "交互逻辑", "React组件", "响应式适配", "SEO优化", "Landing Page", "组件库", "后台模板", "电商主题"],
+      image: ["Midjourney风格", "Stable Diffusion", "DALL-E 3", "ComfyUI", "LoRA训练", "ControlNet", "图生图", "超分辨率", "风格迁移", "背景替换", "产品摄影", "插画设计"],
+      video: ["Runway Gen-2", "Pika", "HeyGen", "Sora", "剪辑节奏", "转场效果", "配音同步", "字幕生成", "封面设计", "分镜脚本", "特效合成", "色彩调色"],
+      web: ["Figma设计", "Webflow", "响应式布局", "动效设计", "组件库", "Tailwind", "Framer Motion", "Three.js", "微交互", "用户流程", "A/B测试", "无障碍设计"],
     },
     uploadContent: "上传内容",
     aiReady: "AI 就绪",
@@ -318,37 +318,38 @@ export default function HomePage() {
       const modelInfo = MODELS.find(m => m.key === modelKey);
       
       // 基于实际内容生成具体可编辑的提示词
-      const prompt = `【${modelInfo?.name} - 提示词分析与生成】
+      const promptContent = content.length > 300 ? content.substring(0, 300) + '...' : content;
+      
+      const prompt = `# ${modelInfo?.name} 提示词 - 基于上传内容生成
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📋 内容分析结果
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📝 内容类型：${contentTypeName}
-📊 字数统计：${wordCount} 字 / ${charCount} 字符
-🏷️ 选维度：${dims}
+## 📋 原始内容分析
+- 内容类型：${contentTypeName}
+- 字数统计：${wordCount} 字 / ${charCount} 字符
+- 分析维度：${dims}
 
-📄 提取的关键信息：
-${keyPoints || '（从内容中自动提取）'}
+## 📄 提取的关键信息
+${keyPoints || '（请在此补充关键信息）'}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💡 生成的提示词（可直接编辑）
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## 💡 提示词模板（请根据实际情况编辑）
 
-# 角色设定
-你是一个专业的AI助手，擅长分析和解构各类内容。你的任务是理解给定的原始内容，并按照用户要求生成高质量的输出。
+### 角色设定
+你是一位专业的内容分析师，擅长从各类文档中提取核心要点并生成高质量提示词。
 
-# 输入内容
-${content.substring(0, 500)}${content.length > 500 ? '...' : ''}
+### 任务描述
+请基于以下原始内容，按照「${dims}」维度进行分析：
 
-# 核心任务
-基于上述输入内容，按照以下维度进行分析和创作：
-${dims.split('、').map(d => `- ${d}`).join('\n')}
+\`\`\`
+${promptContent}
+\`\`\`
 
-# 输出要求
-1. 准确理解输入内容的核心主题
-2. 提取关键信息和要点
-3. 按照选定的维度进行专业化处理
-4. 输出结构清晰、逻辑性强`;
+### 输出要求
+1. 总结核心观点
+2. 提取关键信息点
+3. 按照选定维度生成针对性提示词
+4. 输出可直接使用的AI提示词
+
+### 生成结果（请编辑此处）
+[在此处输入生成的提示词...]`;
 
       newCardPrompts[idx] = prompt;
       allPrompts.push(prompt);
@@ -434,8 +435,23 @@ ${dims.split('、').map(d => `- ${d}`).join('\n')}
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
-                    setPastedContent(file.name);
-                    console.log('文件已选择:', file.name);
+                    // 读取文件内容
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                      const text = e.target?.result as string;
+                      setPastedContent(text || file.name);
+                      console.log('文件已读取:', file.name, '字数:', text?.length || 0);
+                    };
+                    reader.onerror = () => {
+                      setPastedContent(file.name);
+                      console.log('文件读取失败，使用文件名:', file.name);
+                    };
+                    // 尝试读取文本内容，如果不是文本文件则使用文件名
+                    if (file.type.includes('text') || file.name.endsWith('.txt') || file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
+                      reader.readAsText(file);
+                    } else {
+                      setPastedContent(`[文件] ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
+                    }
                   }
                 }} 
                 style={{ display: 'none' }}
