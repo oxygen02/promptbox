@@ -189,15 +189,15 @@ export default function Sidebar() {
       
       {/* 底部用户信息 - 固定在左下角 */}
       <div className="px-4 py-3 border-t border-slate-200/50">
-        <div className="flex items-center gap-3 p-2 glass-card rounded-xl">
+        <button onClick={() => router.push("/login")} className="w-full flex items-center gap-3 p-2 glass-card rounded-xl hover:scale-[1.02] transition-transform cursor-pointer">
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center flex-shrink-0">
             <User className="w-4 h-4 text-white" />
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 text-left">
             <div className="text-sm font-medium text-slate-800 truncate">{language === "zh" ? "游客用户" : "Guest"}</div>
             <div className="text-xs text-slate-500">Lv.1</div>
           </div>
-        </div>
+        </button>
       </div>
     </aside>
   );
