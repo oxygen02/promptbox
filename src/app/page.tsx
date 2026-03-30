@@ -441,7 +441,7 @@ ${promptContent}
           {/* 左侧：上传区域，右侧：维度选择 */}
           <div className="flex gap-4">
             {/* 左侧：上传区域 */}
-            <div className="w-1/3">
+            <div className="w-1/2">
               <div 
                 className="upload-zone py-2 px-3 flex items-center justify-between border border-slate-200 rounded-lg bg-white cursor-pointer hover:border-blue-400"
                 onClick={() => {
@@ -493,7 +493,7 @@ ${promptContent}
             </div>
             
             {/* 右侧：维度选择 */}
-            <div className="flex-1">
+            <div className="w-1/2">
               <h4 className="text-xs font-medium text-slate-500 mb-2">{t.promptDimensions}</h4>
               <div className="grid grid-cols-4 gap-1.5">
                 {currentTags.map((tag) => (
