@@ -443,7 +443,7 @@ ${promptContent}
             {/* 左侧：上传区域 */}
             <div className="w-1/2">
               <div 
-                className="upload-zone py-2 px-3 flex items-center justify-between border border-slate-200 rounded-lg bg-white cursor-pointer hover:border-blue-400"
+                className="upload-zone py-4 px-3 flex flex-col justify-center border border-slate-200 rounded-lg bg-white cursor-pointer hover:border-blue-400 min-h-[100px]"
                 onClick={() => {
                   const input = document.getElementById('pb-file-input');
                   if (input) input.click();
@@ -458,9 +458,9 @@ ${promptContent}
                 tabIndex={0}
               >
                 <span className="text-sm text-slate-500">{pastedContent || t.dragOrClick}</span>
-                <span className="text-xs text-slate-400">点击上传</span>
+                <span className="text-xs text-slate-400 mt-1">点击上传或Ctrl+V粘贴</span>
               </div>
-              <input type="text" placeholder="输入网页URL" value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-2 text-sm mt-2" />
+              <input type="text" placeholder="输入网页URL" value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-2 text-sm mt-3" />
               
               <input 
                 type="file" 
