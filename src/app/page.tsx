@@ -331,8 +331,13 @@ export default function HomePage() {
             <div className="flex-1">
               {/* 文件上传 */}
               <div className="mb-3">
+                {/* 用原生document.getElementById触发file input - 参考网站做法 */}
                 <div 
-                  className="upload-zone py-2 px-3 flex items-center justify-between border border-slate-200 rounded-lg bg-white"
+                  className="upload-zone py-2 px-3 flex items-center justify-between border border-slate-200 rounded-lg bg-white cursor-pointer hover:border-blue-400"
+                  onClick={() => {
+                    const input = document.getElementById('pb-file-input');
+                    if (input) input.click();
+                  }}
                   onPaste={(e) => {
                     e.preventDefault();
                     const text = e.clipboardData.getData('text');
@@ -344,23 +349,22 @@ export default function HomePage() {
                   tabIndex={0}
                 >
                   <span className="text-sm text-slate-500">{pastedContent || t.dragOrClick}</span>
-                  <label className="px-3 py-1.5 text-xs text-slate-600 hover:text-slate-800 cursor-pointer">
-                    点击上传
-                    <input 
-                      type="file" 
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          setPastedContent(file.name);
-                          setUploadUrl(file.name);
-                          alert(`已选择文件: ${file.name}\n大小: ${(file.size/1024).toFixed(2)} KB`);
-                        }
-                      }} 
-                      className="hidden"
-                      accept="image/*,video/*,.txt,.doc,.docx,.pdf"
-                    />
-                  </label>
+                  <span className="text-xs text-slate-400">点击上传</span>
                 </div>
+                <input 
+                  type="file" 
+                  id="pb-file-input"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setPastedContent(file.name);
+                      setUploadUrl(file.name);
+                      alert(`已选择文件: ${file.name}\n大小: ${(file.size/1024).toFixed(2)} KB`);
+                    }
+                  }} 
+                  style={{ display: 'none' }}
+                  accept="image/*,video/*,.txt,.doc,.docx,.pdf"
+                />
               </div>
               
               {/* URL输入 */}
