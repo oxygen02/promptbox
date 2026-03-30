@@ -331,29 +331,20 @@ export default function HomePage() {
               <div className="upload-zone py-5 flex flex-col items-center justify-center min-h-[100px]">
                 <Upload className="w-6 h-6 text-slate-400 mb-2" />
                 <p className="text-sm text-slate-500 mb-2">{t.dragOrClick}</p>
-                <button 
-                  type="button"
-                  onClick={() => {
-                    console.log('点击选择文件按钮');
-                    fileInputRef.current?.click();
-                  }}
-                  className="px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors"
-                >
+                <label className="px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors cursor-pointer">
                   选择文件
-                </button>
-                <input 
-                  ref={fileInputRef}
-                  type="file" 
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      console.log('文件已选择:', file.name);
-                      alert(`已选择文件: ${file.name}\n大小: ${(file.size/1024).toFixed(2)} KB`);
-                    }
-                  }} 
-                  className="hidden" 
-                  accept="image/*,video/*,.txt,.doc,.docx,.pdf"
-                />
+                  <input 
+                    type="file" 
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        alert(`已选择文件: ${file.name}\n大小: ${(file.size/1024).toFixed(2)} KB`);
+                      }
+                    }} 
+                    className="hidden" 
+                    accept="image/*,video/*,.txt,.doc,.docx,.pdf"
+                  />
+                </label>
               </div>
             </div>
             <div className="flex-1"><input type="text" placeholder={t.enterUrl} value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-3" /></div>
