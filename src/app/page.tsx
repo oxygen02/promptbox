@@ -336,16 +336,18 @@ export default function HomePage() {
           {[0, 1, 2].map((index) => { const model = cardModels[index]; const prompt = cardPrompts[index]; const modelInfo = MODELS.find((m) => m.key === model); return (
             <div key={index} className="glass-card rounded-xl p-4">
               <div className="relative">
-                <button onClick={(e) => { e.stopPropagation(); setOpenDropdown(openDropdown === index ? null : index); }} className="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"><span className={model ? "text-slate-700 font-medium" : "text-slate-400"}>{model ? modelInfo?.name : t.selectModel}</span><ChevronDown className="w-4 h-4 text-slate-400" /></button>
-                {openDropdown === index && mounted && createPortal(
-                  <div onClick={(e) => e.stopPropagation()} className="fixed bg-white border border-slate-200 rounded-lg shadow-2xl max-h-64 overflow-y-auto" style={{ zIndex: 99999, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                    <div className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", !model && "bg-slate-50")} onClick={() => { handleCardModelSelect(index, null); setOpenDropdown(null); }}>— 未选中 —</div>
-                    {MODELS.map((m) => (
-                      <div key={m.key} className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", model === m.key && "bg-slate-50 text-blue-600")} onClick={() => { handleCardModelSelect(index, m.key); setOpenDropdown(null); }}>{m.name} ({m.region})</div>
-                    ))}
-                  </div>,
-                  document.body
-                )}
+                <div className="relative">
+                  <button type="button" onClick={(e) => { e.stopPropagation(); setOpenDropdown(openDropdown === index ? null : index); }} className="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"><span className={model ? "text-slate-700 font-medium" : "text-slate-400"}>{model ? modelInfo?.name : t.selectModel}</span><ChevronDown className="w-4 h-4 text-slate-400" /></button>
+                  {openDropdown === index && mounted && createPortal(
+                    <div onClick={(e) => e.stopPropagation()} className="fixed bg-white border border-slate-200 rounded-lg shadow-2xl max-h-64 overflow-y-auto" style={{ zIndex: 99999 }}>
+                      <div className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", !model && "bg-slate-50")} onClick={() => { handleCardModelSelect(index, null); setOpenDropdown(null); }}>— 未选中 —</div>
+                      {MODELS.map((m) => (
+                        <div key={m.key} className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", model === m.key && "bg-slate-50 text-blue-600")} onClick={() => { handleCardModelSelect(index, m.key); setOpenDropdown(null); }}>{m.name} ({m.region})</div>
+                      ))}
+                    </div>,
+                    document.body
+                  )}
+                </div>
               </div>
               <div className="mt-3 min-h-[70px] text-sm text-slate-600 whitespace-pre-wrap">{prompt || t.waitingGenerate}</div>
               {prompt && (<div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-slate-100"><button onClick={() => handleShare(prompt)} className="p-1.5 hover:bg-slate-100 rounded-lg"><Share2 className="w-4 h-4 text-slate-400" /></button><button className="p-1.5 hover:bg-slate-100 rounded-lg"><Copy className="w-4 h-4 text-slate-400" /></button><button className="p-1.5 hover:bg-slate-100 rounded-lg"><Star className="w-4 h-4 text-slate-400" /></button></div>)}
