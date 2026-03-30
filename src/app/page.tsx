@@ -238,18 +238,7 @@ export default function HomePage() {
     }
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      // 如果点击的不是下拉按钮或下拉菜单，则关闭下拉菜单
-      if (!target.closest('.dropdown-menu') && !target.closest('button')) {
-        setOpenDropdown(null);
-        setOpenGenDropdown(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+
 
   const handleDimensionClick = (dim: string) => {
     setSelectedDimensions((prev) => prev.includes(dim) ? prev.filter((d) => d !== dim) : [...prev, dim]);
@@ -339,7 +328,7 @@ export default function HomePage() {
               <div className="relative">
                 <button onClick={() => setOpenDropdown(openDropdown === index ? null : index)} className="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"><span className={model ? "text-slate-700 font-medium" : "text-slate-400"}>{model ? modelInfo?.name : t.selectModel}</span><ChevronDown className="w-4 h-4 text-slate-400" /></button>
                 {openDropdown === index && mounted && createPortal(
-                  <div className="fixed bg-white border border-slate-200 rounded-lg shadow-2xl max-h-64 overflow-y-auto" style={{ zIndex: 99999 }}>
+                  <div onClick={(e) => e.stopPropagation()} className="fixed bg-white border border-slate-200 rounded-lg shadow-2xl max-h-64 overflow-y-auto" style={{ zIndex: 99999, top: 'auto', left: 'auto' }}>
                     <div className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", !model && "bg-slate-50")} onClick={() => { handleCardModelSelect(index, null); setOpenDropdown(null); }}>— 未选中 —</div>
                     {MODELS.map((m) => (
                       <div key={m.key} className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", model === m.key && "bg-slate-50 text-blue-600")} onClick={() => { handleCardModelSelect(index, m.key); setOpenDropdown(null); }}>{m.name} ({m.region})</div>
