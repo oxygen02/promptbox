@@ -281,13 +281,16 @@ export default function HomePage() {
   };
 
   const handleAnalyze = async () => {
-    // 检查是否有上传内容
+    // 检查是否有上传内容或URL
     const content = pastedContent || uploadUrl;
     
     if (!content) {
-      alert("请先上传内容或粘贴内容后再进行分析");
+      alert("请先上传文件、粘贴内容或输入URL后再进行分析");
       return;
     }
+    
+    // 判断是否为文件上传（文件名格式）
+    const isFileUpload = content.startsWith('[文件]');
     
     // 显示分析中状态
     setIsAnalyzing(true);
@@ -318,9 +321,38 @@ export default function HomePage() {
       const modelInfo = MODELS.find(m => m.key === modelKey);
       
       // 基于实际内容生成具体可编辑的提示词
-      const promptContent = content.length > 300 ? content.substring(0, 300) + '...' : content;
+      let prompt = '';
       
-      const prompt = `# ${modelInfo?.name} 提示词 - 基于上传内容生成
+      if (isFileUpload) {
+        // 文件上传的情况 - 提示用户文件已上传但内容无法直接读取
+        const fileName = content.replace('[文件] ', '');
+        prompt = `# ${modelInfo?.name} 提示词 - 文件分析
+
+## 📁 上传文件信息
+- 文件名：${fileName}
+- 内容类型：${contentTypeName}
+- 分析维度：${dims}
+
+## ⚠️ 注意
+上传的是文件格式（.docx/.pdf等），系统暂时无法直接解析文件内容。
+
+## 💡 建议操作
+1. 将文件内容复制粘贴到下方
+2. 或手动输入文件的主要内容描述
+3. 然后基于内容进行提示词生成
+
+## 📋 文件内容（请粘贴在此处）
+[请在此处粘贴文件的主要内容...]
+
+## 🎯 分析维度：${dims}
+请基于上述内容，按照选定维度进行分析并生成提示词。
+
+## ✏️ 生成的提示词（请编辑此处）
+[基于文件内容生成的提示词将显示在这里...]`;
+      } else {
+        // 文本内容或URL
+        const promptContent = content.length > 300 ? content.substring(0, 300) + '...' : content;
+        prompt = `# ${modelInfo?.name} 提示词 - 基于内容生成
 
 ## 📋 原始内容分析
 - 内容类型：${contentTypeName}
@@ -330,26 +362,27 @@ export default function HomePage() {
 ## 📄 提取的关键信息
 ${keyPoints || '（请在此补充关键信息）'}
 
-## 💡 提示词模板（请根据实际情况编辑）
-
-### 角色设定
-你是一位专业的内容分析师，擅长从各类文档中提取核心要点并生成高质量提示词。
-
-### 任务描述
-请基于以下原始内容，按照「${dims}」维度进行分析：
-
+## 📝 原始内容
 \`\`\`
 ${promptContent}
 \`\`\`
 
+## 💡 提示词模板（请编辑）
+
+### 角色设定
+你是一位专业的内容分析师。
+
+### 任务
+基于上述内容，按照「${dims}」维度进行分析。
+
 ### 输出要求
 1. 总结核心观点
-2. 提取关键信息点
-3. 按照选定维度生成针对性提示词
-4. 输出可直接使用的AI提示词
+2. 提取关键信息
+3. 生成针对性提示词
 
-### 生成结果（请编辑此处）
+### ✏️ 生成的提示词（请编辑此处）
 [在此处输入生成的提示词...]`;
+      }
 
       newCardPrompts[idx] = prompt;
       allPrompts.push(prompt);
@@ -435,22 +468,22 @@ ${promptContent}
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
-                    // 读取文件内容
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                      const text = e.target?.result as string;
-                      setPastedContent(text || file.name);
-                      console.log('文件已读取:', file.name, '字数:', text?.length || 0);
-                    };
-                    reader.onerror = () => {
-                      setPastedContent(file.name);
-                      console.log('文件读取失败，使用文件名:', file.name);
-                    };
-                    // 尝试读取文本内容，如果不是文本文件则使用文件名
-                    if (file.type.includes('text') || file.name.endsWith('.txt') || file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
+                    // 只读取纯文本文件，其他文件显示文件名
+                    if (file.type.includes('text') || file.name.endsWith('.txt') || file.name.endsWith('.md')) {
+                      const reader = new FileReader();
+                      reader.onload = (e) => {
+                        const text = e.target?.result as string;
+                        setPastedContent(text || '');
+                        console.log('文本文件已读取:', file.name, '字数:', text?.length || 0);
+                      };
+                      reader.onerror = () => {
+                        setPastedContent(`[文件] ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
+                      };
                       reader.readAsText(file);
                     } else {
+                      // 对于 .docx, .pdf, 图片等，只显示文件名
                       setPastedContent(`[文件] ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
+                      console.log('非文本文件:', file.name);
                     }
                   }
                 }} 
