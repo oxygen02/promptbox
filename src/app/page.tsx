@@ -145,6 +145,7 @@ export default function HomePage() {
   const [contentType, setContentType] = useState<ContentType>("text");
   const [selectedDimensions, setSelectedDimensions] = useState<string[]>([]);
   const [uploadUrl, setUploadUrl] = useState("");
+  const [pastedContent, setPastedContent] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -326,9 +327,28 @@ export default function HomePage() {
           
           {/* 文件上传 */}
           <div className="mb-4">
-            <div className="upload-zone py-4 flex flex-col items-center justify-center min-h-[80px] border-2 border-dashed border-slate-200 rounded-xl bg-slate-50">
-              <Upload className="w-8 h-8 text-slate-300 mb-2" />
-              <p className="text-sm text-slate-500 mb-2">{t.dragOrClick}</p>
+            <div 
+              className="upload-zone py-4 flex flex-col items-center justify-center min-h-[80px] border-2 border-dashed border-slate-200 rounded-xl bg-slate-50"
+              onPaste={(e) => {
+                e.preventDefault();
+                const text = e.clipboardData.getData('text');
+                if (text) {
+                  setPastedContent(text);
+                  setUploadUrl(text);
+                  alert(`已粘贴内容: ${text.substring(0, 50)}${text.length > 50 ? '...' : ''}`);
+                }
+              }}
+              tabIndex={0}
+            >
+              {pastedContent ? (
+                <div className="text-sm text-green-600 font-medium">✓ 已粘贴内容</div>
+              ) : (
+                <>
+                  <Upload className="w-8 h-8 text-slate-300 mb-2" />
+                  <p className="text-sm text-slate-500 mb-2">{t.dragOrClick}</p>
+                  <p className="text-xs text-slate-400 mb-2">支持 Ctrl+V 粘贴</p>
+                </>
+              )}
               <label className="px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors cursor-pointer">
                 📂 选择文件
                 <input 
