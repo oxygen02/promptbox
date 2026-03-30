@@ -369,50 +369,41 @@ export default function HomePage() {
             <span className="text-xs px-3 py-1 rounded-full bg-slate-100 text-slate-500 flex items-center gap-1.5"><Sparkles className="w-3.5 h-3.5" />{t.aiReady}</span>
           </div>
           
-          {/* 左侧：上传区域+URL，右侧：维度选择 */}
+          {/* 左侧：上传区域，右侧：维度选择 */}
           <div className="flex gap-4">
-            {/* 左侧 */}
-            <div className="flex-1">
-              {/* 文件上传 */}
-              <div className="mb-3">
-                {/* 用原生document.getElementById触发file input - 参考网站做法 */}
-                <div 
-                  className="upload-zone py-2 px-3 flex items-center justify-between border border-slate-200 rounded-lg bg-white cursor-pointer hover:border-blue-400"
-                  onClick={() => {
-                    const input = document.getElementById('pb-file-input');
-                    if (input) input.click();
-                  }}
-                  onPaste={(e) => {
-                    e.preventDefault();
-                    const text = e.clipboardData.getData('text');
-                    if (text) {
-                      setPastedContent(text);
-                      setUploadUrl(text);
-                    }
-                  }}
-                  tabIndex={0}
-                >
-                  <span className="text-sm text-slate-500">{pastedContent || t.dragOrClick}</span>
-                  <span className="text-xs text-slate-400">点击上传</span>
-                </div>
-                <input 
-                  type="file" 
-                  id="pb-file-input"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setPastedContent(file.name);
-                      setUploadUrl(file.name);
-                      alert(`已选择文件: ${file.name}\n大小: ${(file.size/1024).toFixed(2)} KB`);
-                    }
-                  }} 
-                  style={{ display: 'none' }}
-                  accept="image/*,video/*,.txt,.doc,.docx,.pdf"
-                />
+            {/* 左侧：上传区域 */}
+            <div className="w-1/3">
+              <div 
+                className="upload-zone py-2 px-3 flex items-center justify-between border border-slate-200 rounded-lg bg-white cursor-pointer hover:border-blue-400"
+                onClick={() => {
+                  const input = document.getElementById('pb-file-input');
+                  if (input) input.click();
+                }}
+                onPaste={(e) => {
+                  e.preventDefault();
+                  const text = e.clipboardData.getData('text');
+                  if (text) {
+                    setPastedContent(text);
+                  }
+                }}
+                tabIndex={0}
+              >
+                <span className="text-sm text-slate-500">{pastedContent || t.dragOrClick}</span>
+                <span className="text-xs text-slate-400">点击上传</span>
               </div>
-              
-              {/* URL输入 */}
-              <input type="text" placeholder={t.enterUrl} value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-2 text-sm" />
+              <input 
+                type="file" 
+                id="pb-file-input"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setPastedContent(file.name);
+                    console.log('文件已选择:', file.name);
+                  }
+                }} 
+                style={{ display: 'none' }}
+                accept="image/*,video/*,.txt,.doc,.docx,.pdf"
+              />
             </div>
             
             {/* 右侧：维度选择 */}
