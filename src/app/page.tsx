@@ -16,6 +16,10 @@ import {
   File,
   Image,
   Video,
+  Type,
+  Palette,
+  Monitor,
+  Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -292,7 +296,12 @@ export default function HomePage() {
   const handleCopy = async () => { await navigator.clipboard.writeText(shareContent || generatedContent); setCopied(true); setTimeout(() => setCopied(false), 2000); };
   const handleDownload = () => { const blob = new Blob([shareContent || generatedContent], { type: "text/plain" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "prompt.txt"; a.click(); URL.revokeObjectURL(url); };
 
-  const contentTypes = t.contentTypes;
+  const contentTypes = [
+    { key: "text", label: t.contentTypes[0].label, icon: Type },
+    { key: "image", label: t.contentTypes[1].label, icon: Palette },
+    { key: "video", label: t.contentTypes[2].label, icon: Video },
+    { key: "web", label: t.contentTypes[3].label, icon: Monitor },
+  ];
   const uploadTypes = [
     { key: "text", label: t.uploadTypes[0].label, icon: FileText },
     { key: "doc", label: t.uploadTypes[1].label, icon: File },
@@ -310,7 +319,7 @@ export default function HomePage() {
       <div className="relative z-10">
         <div className="flex gap-2 mb-4">
           {contentTypes.map((type) => (
-            <button key={type.key} onClick={() => handleContentTypeChange(type.key as ContentType)} className={cn("px-4 py-2 text-sm font-medium rounded-lg transition-all", contentType === type.key ? "bg-slate-800 text-white shadow-lg" : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300")}>{type.label}</button>
+            <button key={type.key} onClick={() => handleContentTypeChange(type.key as ContentType)} className={cn("flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all", contentType === type.key ? "bg-slate-800 text-white shadow-lg" : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300")}><type.icon className="w-4 h-4" />{type.label}</button>
           ))}
         </div>
         <div className="glass-card rounded-2xl p-5 mb-4">
