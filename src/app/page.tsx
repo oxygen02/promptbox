@@ -573,7 +573,7 @@ ${promptContent}
         {showShare && (<div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50" onClick={() => setShowShare(false)}><div className="glass-card rounded-2xl p-6 w-80" onClick={(e) => e.stopPropagation()}><div className="flex items-center justify-between mb-5"><h3 className="text-base font-semibold text-slate-700">{t.share}</h3><button onClick={() => setShowShare(false)} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-5 h-5 text-slate-400" /></button></div><div className="flex justify-center gap-3 mb-5 flex-wrap">
               {(language === "zh" 
                 ? ["wechat", "weibo", "xiaohongshu"] 
-                : ["x", "facebook", "instagram", "telegram", "tiktok"]
+                : ["x", "facebook", "instagram"]
               ).map((platform) => (
                 <button key={platform} className="w-12 h-12 rounded-full bg-slate-700 hover:bg-slate-800 flex items-center justify-center text-white">
                   <SocialIcon platform={platform} />
