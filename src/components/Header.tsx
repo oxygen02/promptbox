@@ -52,8 +52,21 @@ export default function Header() {
       <div className="h-full max-w-[1600px] mx-auto px-4 md:px-6 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-          <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center shadow-md">
-            <Sparkles className="w-4 h-4 text-white" />
+          <div className="w-9 h-9 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" className="w-full h-full">
+              {/* Outer box */}
+              <rect x="8" y="16" width="48" height="40" rx="6" fill="#3b82f6"/>
+              <rect x="8" y="16" width="48" height="40" rx="6" stroke="#1e40af" stroke-width="2"/>
+              {/* Box lid */}
+              <path d="M8 22 L32 10 L56 22" stroke="#1e40af" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              {/* Inner glow */}
+              <rect x="14" y="26" width="36" height="24" rx="4" fill="#60a5fa" opacity="0.5"/>
+              {/* Sparkle stars */}
+              <circle cx="20" cy="30" r="2" fill="white"/>
+              <circle cx="44" cy="28" r="1.5" fill="white"/>
+              <circle cx="38" cy="42" r="2" fill="white"/>
+              <circle cx="24" cy="40" r="1" fill="white"/>
+            </svg>
           </div>
           <span className="text-lg font-bold text-slate-800">PromptBox</span>
         </Link>
