@@ -327,9 +327,6 @@ export default function HomePage() {
             <h3 className="text-sm font-semibold text-slate-700">{t.uploadContent}</h3>
             <span className="text-xs px-3 py-1 rounded-full bg-slate-100 text-slate-500 flex items-center gap-1.5"><Sparkles className="w-3.5 h-3.5" />{t.aiReady}</span>
           </div>
-          <div className="flex justify-center gap-6 mb-4">
-            {uploadTypes.map((type) => (<button key={type.key} className="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-slate-50 transition-colors"><type.icon className="w-5 h-5 text-slate-400" /><span className="text-xs text-slate-500">{type.label}</span></button>))}
-          </div>
           <div className="flex gap-3 mb-4">
             <div className="flex-1"><label className="block upload-zone py-5 flex flex-col items-center justify-center min-h-[100px] cursor-pointer"><Upload className="w-5 h-5 text-slate-400 mb-2" /><p className="text-sm text-slate-500">{t.dragOrClick}</p><input type="file" className="hidden" /></label></div>
             <div className="flex-1"><input type="text" placeholder={t.enterUrl} value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-3" /></div>
