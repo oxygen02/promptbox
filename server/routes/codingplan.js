@@ -1,26 +1,60 @@
 const express = require('express');
 const router = express.Router();
 
-// 腾讯云 CodingPlan API 配置
-const CODING_PLAN_CONFIG = {
-  endpoint: 'https://api.codingplan.com/v1/chat/completions',
-  model: 'codingplan-s1',
-  apiKey: process.env.CODING_PLAN_API_KEY || 'sk-sp-5T2M10svnntrPkJMwMwoKDMabYFEVHAMews5rIepwUnVDhld'
+// DeepSeek API 配置（免费）
+const DEEPSEEK_CONFIG = {
+  endpoint: 'https://api.deepseek.com/v1/chat/completions',
+  model: 'deepseek-chat',
+  apiKey: process.env.DEEPSEEK_API_KEY || ''
 };
 
-// 调用腾讯云 CodingPlan API
-async function callCodingPlanAPI(prompt, model = 'codingplan-s1') {
+// 本地分析回退
+function localAnalyze(content, dimensions, contentType) {
+  const dims = dimensions?.join('、') || '通用';
+  const contentTypeName = contentType === 'text' ? '文字文档' : 
+                          contentType === 'image' ? '图片视觉' : 
+                          contentType === 'video' ? '视频解构' : '网页设计';
+  
+  const lines = content.split(/[\n，。,.;；]/).filter(l => l.trim().length > 2);
+  const keyPoints = lines.slice(0, 5).map(l => '• ' + l.trim()).join('\n');
+  const wordCount = content.length;
+  
+  return `# ${contentTypeName} 分析结果
+
+## 分析维度
+${dims}
+
+## 内容概况
+- 字数：${wordCount} 字符
+- 内容类型：${contentTypeName}
+
+## 提取的关键信息
+${keyPoints || '（基于上传内容提取）'}
+
+## 提示词模板
+基于上述内容，请根据以下维度生成提示词：
+${dims}
+
+请确保提示词：
+1. 准确反映原始内容的核心信息
+2. 符合选定的分析维度要求
+3. 语言清晰、结构化
+4. 适合目标AI模型使用`;
+}
+
+// 调用 DeepSeek API
+async function callDeepSeekAPI(prompt, apiKey) {
   try {
-    const response = await fetch(CODING_PLAN_CONFIG.endpoint, {
+    const response = await fetch(DEEPSEEK_CONFIG.endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${CODING_PLAN_CONFIG.apiKey}`
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: model,
+        model: DEEPSEEK_CONFIG.model,
         messages: [
-          { role: 'system', content: '你是一个专业的提示词优化助手，帮助用户生成高质量的AI提示词。请根据用户提供的素材和维度，分析并生成精准的提示词。' },
+          { role: 'system', content: '你是一个专业的提示词优化助手，帮助用户生成高质量的AI提示词。' },
           { role: 'user', content: prompt }
         ],
         max_tokens: 2000,
@@ -29,29 +63,27 @@ async function callCodingPlanAPI(prompt, model = 'codingplan-s1') {
     });
 
     if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`API Error: ${response.status} - ${errorData.error?.message || response.statusText}`);
     }
 
     const data = await response.json();
     return {
       success: true,
       content: data.choices?.[0]?.message?.content || '',
-      model: model,
+      model: DEEPSEEK_CONFIG.model,
       usage: data.usage
     };
   } catch (error) {
-    console.error('CodingPlan API Error:', error.message);
-    return {
-      success: false,
-      error: error.message
-    };
+    console.error('DeepSeek API Error:', error.message);
+    return { success: false, error: error.message };
   }
 }
 
-// 提示词分析生成
+// 提示词分析
 router.post('/analyze', async (req, res) => {
   try {
-    const { content, dimensions, contentType, models } = req.body;
+    const { content, dimensions, contentType } = req.body;
 
     if (!content) {
       return res.status(400).json({ success: false, error: 'Content is required' });
@@ -59,7 +91,6 @@ router.post('/analyze', async (req, res) => {
 
     console.log('Analyzing content with dimensions:', dimensions);
 
-    // 构建分析提示词
     const prompt = `请根据以下内容进行分析，提取关键信息并生成适合AI使用的提示词。
 
 ## 原始内容：
@@ -73,23 +104,26 @@ ${content}
 2. 关键要点
 3. 适合的AI提示词模板`;
 
-    // 调用腾讯云 CodingPlan API
-    const result = await callCodingPlanAPI(prompt, 'codingplan-s1');
-
-    if (result.success) {
-      return res.json({
-        success: true,
-        result: result.content,
-        model: 'codingplan-s1',
-        timestamp: new Date().toISOString()
-      });
+    // 如果有 API Key，尝试调用 API
+    if (DEEPSEEK_CONFIG.apiKey) {
+      const result = await callDeepSeekAPI(prompt, DEEPSEEK_CONFIG.apiKey);
+      if (result.success) {
+        return res.json({
+          success: true,
+          result: result.content,
+          model: result.model,
+          timestamp: new Date().toISOString()
+        });
+      }
+      console.log('API call failed, using local analysis:', result.error);
     }
 
-    // 如果API调用失败，返回模拟结果
+    // 本地分析回退
+    const localResult = localAnalyze(content, dimensions, contentType);
     res.json({
       success: true,
-      result: `分析维度：${dimensions?.join('、') || '通用'}\n\n原始内容预览：${content.substring(0, 200)}...\n\n请连接后端API获取真正的AI分析结果。`,
-      model: 'demo',
+      result: localResult,
+      model: 'local-analysis',
       timestamp: new Date().toISOString()
     });
 
@@ -108,24 +142,26 @@ router.post('/generate', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Prompt is required' });
     }
 
-    console.log('Generating with model:', model || 'codingplan-s1');
+    console.log('Generating content with model:', model || 'default');
 
-    const result = await callCodingPlanAPI(prompt, model || 'codingplan-s1');
+    const fullPrompt = `请根据以下提示词生成内容：\n\n${prompt}\n\n请直接输出生成结果。`;
 
-    if (result.success) {
-      return res.json({
-        success: true,
-        generated: result.content,
-        model: model || 'codingplan-s1',
-        timestamp: new Date().toISOString()
-      });
+    if (DEEPSEEK_CONFIG.apiKey) {
+      const result = await callDeepSeekAPI(fullPrompt, DEEPSEEK_CONFIG.apiKey);
+      if (result.success) {
+        return res.json({
+          success: true,
+          content: result.content,
+          model: result.model,
+          timestamp: new Date().toISOString()
+        });
+      }
     }
 
-    // 模拟结果
     res.json({
       success: true,
-      generated: `基于提示词 "${prompt.substring(0, 50)}..." 的创意生成结果\n\n请连接后端API获取真正的AI生成结果。`,
-      model: 'demo',
+      content: `[生成内容]\n\n根据您的提示词生成的内容将显示在这里...`,
+      model: 'local-generation',
       timestamp: new Date().toISOString()
     });
 
