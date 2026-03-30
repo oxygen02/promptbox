@@ -267,17 +267,31 @@ export default function HomePage() {
   };
 
   const handleCardModelSelect = (cardIndex: number, model: string | null) => {
+    if (model) {
+      // 检查其他卡片是否已选择相同模型
+      for (const [idx, m] of Object.entries(cardModels)) {
+        if (idx !== String(cardIndex) && m === model) {
+          alert(`模型 ${MODELS.find(x => x.key === model)?.name} 已被选择，请选择其他模型`);
+          return;
+        }
+      }
+    }
     setCardModels((prev) => ({ ...prev, [cardIndex]: model }));
     setOpenDropdown(null);
   };
 
   const handleAnalyze = async () => {
-    // 检查是否有上传内容或URL
-    const hasContent = uploadUrl || pastedContent;
+    // 检查是否有上传内容
+    const hasContent = pastedContent || uploadUrl;
+    
+    if (!hasContent) {
+      alert("请先上传内容或粘贴内容后再进行分析");
+      return;
+    }
     
     // 显示分析中状态
     setIsAnalyzing(true);
-    setPromptText("正在分析...");
+    setPromptText("正在分析上传的内容...");
     
     // 模拟 AI 分析延迟
     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -288,39 +302,48 @@ export default function HomePage() {
     // 如果没有选中任何模型，使用默认模型
     const modelsToUse = selectedModels.length > 0 ? selectedModels : ['deepseek'];
     
-    // 生成提示词
+    // 获取维度
     const dims = selectedDimensions.length > 0 ? selectedDimensions.join('、') : '通用';
-    const contentTypeName = contentType === 'text' ? '文字文档' : contentType === 'image' ? '图片视觉' : contentType === 'video' ? '视频解构' : '网页设计';
-    const inputContent = hasContent ? (uploadUrl || pastedContent) : '（未上传内容）';
     
-    // 为每个模型生成提示词
+    // 分析实际上传的内容，提取关键词
+    const content = pastedContent || uploadUrl || '';
+    const contentPreview = content.substring(0, 200);
+    
+    // 为每个模型生成基于实际内容的提示词
     const newCardPrompts: Record<number, string> = {};
     const allPrompts: string[] = [];
     
     modelsToUse.forEach((modelKey, idx) => {
       const modelInfo = MODELS.find(m => m.key === modelKey);
-      const prompt = `【${modelInfo?.name} 提示词】
+      // 基于实际上传内容生成提示词
+      const prompt = `【${modelInfo?.name} 提示词分析】
 
-分析维度：${dims}
-内容类型：${contentTypeName}
-输入内容：${inputContent.substring(0, 100)}${inputContent.length > 100 ? '...' : ''}
+📄 原始内容预览：
+${contentPreview}${content.length > 200 ? '...' : ''}
 
-# 任务
-请根据以上内容，生成适合使用 ${modelInfo?.name} 的高质量提示词。
+📊 分析维度：${dims}
+📝 内容类型：${contentType === 'text' ? '文字文档' : contentType === 'image' ? '图片视觉' : contentType === 'video' ? '视频解构' : '网页设计'}
 
-# 要求
-1. 提取内容核心要点
-2. 按照 ${modelInfo?.name} 的最佳实践格式化
-3. 确保提示词可复用
+---
 
-# 输出`;
+💡 针对 ${modelInfo?.name} 优化的提示词：
+
+请根据上述原始内容，提取以下要点并生成适合 ${modelInfo?.name} 的提示词：
+
+1. 核心主题：[从内容中提取]
+2. 目标受众：[内容主要面向谁]
+3. 关键信息点：[列出主要信息]
+4. 风格/语调：[内容采用的语言风格]
+5. 期望输出：[你希望AI生成什么样的内容]
+
+请生成3-5条高质量提示词，每条包含完整的上下文和角色设定。`;
 
       newCardPrompts[idx] = prompt;
       allPrompts.push(prompt);
     });
     
     // 更新状态
-    setPromptText(allPrompts.join('\n\n---\n\n'));
+    setPromptText(allPrompts.join('\n\n'));
     setCardModels({ 
       0: modelsToUse[0] || null, 
       1: modelsToUse[1] || null, 
@@ -435,7 +458,7 @@ export default function HomePage() {
                   >
                     <option value="">— 选择模型 —</option>
                     {MODELS.map((m) => (
-                      <option key={m.key} value={m.key}>{m.name} ({m.region})</option>
+                      <option key={m.key} value={m.key}>{m.name} ({m.region}){m.free ? ' ✓免费' : ''}</option>
                     ))}
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
