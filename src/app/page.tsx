@@ -272,35 +272,46 @@ export default function HomePage() {
   };
 
   const handleAnalyze = async () => {
-    // 先选中一个默认模型，如果没有选中任何模型
-    let models = { ...cardModels };
-    let hasModel = false;
-    for (const [idx, m] of Object.entries(models)) {
-      if (m) { hasModel = true; break; }
-    }
-    if (!hasModel) {
-      // 自动选中第一个模型
-      models[0] = 'deepseek';
-      setCardModels(models);
-    }
+    // 使用 DeepSeek 作为默认模型
+    const modelKey = 'deepseek';
+    const modelInfo = MODELS.find(m => m.key === modelKey);
     
+    // 显示分析中状态
     setIsAnalyzing(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setPromptText("正在分析...");
     
-    const newPrompts: Record<number, string> = {};
-    // 延迟一下再获取模型状态，确保状态已更新
-    setTimeout(() => {
-      const updatedModels = cardModels;
-      Object.entries(updatedModels).forEach(([index, model]) => {
-        if (model) {
-          const modelInfo = MODELS.find((m) => m.key === model);
-          newPrompts[Number(index)] = "【" + modelInfo?.name + "】分析维度：" + (selectedDimensions.length > 0 ? selectedDimensions.join('、') : '通用') + "。分析内容：这是基于您上传的内容生成的提示词。";
-        }
-      });
-      setCardPrompts(newPrompts);
-      setPromptText(Object.values(newPrompts).join("\n\n"));
-      setIsAnalyzing(false);
-    }, 100);
+    // 模拟 AI 分析延迟
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // 生成提示词内容
+    const dims = selectedDimensions.length > 0 ? selectedDimensions.join('、') : '通用';
+    const content = `【${modelInfo?.name} 提示词】
+
+分析维度：${dims}
+
+内容类型：${contentType === 'text' ? '文字文档' : contentType === 'image' ? '图片视觉' : contentType === 'video' ? '视频解构' : '网页设计'}
+
+生成的提示词：
+你是${modelInfo?.name}，请根据以下要求生成内容...
+
+# 角色设定
+你是一个专业的AI助手，擅长分析和生成各类内容。
+
+# 任务要求
+1. 分析上传的内容
+2. 提取关键信息
+3. 生成高质量的提示词
+
+# 输出格式
+请按照以下格式输出：
+- 核心观点：...
+- 详细内容：...
+- 参考示例：...`;
+
+    setPromptText(content);
+    setCardModels({ 0: modelKey, 1: null, 2: null });
+    setCardPrompts({ 0: content });
+    setIsAnalyzing(false);
   };
 
   const handleCreativeGenerate = async () => {
