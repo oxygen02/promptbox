@@ -228,7 +228,7 @@ export default function HomePage() {
   useEffect(() => {
     setMounted(true);
   }, []);
-  const [selectedGenModel, setSelectedGenModel] = useState<Model | null>(null);
+  const [selectedGenModel, setSelectedGenModel] = useState<string | null>(null);
   const [showShare, setShowShare] = useState(false);
   const [shareContent, setShareContent] = useState("");
   const [copied, setCopied] = useState(false);
@@ -289,14 +289,11 @@ export default function HomePage() {
       return;
     }
     
-    // 判断是否为文件上传（文件名格式）
-    const isFileUpload = content.startsWith('[文件]');
-    
     // 显示分析中状态
     setIsAnalyzing(true);
     setPromptText("正在分析上传的内容...");
     
-    // Try calling backend API first
+    // 优先调用后端 API 进行真正的 AI 分析
     try {
       const response = await fetch('http://124.156.200.127:3002/api/codingplan/analyze', {
         method: 'POST',
@@ -307,17 +304,20 @@ export default function HomePage() {
           contentType: contentType
         })
       });
+      
       const data = await response.json();
+      
       if (data.success) {
         setPromptText(data.result);
         setIsAnalyzing(false);
         return;
       }
-    } catch (e) {
-      console.error('API Error:', e);
+    } catch (error) {
+      console.error('API调用失败，使用本地分析:', error);
     }
     
-    // Fallback: 模拟 AI 分析延迟
+    // 回退：本地模拟分析
+    await new Promise(resolve => setTimeout(resolve, 1500));
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     // 获取选中的模型
@@ -334,12 +334,18 @@ export default function HomePage() {
     const wordCount = content.length;
     const charCount = content.replace(/\s/g, '').length;
     
-    // 为每个选中的模型更新卡片
-    const selectedModels = [cardModels[0], cardModels[1], cardModels[2]].filter(Boolean);
-    const modelsToUse = selectedModels.length > 0 ? selectedModels : ['deepseek'];
+    // 为每个模型生成基于实际内容的提示词
     const newCardPrompts: Record<number, string> = {};
+    const allPrompts: string[] = [];
     
     modelsToUse.forEach((modelKey, idx) => {
+      const modelInfo = MODELS.find(m => m.key === modelKey);
+      
+      // 基于实际内容生成具体可编辑的提示词
+      const isFileUpload = content.startsWith('[文件]');
+      let prompt = '';
+      
+      if (isFileUpload) {
         // 文件上传的情况 - 提示用户文件已上传但内容无法直接读取
         const fileName = content.replace('[文件] ', '');
         prompt = `# ${modelInfo?.name} 提示词 - 文件分析
@@ -565,7 +571,7 @@ ${promptContent}
           <div className="relative">
             <select 
               value={selectedGenModel || ''} 
-              onChange={(e) => setSelectedGenModel(e.target.value || null)}
+              onChange={(e) => setSelectedGenModel(e.target.value || undefined)}
               className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none appearance-none cursor-pointer"
             >
               <option value="">{t.selectModel}</option>
