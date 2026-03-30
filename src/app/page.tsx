@@ -412,7 +412,7 @@ export default function HomePage() {
           );})}
         </div>
         <div className="flex items-center gap-4 mb-4">
-          <button onClick={handleAnalyze} disabled={isAnalyzing || selectedCount === 0} className={cn("text-sm px-6 py-2 rounded-xl font-semibold transition-all shadow-lg bg-slate-800 text-white hover:bg-slate-900", selectedCount === 0 && "opacity-50 cursor-not-allowed")}>{isAnalyzing ? t.analyzing : t.startAnalyze}</button>
+          <button onClick={handleAnalyze} disabled={isAnalyzing} className={cn("text-sm px-6 py-2 rounded-xl font-semibold transition-all shadow-lg bg-slate-800 text-white hover:bg-slate-900", selectedCount === 0 && "opacity-50 cursor-not-allowed")}>{isAnalyzing ? t.analyzing : t.startAnalyze}</button>
           <div className="flex items-center gap-2 text-sm"><span className="text-amber-500 font-medium">Credit</span><span className="text-slate-700 font-semibold">{credits}</span></div>
         </div>
         <div className="glass-card rounded-xl p-4 mb-4">
