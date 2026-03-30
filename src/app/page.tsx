@@ -331,8 +331,8 @@ export default function HomePage() {
               <div className="upload-zone py-5 flex flex-col items-center justify-center min-h-[100px]">
                 <Upload className="w-6 h-6 text-slate-400 mb-2" />
                 <p className="text-sm text-slate-500 mb-2">{t.dragOrClick}</p>
-                <label className="px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors cursor-pointer">
-                  选择文件
+                <label className="px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors cursor-pointer flex items-center gap-2">
+                  <span>📂 点击选择文件</span>
                   <input 
                     type="file" 
                     onChange={(e) => {
@@ -341,7 +341,7 @@ export default function HomePage() {
                         alert(`已选择文件: ${file.name}\n大小: ${(file.size/1024).toFixed(2)} KB`);
                       }
                     }} 
-                    style={{ display: 'none' }}
+                    className="text-xs text-slate-500"
                     accept="image/*,video/*,.txt,.doc,.docx,.pdf"
                   />
                 </label>
