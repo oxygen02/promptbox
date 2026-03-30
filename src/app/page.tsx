@@ -81,7 +81,7 @@ const I18N = {
     enterUrl: "请输入网页链接 URL",
     promptCards: "提示词卡片",
     waitingGenerate: "等待生成...",
-    promptEdit: "提示词编辑",
+    promptEdit: "提示词生成与编辑",
     editPlaceholder: "编辑提示词...",
     generatedContent: "生成内容",
     share: "分享",
@@ -219,6 +219,7 @@ export default function HomePage() {
   };
   const [credits] = useState(520);
   const [cardModels, setCardModels] = useState<Record<number, string | null>>({ 0: null, 1: null, 2: null });
+  const [promptText, setPromptText] = useState("");
   const [cardPrompts, setCardPrompts] = useState<Record<number, string>>({ 0: "", 1: "", 2: "" });
   const [openDropdown, setOpenDropdown] = useState<number | null>(null);
   const [openGenDropdown, setOpenGenDropdown] = useState(false);
@@ -297,6 +298,7 @@ export default function HomePage() {
         }
       });
       setCardPrompts(newPrompts);
+      setPromptText(Object.values(newPrompts).join("\n\n"));
       setIsAnalyzing(false);
     }, 100);
   };
@@ -432,7 +434,7 @@ export default function HomePage() {
         </div>
         <div className="glass-card rounded-xl p-4 mb-4">
           <div className="flex items-center justify-between mb-3"><h3 className="text-sm font-semibold text-slate-700">{t.promptEdit}</h3><div className="flex gap-1.5"><button className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg"><Copy className="w-4 h-4 text-slate-400" /></button><button className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg"><Star className="w-4 h-4 text-slate-400" /></button></div></div>
-          <textarea className="input-field min-h-[80px] resize-none" placeholder={t.editPlaceholder} />
+          <textarea value={promptText} onChange={(e) => setPromptText(e.target.value)} className="input-field min-h-[80px] resize-none" placeholder={t.editPlaceholder} />
           <div className="text-xs text-slate-400 mt-2">0 字符</div>
         </div>
         <div className="flex items-center gap-4 mb-4">
