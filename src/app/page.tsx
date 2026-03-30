@@ -296,7 +296,28 @@ export default function HomePage() {
     setIsAnalyzing(true);
     setPromptText("正在分析上传的内容...");
     
-    // 模拟 AI 分析延迟
+    // Try calling backend API first
+    try {
+      const response = await fetch('http://124.156.200.127:3002/api/codingplan/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: content,
+          dimensions: selectedDimensions,
+          contentType: contentType
+        })
+      });
+      const data = await response.json();
+      if (data.success) {
+        setPromptText(data.result);
+        setIsAnalyzing(false);
+        return;
+      }
+    } catch (e) {
+      console.error('API Error:', e);
+    }
+    
+    // Fallback: 模拟 AI 分析延迟
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     // 获取选中的模型
@@ -313,17 +334,12 @@ export default function HomePage() {
     const wordCount = content.length;
     const charCount = content.replace(/\s/g, '').length;
     
-    // 为每个模型生成基于实际内容的提示词
+    // 为每个选中的模型更新卡片
+    const selectedModels = [cardModels[0], cardModels[1], cardModels[2]].filter(Boolean);
+    const modelsToUse = selectedModels.length > 0 ? selectedModels : ['deepseek'];
     const newCardPrompts: Record<number, string> = {};
-    const allPrompts: string[] = [];
     
     modelsToUse.forEach((modelKey, idx) => {
-      const modelInfo = MODELS.find(m => m.key === modelKey);
-      
-      // 基于实际内容生成具体可编辑的提示词
-      let prompt = '';
-      
-      if (isFileUpload) {
         // 文件上传的情况 - 提示用户文件已上传但内容无法直接读取
         const fileName = content.replace('[文件] ', '');
         prompt = `# ${modelInfo?.name} 提示词 - 文件分析
