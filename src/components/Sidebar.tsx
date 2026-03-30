@@ -16,6 +16,8 @@ import {
   Star,
   Settings,
   Layers,
+  Type,
+  Palette,
   type LucideIcon,
 } from "lucide-react";
 
