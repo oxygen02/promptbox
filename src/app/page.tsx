@@ -328,22 +328,33 @@ export default function HomePage() {
           </div>
           <div className="flex gap-3 mb-4">
             <div className="flex-1">
-              <label className="block upload-zone py-5 flex flex-col items-center justify-center min-h-[100px] cursor-pointer">
+              <div className="upload-zone py-5 flex flex-col items-center justify-center min-h-[100px]">
                 <Upload className="w-6 h-6 text-slate-400 mb-2" />
-                <p className="text-sm text-slate-500">{t.dragOrClick}</p>
+                <p className="text-sm text-slate-500 mb-2">{t.dragOrClick}</p>
+                <button 
+                  type="button"
+                  onClick={() => {
+                    console.log('点击选择文件按钮');
+                    fileInputRef.current?.click();
+                  }}
+                  className="px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  选择文件
+                </button>
                 <input 
+                  ref={fileInputRef}
                   type="file" 
-                  id="file-upload"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
+                      console.log('文件已选择:', file.name);
                       alert(`已选择文件: ${file.name}\n大小: ${(file.size/1024).toFixed(2)} KB`);
                     }
                   }} 
-                  className="absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0" 
-                  style={{ clip: 'rect(0,0,0,0)' }}
+                  className="hidden" 
+                  accept="image/*,video/*,.txt,.doc,.docx,.pdf"
                 />
-              </label>
+              </div>
             </div>
             <div className="flex-1"><input type="text" placeholder={t.enterUrl} value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-3" /></div>
           </div>
@@ -384,15 +395,17 @@ export default function HomePage() {
         <div className="flex items-center gap-4 mb-4">
           <button onClick={handleCreativeGenerate} disabled={!selectedGenModel || isGenerating} className={cn("text-sm px-6 py-2 rounded-xl font-semibold transition-all shadow-lg bg-slate-800 text-white hover:bg-slate-900", !selectedGenModel && "opacity-50 cursor-not-allowed")}>{isGenerating ? t.generating : t.creativeGenerate}</button>
           <div className="relative">
-            <button onClick={() => setOpenGenDropdown(!openGenDropdown)} className="flex items-center gap-2 px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl hover:bg-slate-50 font-medium text-slate-700">{selectedGenModel ? <>{MODELS.find(m => m.key === selectedGenModel)?.name}</> : <span className="text-slate-400">{t.selectModel}</span>}<ChevronDown className="w-4 h-4 text-slate-400" /></button>
-            {openGenDropdown && mounted && createPortal(
-              <div className="fixed bg-white border border-slate-200 rounded-lg shadow-2xl min-w-[140px] max-h-64 overflow-y-auto" style={{ zIndex: 99999 }}>
-                {MODELS.map((m) => (
-                  <div key={m.key} className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", selectedGenModel === m.key && "bg-slate-50 text-blue-600")} onClick={() => { setSelectedGenModel(m.key); setOpenGenDropdown(false); }}>{m.name}</div>
-                ))}
-              </div>,
-              document.body
-            )}
+            <select 
+              value={selectedGenModel || ''} 
+              onChange={(e) => setSelectedGenModel(e.target.value || null)}
+              className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none appearance-none cursor-pointer"
+            >
+              <option value="">{t.selectModel}</option>
+              {MODELS.map((m) => (
+                <option key={m.key} value={m.key}>{m.name}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
           </div>
           <div className="flex items-center gap-2 text-sm"><span className="text-amber-500 font-medium">Credit</span><span className="text-slate-700 font-semibold">{credits}</span></div>
         </div>
