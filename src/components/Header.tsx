@@ -54,16 +54,17 @@ export default function Header() {
         <Link href="/" className="flex items-center gap-2 flex-shrink-0">
           <div className="w-9 h-9 flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" className="w-full h-full">
-              {/* Outer box */}
-              <rect x="8" y="16" width="48" height="40" rx="6" fill="#3b82f6"/>
-              <rect x="8" y="16" width="48" height="40" rx="6" stroke="#1e40af" stroke-width="2"/>
-              {/* Box lid */}
-              <path d="M8 22 L32 10 L56 22" stroke="#1e40af" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              {/* Inner glow */}
-              <rect x="14" y="26" width="36" height="24" rx="4" fill="#60a5fa" opacity="0.5"/>
-              {/* Sparkle stars */}
-              <circle cx="20" cy="30" r="2" fill="white"/>
-              <circle cx="44" cy="28" r="1.5" fill="white"/>
+              {/* 3D Box - Front face */}
+              <path d="M12 20 L32 12 L52 20 L52 48 L32 56 L12 48 Z" fill="#3b82f6"/>
+              {/* 3D Box - Top face */}
+              <path d="M12 20 L32 12 L52 20 L32 28 Z" fill="#60a5fa"/>
+              {/* 3D Box - Right face */}
+              <path d="M52 20 L32 28 L32 56 L52 48 Z" fill="#1d4ed8"/>
+              {/* Box opening/inner */}
+              <rect x="20" y="28" width="24" height="20" rx="3" fill="#1e40af" opacity="0.3"/>
+              {/* Stars/Sparkles */}
+              <circle cx="26" cy="34" r="2" fill="white"/>
+              <circle cx="42" cy="32" r="1.5" fill="white"/>
               <circle cx="38" cy="42" r="2" fill="white"/>
               <circle cx="24" cy="40" r="1" fill="white"/>
             </svg>

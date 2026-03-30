@@ -14,6 +14,7 @@ import {
   History,
   Star,
   Settings,
+  Layers,
   type LucideIcon,
 } from "lucide-react";
 
@@ -36,12 +37,12 @@ interface NavSection {
 const navSections: NavSection[] = [
   {
     key: "content",
-    icon: FileText,
+    icon: Layers,
     zh: "内容分类",
     en: "Content",
     items: [
-      { key: "text", icon: FileText, zh: "文字文档", en: "Text" },
-      { key: "image", icon: Image, zh: "图片视觉", en: "Image" },
+      { key: "text", icon: Type, zh: "文字文档", en: "Text" },
+      { key: "image", icon: Palette, zh: "图片视觉", en: "Image" },
       { key: "video", icon: Video, zh: "视频解构", en: "Video" },
       { key: "web", icon: Globe, zh: "网页设计", en: "Web" },
     ],
