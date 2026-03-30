@@ -282,9 +282,9 @@ export default function HomePage() {
 
   const handleAnalyze = async () => {
     // 检查是否有上传内容
-    const hasContent = pastedContent || uploadUrl;
+    const content = pastedContent || uploadUrl;
     
-    if (!hasContent) {
+    if (!content) {
       alert("请先上传内容或粘贴内容后再进行分析");
       return;
     }
@@ -298,16 +298,17 @@ export default function HomePage() {
     
     // 获取选中的模型
     const selectedModels = [cardModels[0], cardModels[1], cardModels[2]].filter(Boolean);
-    
-    // 如果没有选中任何模型，使用默认模型
     const modelsToUse = selectedModels.length > 0 ? selectedModels : ['deepseek'];
     
     // 获取维度
     const dims = selectedDimensions.length > 0 ? selectedDimensions.join('、') : '通用';
+    const contentTypeName = contentType === 'text' ? '文字文档' : contentType === 'image' ? '图片视觉' : contentType === 'video' ? '视频解构' : '网页设计';
     
-    // 分析实际上传的内容，提取关键词
-    const content = pastedContent || uploadUrl || '';
-    const contentPreview = content.substring(0, 200);
+    // 简单提取内容中的关键信息（模拟 AI 分析）
+    const lines = content.split(/[\n，。,.、]/).filter(l => l.trim().length > 2);
+    const keyPoints = lines.slice(0, 5).map(l => l.trim()).join('\n');
+    const wordCount = content.length;
+    const charCount = content.replace(/\s/g, '').length;
     
     // 为每个模型生成基于实际内容的提示词
     const newCardPrompts: Record<number, string> = {};
@@ -315,34 +316,45 @@ export default function HomePage() {
     
     modelsToUse.forEach((modelKey, idx) => {
       const modelInfo = MODELS.find(m => m.key === modelKey);
-      // 基于实际上传内容生成提示词
-      const prompt = `【${modelInfo?.name} 提示词分析】
+      
+      // 基于实际内容生成具体可编辑的提示词
+      const prompt = `【${modelInfo?.name} - 提示词分析与生成】
 
-📄 原始内容预览：
-${contentPreview}${content.length > 200 ? '...' : ''}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 内容分析结果
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📝 内容类型：${contentTypeName}
+📊 字数统计：${wordCount} 字 / ${charCount} 字符
+🏷️ 选维度：${dims}
 
-📊 分析维度：${dims}
-📝 内容类型：${contentType === 'text' ? '文字文档' : contentType === 'image' ? '图片视觉' : contentType === 'video' ? '视频解构' : '网页设计'}
+📄 提取的关键信息：
+${keyPoints || '（从内容中自动提取）'}
 
----
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 生成的提示词（可直接编辑）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-💡 针对 ${modelInfo?.name} 优化的提示词：
+# 角色设定
+你是一个专业的AI助手，擅长分析和解构各类内容。你的任务是理解给定的原始内容，并按照用户要求生成高质量的输出。
 
-请根据上述原始内容，提取以下要点并生成适合 ${modelInfo?.name} 的提示词：
+# 输入内容
+${content.substring(0, 500)}${content.length > 500 ? '...' : ''}
 
-1. 核心主题：[从内容中提取]
-2. 目标受众：[内容主要面向谁]
-3. 关键信息点：[列出主要信息]
-4. 风格/语调：[内容采用的语言风格]
-5. 期望输出：[你希望AI生成什么样的内容]
+# 核心任务
+基于上述输入内容，按照以下维度进行分析和创作：
+${dims.split('、').map(d => `- ${d}`).join('\n')}
 
-请生成3-5条高质量提示词，每条包含完整的上下文和角色设定。`;
+# 输出要求
+1. 准确理解输入内容的核心主题
+2. 提取关键信息和要点
+3. 按照选定的维度进行专业化处理
+4. 输出结构清晰、逻辑性强`;
 
       newCardPrompts[idx] = prompt;
       allPrompts.push(prompt);
     });
     
-    // 更新状态
+    // 更新状态 - 文本框可编辑
     setPromptText(allPrompts.join('\n\n'));
     setCardModels({ 
       0: modelsToUse[0] || null, 
