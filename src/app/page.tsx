@@ -458,7 +458,7 @@ ${contentPreview}${content.length > 200 ? '...' : ''}
                   >
                     <option value="">— 选择模型 —</option>
                     {MODELS.map((m) => (
-                      <option key={m.key} value={m.key}>{m.name} ({m.region}){m.free ? ' ✓免费' : ''}</option>
+                      <option key={m.key} value={m.key}>{m.name} ({m.region})</option>
                     ))}
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
