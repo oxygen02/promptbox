@@ -207,6 +207,16 @@ export default function HomePage() {
   }, []);
 
   const t = I18N[language];
+
+  // 处理文件上传
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      console.log("Uploaded file:", file.name);
+      // 这里可以添加文件上传逻辑
+      alert(`已选择文件: ${file.name}`);
+    }
+  };
   const [credits] = useState(520);
   const [cardModels, setCardModels] = useState<Record<number, Model | null>>({ 0: null, 1: null, 2: null });
   const [cardPrompts, setCardPrompts] = useState<Record<number, string>>({ 0: "", 1: "", 2: "" });
@@ -317,7 +327,7 @@ export default function HomePage() {
             {uploadTypes.map((type) => (<button key={type.key} className="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-slate-50 transition-colors"><type.icon className="w-5 h-5 text-slate-400" /><span className="text-xs text-slate-500">{type.label}</span></button>))}
           </div>
           <div className="flex gap-3 mb-4">
-            <div className="flex-1"><label className="block upload-zone py-5 flex flex-col items-center justify-center min-h-[100px] cursor-pointer"><Upload className="w-5 h-5 text-slate-400 mb-2" /><p className="text-sm text-slate-500">{t.dragOrClick}</p><input type="file" className="hidden" /></label></div>
+            <div className="flex-1"><label className="block upload-zone py-5 flex flex-col items-center justify-center min-h-[100px] cursor-pointer"><Upload className="w-5 h-5 text-slate-400 mb-2" /><p className="text-sm text-slate-500">{t.dragOrClick}</p><input type="file" onChange={handleFileUpload} className="hidden" /></label></div>
             <div className="flex-1"><input type="text" placeholder={t.enterUrl} value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-3" /></div>
           </div>
           <div><h4 className="text-xs font-medium text-slate-500 mb-2">{t.promptDimensions}</h4><div className="grid grid-cols-6 gap-1.5">{currentTags.map((tag) => (<button key={tag} onClick={() => handleDimensionClick(tag)} className={cn("px-2 py-1.5 text-xs rounded-lg transition-all text-center", selectedDimensions.includes(tag) ? "bg-slate-800 text-white shadow" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}>{tag}</button>))}</div></div>
