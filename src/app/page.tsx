@@ -575,7 +575,7 @@ ${promptContent}
                 ? ["wechat", "weibo", "xiaohongshu"] 
                 : ["x", "facebook", "instagram"]
               ).map((platform) => (
-                <button key={platform} className="w-12 h-12 rounded-full bg-slate-700 hover:bg-slate-800 flex items-center justify-center text-white">
+                <button key={platform} className="hover:scale-110 transition-transform">
                   <SocialIcon platform={platform} />
                 </button>
               ))}
