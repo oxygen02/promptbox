@@ -355,7 +355,7 @@ export default function HomePage() {
                 <div className="relative">
                   <button type="button" onClick={() => setOpenDropdown(openDropdown === index ? null : index)} className="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"><span className={model ? "text-slate-700 font-medium" : "text-slate-400"}>{model ? modelInfo?.name : t.selectModel}</span><ChevronDown className="w-4 h-4 text-slate-400" /></button>
                   {openDropdown === index && (
-                    <div className="absolute z-50 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto w-full">
+                    <div className="absolute z-[999999] mt-1 bg-white border border-slate-200 rounded-lg shadow-[0_10px_40px_rgba(0,0,0,0.3)] max-h-60 overflow-y-auto w-full !important">
                       <div className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", !model && "bg-slate-100")} onClick={() => { handleCardModelSelect(index, null); setOpenDropdown(null); }}>— 未选中 —</div>
                       {MODELS.map((m) => (
                         <div key={m.key} className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", model === m.key && "bg-slate-100 text-blue-600 font-medium")} onClick={() => { handleCardModelSelect(index, m.key); setOpenDropdown(null); }}>{m.name} ({m.region})</div>
