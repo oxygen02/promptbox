@@ -7,6 +7,7 @@ import {
   Image, 
   Video, 
   Globe,
+  Monitor,
   Zap,
   BookOpen,
   Link2,
@@ -44,7 +45,7 @@ const navSections: NavSection[] = [
       { key: "text", icon: Type, zh: "文字文档", en: "Text" },
       { key: "image", icon: Palette, zh: "图片视觉", en: "Image" },
       { key: "video", icon: Video, zh: "视频解构", en: "Video" },
-      { key: "web", icon: Globe, zh: "网页设计", en: "Web" },
+      { key: "web", icon: Monitor, zh: "网页设计", en: "Web" },
     ],
   },
   {
