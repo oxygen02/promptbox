@@ -272,9 +272,8 @@ export default function HomePage() {
   };
 
   const handleAnalyze = async () => {
-    // 使用 DeepSeek 作为默认模型
-    const modelKey = 'deepseek';
-    const modelInfo = MODELS.find(m => m.key === modelKey);
+    // 检查是否有上传内容或URL
+    const hasContent = uploadUrl || pastedContent;
     
     // 显示分析中状态
     setIsAnalyzing(true);
@@ -283,34 +282,51 @@ export default function HomePage() {
     // 模拟 AI 分析延迟
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    // 生成提示词内容
+    // 获取选中的模型
+    const selectedModels = [cardModels[0], cardModels[1], cardModels[2]].filter(Boolean);
+    
+    // 如果没有选中任何模型，使用默认模型
+    const modelsToUse = selectedModels.length > 0 ? selectedModels : ['deepseek'];
+    
+    // 生成提示词
     const dims = selectedDimensions.length > 0 ? selectedDimensions.join('、') : '通用';
-    const content = `【${modelInfo?.name} 提示词】
+    const contentTypeName = contentType === 'text' ? '文字文档' : contentType === 'image' ? '图片视觉' : contentType === 'video' ? '视频解构' : '网页设计';
+    const inputContent = hasContent ? (uploadUrl || pastedContent) : '（未上传内容）';
+    
+    // 为每个模型生成提示词
+    const newCardPrompts: Record<number, string> = {};
+    const allPrompts: string[] = [];
+    
+    modelsToUse.forEach((modelKey, idx) => {
+      const modelInfo = MODELS.find(m => m.key === modelKey);
+      const prompt = `【${modelInfo?.name} 提示词】
 
 分析维度：${dims}
+内容类型：${contentTypeName}
+输入内容：${inputContent.substring(0, 100)}${inputContent.length > 100 ? '...' : ''}
 
-内容类型：${contentType === 'text' ? '文字文档' : contentType === 'image' ? '图片视觉' : contentType === 'video' ? '视频解构' : '网页设计'}
+# 任务
+请根据以上内容，生成适合使用 ${modelInfo?.name} 的高质量提示词。
 
-生成的提示词：
-你是${modelInfo?.name}，请根据以下要求生成内容...
+# 要求
+1. 提取内容核心要点
+2. 按照 ${modelInfo?.name} 的最佳实践格式化
+3. 确保提示词可复用
 
-# 角色设定
-你是一个专业的AI助手，擅长分析和生成各类内容。
+# 输出`;
 
-# 任务要求
-1. 分析上传的内容
-2. 提取关键信息
-3. 生成高质量的提示词
-
-# 输出格式
-请按照以下格式输出：
-- 核心观点：...
-- 详细内容：...
-- 参考示例：...`;
-
-    setPromptText(content);
-    setCardModels({ 0: modelKey, 1: null, 2: null });
-    setCardPrompts({ 0: content });
+      newCardPrompts[idx] = prompt;
+      allPrompts.push(prompt);
+    });
+    
+    // 更新状态
+    setPromptText(allPrompts.join('\n\n---\n\n'));
+    setCardModels({ 
+      0: modelsToUse[0] || null, 
+      1: modelsToUse[1] || null, 
+      2: modelsToUse[2] || null 
+    });
+    setCardPrompts(newCardPrompts);
     setIsAnalyzing(false);
   };
 
