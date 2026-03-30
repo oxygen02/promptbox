@@ -271,19 +271,34 @@ export default function HomePage() {
   };
 
   const handleAnalyze = async () => {
-    const selectedCount = Object.values(cardModels).filter(Boolean).length;
-    if (selectedCount === 0) return;
+    // 先选中一个默认模型，如果没有选中任何模型
+    let models = { ...cardModels };
+    let hasModel = false;
+    for (const [idx, m] of Object.entries(models)) {
+      if (m) { hasModel = true; break; }
+    }
+    if (!hasModel) {
+      // 自动选中第一个模型
+      models[0] = 'deepseek';
+      setCardModels(models);
+    }
+    
     setIsAnalyzing(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
+    
     const newPrompts: Record<number, string> = {};
-    Object.entries(cardModels).forEach(([index, model]) => {
-      if (model) {
-        const modelInfo = MODELS.find((m) => m.key === model);
-        newPrompts[Number(index)] = "【" + modelInfo?.name + "】分析维度：" + selectedDimensions.join('、') + "。";
-      }
-    });
-    setCardPrompts(newPrompts);
-    setIsAnalyzing(false);
+    // 延迟一下再获取模型状态，确保状态已更新
+    setTimeout(() => {
+      const updatedModels = cardModels;
+      Object.entries(updatedModels).forEach(([index, model]) => {
+        if (model) {
+          const modelInfo = MODELS.find((m) => m.key === model);
+          newPrompts[Number(index)] = "【" + modelInfo?.name + "】分析维度：" + (selectedDimensions.length > 0 ? selectedDimensions.join('、') : '通用') + "。分析内容：这是基于您上传的内容生成的提示词。";
+        }
+      });
+      setCardPrompts(newPrompts);
+      setIsAnalyzing(false);
+    }, 100);
   };
 
   const handleCreativeGenerate = async () => {
