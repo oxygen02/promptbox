@@ -325,65 +325,68 @@ export default function HomePage() {
             <span className="text-xs px-3 py-1 rounded-full bg-slate-100 text-slate-500 flex items-center gap-1.5"><Sparkles className="w-3.5 h-3.5" />{t.aiReady}</span>
           </div>
           
-          {/* 文件上传 */}
-          <div className="mb-4">
-            <div 
-              className="upload-zone py-4 flex flex-col items-center justify-center min-h-[80px] border-2 border-dashed border-slate-200 rounded-xl bg-slate-50"
-              onPaste={(e) => {
-                e.preventDefault();
-                const text = e.clipboardData.getData('text');
-                if (text) {
-                  setPastedContent(text);
-                  setUploadUrl(text);
-                  alert(`已粘贴内容: ${text.substring(0, 50)}${text.length > 50 ? '...' : ''}`);
-                }
-              }}
-              tabIndex={0}
-            >
-              {pastedContent ? (
-                <div className="text-sm text-green-600 font-medium">✓ 已粘贴内容</div>
-              ) : (
-                <>
-                  <Upload className="w-8 h-8 text-slate-300 mb-2" />
-                  <p className="text-sm text-slate-500 mb-2">{t.dragOrClick}</p>
-                  <p className="text-xs text-slate-400 mb-2">支持 Ctrl+V 粘贴</p>
-                </>
-              )}
-              <label className="px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors cursor-pointer">
-                📂 选择文件
-                <input 
-                  type="file" 
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      alert(`已选择文件: ${file.name}\n大小: ${(file.size/1024).toFixed(2)} KB`);
+          {/* 左侧：上传区域+URL，右侧：维度选择 */}
+          <div className="flex gap-4">
+            {/* 左侧 */}
+            <div className="flex-1">
+              {/* 文件上传 */}
+              <div className="mb-3">
+                <div 
+                  className="upload-zone py-3 flex flex-col items-center justify-center min-h-[70px] border-2 border-dashed border-slate-200 rounded-xl bg-slate-50"
+                  onPaste={(e) => {
+                    e.preventDefault();
+                    const text = e.clipboardData.getData('text');
+                    if (text) {
+                      setPastedContent(text);
+                      setUploadUrl(text);
+                      alert(`已粘贴内容: ${text.substring(0, 50)}${text.length > 50 ? '...' : ''}`);
                     }
-                  }} 
-                  className="hidden"
-                  accept="image/*,video/*,.txt,.doc,.docx,.pdf"
-                />
-              </label>
-            </div>
-          </div>
-
-          {/* URL输入 */}
-          <div className="mb-4">
-            <input type="text" placeholder={t.enterUrl} value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-3" />
-          </div>
-
-          {/* 维度选择 */}
-          <div>
-            <h4 className="text-xs font-medium text-slate-500 mb-2">{t.promptDimensions}</h4>
-            <div className="flex flex-wrap gap-1.5">
-              {currentTags.map((tag) => (
-                <button 
-                  key={tag} 
-                  onClick={() => handleDimensionClick(tag)} 
-                  className={cn("px-3 py-1.5 text-xs rounded-lg transition-all", selectedDimensions.includes(tag) ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}
+                  }}
+                  tabIndex={0}
                 >
-                  {tag}
-                </button>
-              ))}
+                  {pastedContent ? (
+                    <div className="text-sm text-green-600 font-medium">✓ 已粘贴内容</div>
+                  ) : (
+                    <>
+                      <Upload className="w-6 h-6 text-slate-300 mb-1" />
+                      <p className="text-xs text-slate-500 mb-1">{t.dragOrClick}</p>
+                    </>
+                  )}
+                  <label className="px-3 py-1.5 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-colors cursor-pointer">
+                    📂 选择文件
+                    <input 
+                      type="file" 
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          alert(`已选择文件: ${file.name}\n大小: ${(file.size/1024).toFixed(2)} KB`);
+                        }
+                      }} 
+                      className="hidden"
+                      accept="image/*,video/*,.txt,.doc,.docx,.pdf"
+                    />
+                  </label>
+                </div>
+              </div>
+              
+              {/* URL输入 */}
+              <input type="text" placeholder={t.enterUrl} value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-2 text-sm" />
+            </div>
+            
+            {/* 右侧：维度选择 */}
+            <div className="flex-1">
+              <h4 className="text-xs font-medium text-slate-500 mb-2">{t.promptDimensions}</h4>
+              <div className="flex flex-wrap gap-1.5">
+                {currentTags.map((tag) => (
+                  <button 
+                    key={tag} 
+                    onClick={() => handleDimensionClick(tag)} 
+                    className={cn("px-2 py-1 text-xs rounded-lg transition-all", selectedDimensions.includes(tag) ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
