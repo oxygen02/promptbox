@@ -323,33 +323,49 @@ export default function HomePage() {
             <h3 className="text-sm font-semibold text-slate-700">{t.uploadContent}</h3>
             <span className="text-xs px-3 py-1 rounded-full bg-slate-100 text-slate-500 flex items-center gap-1.5"><Sparkles className="w-3.5 h-3.5" />{t.aiReady}</span>
           </div>
-          <div className="flex justify-center gap-6 mb-4">
-            {uploadTypes.map((type) => (<button key={type.key} className="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-slate-50 transition-colors"><type.icon className="w-5 h-5 text-slate-400" /><span className="text-xs text-slate-500">{type.label}</span></button>))}
+          
+          {/* 文件上传区域 */}
+          <div className="mb-4">
+            <div className="upload-zone py-5 flex flex-col items-center justify-center min-h-[100px]">
+              <Upload className="w-6 h-6 text-slate-400 mb-2" />
+              <p className="text-sm text-slate-500 mb-2">{t.dragOrClick}</p>
+              <label className="px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors cursor-pointer flex items-center gap-2">
+                <span>📂 点击选择文件</span>
+                <input 
+                  type="file" 
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      alert(`已选择文件: ${file.name}\n大小: ${(file.size/1024).toFixed(2)} KB`);
+                    }
+                  }} 
+                  className="text-xs text-slate-500"
+                  accept="image/*,video/*,.txt,.doc,.docx,.pdf"
+                />
+              </label>
+            </div>
           </div>
-          <div className="flex gap-3 mb-4">
+
+          {/* URL输入和维度选择 */}
+          <div className="flex gap-4">
+            <div className="w-1/3">
+              <input type="text" placeholder={t.enterUrl} value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-3" />
+            </div>
             <div className="flex-1">
-              <div className="upload-zone py-5 flex flex-col items-center justify-center min-h-[100px]">
-                <Upload className="w-6 h-6 text-slate-400 mb-2" />
-                <p className="text-sm text-slate-500 mb-2">{t.dragOrClick}</p>
-                <label className="px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors cursor-pointer flex items-center gap-2">
-                  <span>📂 点击选择文件</span>
-                  <input 
-                    type="file" 
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        alert(`已选择文件: ${file.name}\n大小: ${(file.size/1024).toFixed(2)} KB`);
-                      }
-                    }} 
-                    className="text-xs text-slate-500"
-                    accept="image/*,video/*,.txt,.doc,.docx,.pdf"
-                  />
-                </label>
+              <h4 className="text-xs font-medium text-slate-500 mb-2">{t.promptDimensions}</h4>
+              <div className="flex flex-wrap gap-1.5">
+                {currentTags.map((tag) => (
+                  <button 
+                    key={tag} 
+                    onClick={() => handleDimensionClick(tag)} 
+                    className={cn("px-2 py-1.5 text-xs rounded-lg transition-all text-center whitespace-nowrap", selectedDimensions.includes(tag) ? "bg-slate-800 text-white shadow" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}
+                  >
+                    {tag}
+                  </button>
+                ))}
               </div>
             </div>
-            <div className="flex-1"><input type="text" placeholder={t.enterUrl} value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-3" /></div>
           </div>
-          <div><h4 className="text-xs font-medium text-slate-500 mb-2">{t.promptDimensions}</h4><div className="grid grid-cols-6 gap-1.5">{currentTags.map((tag) => (<button key={tag} onClick={() => handleDimensionClick(tag)} className={cn("px-2 py-1.5 text-xs rounded-lg transition-all text-center", selectedDimensions.includes(tag) ? "bg-slate-800 text-white shadow" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}>{tag}</button>))}</div></div>
         </div>
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[0, 1, 2].map((index) => { const model = cardModels[index]; const prompt = cardPrompts[index]; const modelInfo = MODELS.find((m) => m.key === model); return (
