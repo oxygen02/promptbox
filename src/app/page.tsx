@@ -460,7 +460,7 @@ ${promptContent}
                 <span className="text-sm text-slate-500">{pastedContent || t.dragOrClick}</span>
                 <span className="text-xs text-slate-400">点击上传</span>
               </div>
-              <input type="text" placeholder="输入网页URL" value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-3 text-sm mt-2 min-h-[70px]" />
+              <input type="text" placeholder="输入网页URL" value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-2 text-sm mt-2" />
               
               <input 
                 type="file" 
