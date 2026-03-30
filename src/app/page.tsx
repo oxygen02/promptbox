@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { createPortal } from "react-dom";
 import {
   Upload,
   Sparkles,
@@ -211,6 +212,11 @@ export default function HomePage() {
   const [cardPrompts, setCardPrompts] = useState<Record<number, string>>({ 0: "", 1: "", 2: "" });
   const [openDropdown, setOpenDropdown] = useState<number | null>(null);
   const [openGenDropdown, setOpenGenDropdown] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [selectedGenModel, setSelectedGenModel] = useState<Model | null>(null);
   const [showShare, setShowShare] = useState(false);
   const [shareContent, setShareContent] = useState("");
@@ -330,15 +336,18 @@ export default function HomePage() {
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[0, 1, 2].map((index) => { const model = cardModels[index]; const prompt = cardPrompts[index]; const modelInfo = MODELS.find((m) => m.key === model); return (
             <div key={index} className="glass-card rounded-xl p-4">
-              <button ref={(el) => { dropdownButtonRefs.current[index] = el; }} onClick={() => { const btn = dropdownButtonRefs.current[index]; if (btn) { const rect = btn.getBoundingClientRect(); setDropdownPos({ top: rect.bottom + window.scrollY + 4, left: rect.left }); } setOpenDropdown(openDropdown === index ? null : index); }} className="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"><span className={model ? "text-slate-700 font-medium" : "text-slate-400"}>{model ? modelInfo?.name : t.selectModel}</span><ChevronDown className="w-4 h-4 text-slate-400" /></button>
-              {openDropdown === index && (
-                <div className="absolute !z-[99999] mt-1 bg-white border border-slate-200 rounded-lg shadow-xl w-full">
-                  <div className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", !model && "bg-slate-50")} onClick={() => { handleCardModelSelect(index, null); setOpenDropdown(null); }}>— 未选中 —</div>
-                  {MODELS.map((m) => (
-                    <div key={m.key} className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", model === m.key && "bg-slate-50 text-blue-600")} onClick={() => { handleCardModelSelect(index, m.key); setOpenDropdown(null); }}>{m.name} ({m.region})</div>
-                  ))}
-                </div>
-              )}
+              <div className="relative">
+                <button onClick={() => setOpenDropdown(openDropdown === index ? null : index)} className="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"><span className={model ? "text-slate-700 font-medium" : "text-slate-400"}>{model ? modelInfo?.name : t.selectModel}</span><ChevronDown className="w-4 h-4 text-slate-400" /></button>
+                {openDropdown === index && mounted && createPortal(
+                  <div className="fixed bg-white border border-slate-200 rounded-lg shadow-2xl max-h-64 overflow-y-auto" style={{ zIndex: 99999 }}>
+                    <div className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", !model && "bg-slate-50")} onClick={() => { handleCardModelSelect(index, null); setOpenDropdown(null); }}>— 未选中 —</div>
+                    {MODELS.map((m) => (
+                      <div key={m.key} className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", model === m.key && "bg-slate-50 text-blue-600")} onClick={() => { handleCardModelSelect(index, m.key); setOpenDropdown(null); }}>{m.name} ({m.region})</div>
+                    ))}
+                  </div>,
+                  document.body
+                )}
+              </div>
               <div className="mt-3 min-h-[70px] text-sm text-slate-600 whitespace-pre-wrap">{prompt || t.waitingGenerate}</div>
               {prompt && (<div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-slate-100"><button onClick={() => handleShare(prompt)} className="p-1.5 hover:bg-slate-100 rounded-lg"><Share2 className="w-4 h-4 text-slate-400" /></button><button className="p-1.5 hover:bg-slate-100 rounded-lg"><Copy className="w-4 h-4 text-slate-400" /></button><button className="p-1.5 hover:bg-slate-100 rounded-lg"><Star className="w-4 h-4 text-slate-400" /></button></div>)}
             </div>
@@ -355,14 +364,17 @@ export default function HomePage() {
         </div>
         <div className="flex items-center gap-4 mb-4">
           <button onClick={handleCreativeGenerate} disabled={!selectedGenModel || isGenerating} className={cn("text-sm px-6 py-2 rounded-xl font-semibold transition-all shadow-lg bg-slate-800 text-white hover:bg-slate-900", !selectedGenModel && "opacity-50 cursor-not-allowed")}>{isGenerating ? t.generating : t.creativeGenerate}</button>
-          <button ref={genDropdownButtonRef} onClick={() => { const btn = genDropdownButtonRef.current; if (btn) { const rect = btn.getBoundingClientRect(); setGenDropdownPos({ top: rect.bottom + window.scrollY + 4, left: rect.left }); } setOpenGenDropdown(!openGenDropdown); }} className="flex items-center gap-2 px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl hover:bg-slate-50 font-medium text-slate-700">{selectedGenModel ? <>{MODELS.find(m => m.key === selectedGenModel)?.name}</> : <span className="text-slate-400">{t.selectModel}</span>}<ChevronDown className="w-4 h-4 text-slate-400" /></button>
-          {openGenDropdown && (
-            <div className="absolute !z-[99999] mt-1 bg-white border border-slate-200 rounded-lg shadow-xl min-w-[140px]">
-              {MODELS.map((m) => (
-                <div key={m.key} className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", selectedGenModel === m.key && "bg-slate-50 text-blue-600")} onClick={() => { setSelectedGenModel(m.key); setOpenGenDropdown(false); }}>{m.name}</div>
-              ))}
-            </div>
-          )}
+          <div className="relative">
+            <button onClick={() => setOpenGenDropdown(!openGenDropdown)} className="flex items-center gap-2 px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl hover:bg-slate-50 font-medium text-slate-700">{selectedGenModel ? <>{MODELS.find(m => m.key === selectedGenModel)?.name}</> : <span className="text-slate-400">{t.selectModel}</span>}<ChevronDown className="w-4 h-4 text-slate-400" /></button>
+            {openGenDropdown && mounted && createPortal(
+              <div className="fixed bg-white border border-slate-200 rounded-lg shadow-2xl min-w-[140px] max-h-64 overflow-y-auto" style={{ zIndex: 99999 }}>
+                {MODELS.map((m) => (
+                  <div key={m.key} className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", selectedGenModel === m.key && "bg-slate-50 text-blue-600")} onClick={() => { setSelectedGenModel(m.key); setOpenGenDropdown(false); }}>{m.name}</div>
+                ))}
+              </div>,
+              document.body
+            )}
+          </div>
           <div className="flex items-center gap-2 text-sm"><span className="text-amber-500 font-medium">Credit</span><span className="text-slate-700 font-semibold">{credits}</span></div>
         </div>
         <div className="glass-card rounded-xl p-5">
