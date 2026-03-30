@@ -5,7 +5,7 @@ const router = express.Router();
 const CODING_PLAN_CONFIG = {
   endpoint: 'https://api.codingplan.com/v1/chat/completions',
   model: 'codingplan-s1',
-  apiKey: process.env.CODING_PLAN_CONFIG.apiKey || 'sk-sp-5T2M10svnntrPkJMwMwoKDMabYFEVHAMews5rIepwUnVDhld'
+  apiKey: process.env.CODING_PLAN_API_KEY || 'sk-sp-5T2M10svnntrPkJMwMwoKDMabYFEVHAMews5rIepwUnVDhld'
 };
 
 // 调用腾讯云 CodingPlan API
