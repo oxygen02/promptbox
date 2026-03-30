@@ -76,7 +76,7 @@ const I18N = {
     startAnalyze: "开始分析",
     analyzing: "分析中...",
     generatedPlaceholder: "点击上方「创意生成」按钮生成内容...",
-    promptDimensions: "提示词维度",
+    promptDimensions: "提示词维度（可多选）",
     dragOrClick: "拖拽或点击上传",
     enterUrl: "请输入网页链接 URL",
     promptCards: "提示词卡片",
