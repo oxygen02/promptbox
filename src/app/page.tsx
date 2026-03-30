@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { createPortal } from "react-dom";
 import {
   Upload,
   Sparkles,
@@ -327,7 +326,24 @@ export default function HomePage() {
             {uploadTypes.map((type) => (<button key={type.key} className="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-slate-50 transition-colors"><type.icon className="w-5 h-5 text-slate-400" /><span className="text-xs text-slate-500">{type.label}</span></button>))}
           </div>
           <div className="flex gap-3 mb-4">
-            <div className="flex-1"><label htmlFor="file-upload" className="block upload-zone py-5 flex flex-col items-center justify-center min-h-[100px] cursor-pointer"><Upload className="w-5 h-5 text-slate-400 mb-2" /><p className="text-sm text-slate-500">{t.dragOrClick}</p><input type="file" id="file-upload" onChange={handleFileUpload} className="hidden" /></label></div>
+            <div className="flex-1">
+              <label className="block upload-zone py-5 flex flex-col items-center justify-center min-h-[100px] cursor-pointer">
+                <Upload className="w-6 h-6 text-slate-400 mb-2" />
+                <p className="text-sm text-slate-500">{t.dragOrClick}</p>
+                <input 
+                  type="file" 
+                  id="file-upload"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      alert(`已选择文件: ${file.name}\n大小: ${(file.size/1024).toFixed(2)} KB`);
+                    }
+                  }} 
+                  className="absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0" 
+                  style={{ clip: 'rect(0,0,0,0)' }}
+                />
+              </label>
+            </div>
             <div className="flex-1"><input type="text" placeholder={t.enterUrl} value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-3" /></div>
           </div>
           <div><h4 className="text-xs font-medium text-slate-500 mb-2">{t.promptDimensions}</h4><div className="grid grid-cols-6 gap-1.5">{currentTags.map((tag) => (<button key={tag} onClick={() => handleDimensionClick(tag)} className={cn("px-2 py-1.5 text-xs rounded-lg transition-all text-center", selectedDimensions.includes(tag) ? "bg-slate-800 text-white shadow" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}>{tag}</button>))}</div></div>
@@ -337,15 +353,14 @@ export default function HomePage() {
             <div key={index} className="glass-card rounded-xl p-4">
               <div className="relative">
                 <div className="relative">
-                  <button type="button" onClick={(e) => { e.stopPropagation(); setOpenDropdown(openDropdown === index ? null : index); }} className="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"><span className={model ? "text-slate-700 font-medium" : "text-slate-400"}>{model ? modelInfo?.name : t.selectModel}</span><ChevronDown className="w-4 h-4 text-slate-400" /></button>
-                  {openDropdown === index && mounted && createPortal(
-                    <div onClick={(e) => e.stopPropagation()} className="fixed bg-white border border-slate-200 rounded-lg shadow-2xl max-h-64 overflow-y-auto" style={{ zIndex: 99999 }}>
-                      <div className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", !model && "bg-slate-50")} onClick={() => { handleCardModelSelect(index, null); setOpenDropdown(null); }}>— 未选中 —</div>
+                  <button type="button" onClick={() => setOpenDropdown(openDropdown === index ? null : index)} className="w-full flex items-center justify-between px-3 py-2 text-sm bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"><span className={model ? "text-slate-700 font-medium" : "text-slate-400"}>{model ? modelInfo?.name : t.selectModel}</span><ChevronDown className="w-4 h-4 text-slate-400" /></button>
+                  {openDropdown === index && (
+                    <div className="absolute z-50 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto w-full">
+                      <div className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", !model && "bg-slate-100")} onClick={() => { handleCardModelSelect(index, null); setOpenDropdown(null); }}>— 未选中 —</div>
                       {MODELS.map((m) => (
-                        <div key={m.key} className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", model === m.key && "bg-slate-50 text-blue-600")} onClick={() => { handleCardModelSelect(index, m.key); setOpenDropdown(null); }}>{m.name} ({m.region})</div>
+                        <div key={m.key} className={cn("px-3 py-2 cursor-pointer hover:bg-slate-50", model === m.key && "bg-slate-100 text-blue-600 font-medium")} onClick={() => { handleCardModelSelect(index, m.key); setOpenDropdown(null); }}>{m.name} ({m.region})</div>
                       ))}
-                    </div>,
-                    document.body
+                    </div>
                   )}
                 </div>
               </div>
