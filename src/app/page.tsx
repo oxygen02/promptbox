@@ -231,6 +231,7 @@ export default function HomePage() {
   const [shareContent, setShareContent] = useState("");
   const [copied, setCopied] = useState(false);
   const [generatedContent, setGeneratedContent] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [dropdownPos, setDropdownPos] = useState<{top: number; left: number} | null>(null);
   const [genDropdownPos, setGenDropdownPos] = useState<{top: number; left: number} | null>(null);
   const dropdownButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
