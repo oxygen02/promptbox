@@ -341,7 +341,7 @@ export default function HomePage() {
                         alert(`已选择文件: ${file.name}\n大小: ${(file.size/1024).toFixed(2)} KB`);
                       }
                     }} 
-                    className="hidden" 
+                    style={{ display: 'none' }}
                     accept="image/*,video/*,.txt,.doc,.docx,.pdf"
                   />
                 </label>
