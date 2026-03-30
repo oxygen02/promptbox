@@ -218,7 +218,7 @@ export default function HomePage() {
     }
   };
   const [credits] = useState(520);
-  const [cardModels, setCardModels] = useState<Record<number, Model | null>>({ 0: null, 1: null, 2: null });
+  const [cardModels, setCardModels] = useState<Record<number, string | null>>({ 0: null, 1: null, 2: null });
   const [cardPrompts, setCardPrompts] = useState<Record<number, string>>({ 0: "", 1: "", 2: "" });
   const [openDropdown, setOpenDropdown] = useState<number | null>(null);
   const [openGenDropdown, setOpenGenDropdown] = useState(false);
@@ -265,7 +265,7 @@ export default function HomePage() {
     }
   };
 
-  const handleCardModelSelect = (cardIndex: number, model: Model | null) => {
+  const handleCardModelSelect = (cardIndex: number, model: string | null) => {
     setCardModels((prev) => ({ ...prev, [cardIndex]: model }));
     setOpenDropdown(null);
   };
