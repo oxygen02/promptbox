@@ -30,7 +30,7 @@ function callAIAPI(prompt, config) {
         'Authorization': `Bearer ${config.apiKey}`,
         'Content-Length': Buffer.byteLength(postData)
       },
-      timeout: 10000
+      timeout: 15000
     };
 
     const req = https.request(options, (res) => {
@@ -42,7 +42,7 @@ function callAIAPI(prompt, config) {
           if (json.choices && json.choices[0]) {
             resolve({ success: true, content: json.choices[0].message.content });
           } else {
-            resolve({ success: false, error: 'API error' });
+            resolve({ success: false, error: 'API error: ' + data.substring(0, 100) });
           }
         } catch (e) {
           resolve({ success: false, error: e.message });
@@ -69,6 +69,14 @@ const MODEL_SPECS = {
 router.post('/analyze', async (req, res) => {
   try {
     const { content, dimensions, contentType, models } = req.body;
+    
+    console.log('=== ANALYZE REQUEST ===');
+    console.log('Content length:', content?.length);
+    console.log('Content preview:', content?.substring(0, 100));
+    console.log('Dimensions:', dimensions);
+    console.log('Models:', models);
+    console.log('=====================');
+
     if (!content) return res.status(400).json({ error: 'Content required' });
 
     const modelList = models && models.length > 0 ? models : ['qwen-plus'];
@@ -76,28 +84,25 @@ router.post('/analyze', async (req, res) => {
     const results = {};
     
     for (const modelKey of modelList) {
+      console.log(`Generating for model: ${modelKey}`);
       const modelSpec = MODEL_SPECS[modelKey] || `针对${modelKey}模型`;
-      const prompt = `根据以下内容生成适合${modelKey}的提示词。${modelSpec}\n\n内容：${content}\n维度：${dims}\n\n直接输出提示词。`;
+      const prompt = `根据以下内容生成适合${modelKey}的提示词。${modelSpec}\n\n原始内容：${content}\n维度：${dims}\n\n直接输出提示词。`;
       
       if (QWEN_CONFIG.apiKey) {
         const result = await callAIAPI(prompt, QWEN_CONFIG);
-        results[modelKey] = result.success ? result.content : `【${modelKey}】提示词：${dims} - ${content.substring(0,100)}...`;
+        console.log(`Result for ${modelKey}:`, result.success ? 'OK' : result.error);
+        results[modelKey] = result.success ? result.content : `【${modelKey}】提示词 - 内容：${content.substring(0,50)}...`;
       } else {
-        results[modelKey] = `【${modelKey}】专属提示词\n维度：${dims}\n内容：${content.substring(0,200)}`;
+        results[modelKey] = `【${modelKey}】专属提示词\n维度：${dims}\n内容：${content.substring(0,100)}...`;
       }
     }
 
+    console.log('All results:', Object.keys(results));
     res.json({ success: true, results });
   } catch (error) {
+    console.error('Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
 module.exports = router;
-
-// Debug logging
-router.use((req, res, next) => {
-  console.log('=== API Request ===');
-  console.log('Body:', JSON.stringify(req.body).substring(0, 200));
-  next();
-});

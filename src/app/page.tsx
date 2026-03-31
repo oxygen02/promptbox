@@ -529,9 +529,10 @@ ${promptContent}
           ))}
         </div>
         <div className="glass-card rounded-2xl p-5 mb-4">
+          {/* 标题行：上传内容 + 提示词维度（可多选） */}
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-slate-700">{t.uploadContent}</h3>
-            <span className="text-xs px-3 py-1 rounded-full bg-slate-100 text-slate-500 flex items-center gap-1.5"><Sparkles className="w-3.5 h-3.5" />{t.aiReady}</span>
+            <span className="text-xs text-slate-400">{t.promptDimensions}</span>
           </div>
           
           {/* 左侧：上传区域，右侧：维度选择 */}
@@ -591,11 +592,11 @@ ${promptContent}
                         setPastedContent(`[文件] ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
                         console.log('文件已解析:', file.name, '字数:', data.content?.length || 0);
                       } else {
-                        setPastedContent(`[文件] ${file.name}\n\n解析失败: ${data.error}`);
+                        setPastedContent(`[文件] ${file.name}\n\n❌ 解析失败: ${data.error}`);
                       }
                     } catch (error) {
                       console.error('文件上传失败:', error);
-                      setPastedContent(`[文件] ${file.name}\n\n上传失败，请复制内容粘贴到上方文本框`);
+                      setPastedContent(`[文件] ${file.name}\n\n❌ 上传失败，请复制内容粘贴到上方文本框`);
                     }
                   }
                 }} 
@@ -606,7 +607,6 @@ ${promptContent}
             
             {/* 右侧：维度选择 */}
             <div className="w-1/2">
-              <h4 className="text-xs font-medium text-slate-500 mb-2">{t.promptDimensions}</h4>
               <div className="grid grid-cols-4 gap-1.5">
                 {currentTags.map((tag) => (
                   <button 
@@ -640,7 +640,7 @@ ${promptContent}
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                 </div>
               </div>
-              <div className="mt-3 min-h-[70px] text-sm text-slate-600 whitespace-pre-wrap">{prompt || t.waitingGenerate}</div>
+              <div className="mt-3 h-[120px] overflow-y-auto text-sm text-slate-600 whitespace-pre-wrap">{prompt || t.waitingGenerate}</div>
               {prompt && (<div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-slate-100"><button onClick={() => handleShare(prompt)} className="p-1.5 hover:bg-slate-100 rounded-lg"><Share2 className="w-4 h-4 text-slate-400" /></button><button className="p-1.5 hover:bg-slate-100 rounded-lg"><Copy className="w-4 h-4 text-slate-400" /></button><button className="p-1.5 hover:bg-slate-100 rounded-lg"><Star className="w-4 h-4 text-slate-400" /></button></div>)}
             </div>
           );})}
@@ -651,7 +651,7 @@ ${promptContent}
         </div>
         <div className="glass-card rounded-xl p-4 mb-4">
           <div className="flex items-center justify-between mb-3"><h3 className="text-sm font-semibold text-slate-700">{t.promptEdit}</h3><div className="flex gap-1.5"><button className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg"><Copy className="w-4 h-4 text-slate-400" /></button><button className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg"><Star className="w-4 h-4 text-slate-400" /></button></div></div>
-          <textarea value={promptText} onChange={(e) => setPromptText(e.target.value)} className="input-field min-h-[80px] resize-none" placeholder={t.editPlaceholder} />
+          <textarea value={promptText} onChange={(e) => setPromptText(e.target.value)} className="input-field min-h-[160px] resize-none" placeholder={t.editPlaceholder} />
           <div className="text-xs text-slate-400 mt-2">0 字符</div>
         </div>
         <div className="flex items-center gap-4 mb-4">
