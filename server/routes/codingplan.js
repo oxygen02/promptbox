@@ -2,7 +2,14 @@ const express = require('express');
 const https = require('https');
 const router = express.Router();
 
-// 阿里云千问 API 配置
+// DeepSeek API 配置（优先使用）
+const DEEPSEEK_CONFIG = {
+  endpoint: 'https://api.deepseek.com/chat/completions',
+  model: 'deepseek-chat',
+  apiKey: process.env.DEEPSEEK_API_KEY || ''
+};
+
+// 阿里云千问 API 配置（备用）
 const QWEN_CONFIG = {
   endpoint: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
   model: 'qwen-plus',
@@ -43,11 +50,11 @@ ${dims}
 4. 适合目标AI模型使用`;
 }
 
-// 使用 https 模块调用千问 API
-function callQwenAPI(prompt, apiKey) {
+// 使用 https 模块调用 AI API
+function callAIAPI(prompt, config) {
   return new Promise((resolve) => {
     const postData = JSON.stringify({
-      model: QWEN_CONFIG.model,
+      model: config.model,
       messages: [
         { role: 'system', content: '你是一个专业的提示词优化助手，帮助用户生成高质量的AI提示词。' },
         { role: 'user', content: prompt }
@@ -56,14 +63,14 @@ function callQwenAPI(prompt, apiKey) {
       temperature: 0.7
     });
 
-    const url = new URL(QWEN_CONFIG.endpoint);
+    const url = new URL(config.endpoint);
     const options = {
       hostname: url.hostname,
       path: url.pathname,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${config.apiKey}`,
         'Content-Length': Buffer.byteLength(postData)
       }
     };
@@ -78,9 +85,11 @@ function callQwenAPI(prompt, apiKey) {
             resolve({
               success: true,
               content: json.choices[0].message.content,
-              model: QWEN_CONFIG.model,
+              model: config.model,
               usage: json.usage
             });
+          } else if (json.error) {
+            resolve({ success: false, error: json.error.message || 'API error' });
           } else {
             resolve({ success: false, error: 'Invalid response' });
           }
@@ -123,10 +132,25 @@ ${content}
 2. 关键要点
 3. 适合的AI提示词模板`;
 
-    // 如果有 API Key，尝试调用千问 API
+    // 优先使用 DeepSeek
+    if (DEEPSEEK_CONFIG.apiKey) {
+      console.log('Calling DeepSeek API...');
+      const result = await callAIAPI(prompt, DEEPSEEK_CONFIG);
+      console.log('DeepSeek result:', result.success ? 'success' : result.error);
+      if (result.success) {
+        return res.json({
+          success: true,
+          result: result.content,
+          model: result.model,
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
+
+    // 备用千问
     if (QWEN_CONFIG.apiKey) {
       console.log('Calling Qwen API...');
-      const result = await callQwenAPI(prompt, QWEN_CONFIG.apiKey);
+      const result = await callAIAPI(prompt, QWEN_CONFIG);
       console.log('Qwen result:', result.success ? 'success' : result.error);
       if (result.success) {
         return res.json({
@@ -163,9 +187,24 @@ router.post('/generate', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Prompt is required' });
     }
 
+    const fullPrompt = `请根据以下提示词生成内容：\n\n${prompt}\n\n请直接输出生成结果。`;
+
+    // 优先 DeepSeek
+    if (DEEPSEEK_CONFIG.apiKey) {
+      const result = await callAIAPI(fullPrompt, DEEPSEEK_CONFIG);
+      if (result.success) {
+        return res.json({
+          success: true,
+          content: result.content,
+          model: result.model,
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
+
+    // 备用千问
     if (QWEN_CONFIG.apiKey) {
-      const fullPrompt = `请根据以下提示词生成内容：\n\n${prompt}\n\n请直接输出生成结果。`;
-      const result = await callQwenAPI(fullPrompt, QWEN_CONFIG.apiKey);
+      const result = await callAIAPI(fullPrompt, QWEN_CONFIG);
       if (result.success) {
         return res.json({
           success: true,
