@@ -269,7 +269,7 @@ export default function ToolsPage() {
                   <h2 className="text-sm font-semibold text-slate-900">{cat.category}</h2>
                 </div>
                 <div className="p-4">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                     {cat.tools.slice(0, 10).map((tool, tIdx) => (
                       <a
                         key={tIdx}

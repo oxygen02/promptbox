@@ -98,8 +98,15 @@ const templates = {
 
 export default function TemplatesPage() {
   const [language, setLanguage] = useState<"zh" | "en">("zh");
+  const [copied, setCopied] = useState<string | null>(null);
   const t = templates[language];
   const sites = language === "zh" ? chineseSites : englishSites;
+
+  const handleCopy = async (item: string) => {
+    await navigator.clipboard.writeText(item);
+    setCopied(item);
+    setTimeout(() => setCopied(null), 1500);
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4">
@@ -122,7 +129,7 @@ export default function TemplatesPage() {
             <Star className="w-5 h-5 text-yellow-500" />
             {language === "zh" ? "推荐提示词网站" : "Recommended Prompt Websites"}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {sites.map((site, i) => (
               <a 
                 key={i} 
@@ -151,15 +158,19 @@ export default function TemplatesPage() {
           {t.map((cat, i) => (
             <div key={i} className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
               <h3 className="text-base font-semibold text-slate-900 mb-4">{cat.category}</h3>
-              <div className="space-y-2">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 {cat.items.map((item, j) => (
-                  <div key={j} className="flex items-center justify-between p-2 hover:bg-slate-50 rounded-lg group cursor-pointer">
-                    <span className="text-sm text-slate-600">{item}</span>
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-1.5 hover:bg-slate-200 rounded">
-                        <Copy className="w-4 h-4 text-slate-500" />
-                      </button>
-                    </div>
+                  <div 
+                    key={j} 
+                    onClick={() => handleCopy(item)}
+                    className="flex items-center justify-between p-2 bg-slate-50 hover:bg-blue-50 rounded-lg group cursor-pointer border border-transparent hover:border-blue-200 transition-all"
+                  >
+                    <span className="text-sm text-slate-600 group-hover:text-blue-600 truncate">{item}</span>
+                    {copied === item ? (
+                      <span className="text-[10px] text-green-500">已复制</span>
+                    ) : (
+                      <Copy className="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100" />
+                    )}
                   </div>
                 ))}
               </div>
