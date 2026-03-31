@@ -514,30 +514,31 @@ ${promptContent}
               <input 
                 type="file" 
                 id="pb-file-input"
-                onChange={(e) => {
+                onChange={async (e) => {
                   const file = e.target.files?.[0];
                   if (file) {
-                    // 读取支持的文本文件
-                    const supportedText = file.type.includes('text') || 
-                                         file.name.endsWith('.txt') || 
-                                         file.name.endsWith('.md');
+                    setPastedContent("正在解析文件...");
                     
-                    // 支持读取的文本文件类型
-                    if (supportedText) {
-                      const reader = new FileReader();
-                      reader.onload = (e) => {
-                        const text = e.target?.result as string;
-                        setPastedContent(text || '');
-                        console.log('文本文件已读取:', file.name, '字数:', text?.length || 0);
-                      };
-                      reader.onerror = () => {
-                        setPastedContent(`[文件] ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
-                      };
-                      reader.readAsText(file);
-                    } else {
-                      // 对于 .docx, .pdf, 图片等，显示文件名并提示用户复制内容
-                      setPastedContent(`[文件] ${file.name}\n\n⚠️ 请复制文件内容粘贴到上方文本框中，以便AI分析内容。\n\n提示：Word/PPT/PDF文档可以选中内容后 Ctrl+C 复制，然后 Ctrl+V 粘贴到下方。`);
-                      console.log('非文本文件:', file.name);
+                    try {
+                      const formData = new FormData();
+                      formData.append('file', file);
+                      
+                      const response = await fetch('http://124.156.200.127:3004/api/upload/parse', {
+                        method: 'POST',
+                        body: formData
+                      });
+                      
+                      const data = await response.json();
+                      
+                      if (data.success) {
+                        setPastedContent(data.content || `[文件] ${file.name}`);
+                        console.log('文件已解析:', file.name, '字数:', data.content?.length || 0);
+                      } else {
+                        setPastedContent(`[文件] ${file.name}\n\n解析失败: ${data.error}`);
+                      }
+                    } catch (error) {
+                      console.error('文件上传失败:', error);
+                      setPastedContent(`[文件] ${file.name}\n\n上传失败，请复制内容粘贴到上方文本框`);
                     }
                   }
                 }} 
