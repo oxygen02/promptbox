@@ -540,7 +540,7 @@ ${promptContent}
             {/* 左侧：上传区域 */}
             <div className="w-1/2">
               <div 
-                className="upload-zone py-4 px-3 flex flex-col justify-center items-center border border-slate-200 rounded-lg bg-white hover:border-blue-400 hover:bg-blue-50 min-h-[60px] transition-all"
+                className="upload-zone py-4 px-3 flex flex-col justify-center items-center border border-slate-200 rounded-lg bg-white hover:border-blue-400 hover:bg-blue-50 min-h-[20px] transition-all"
                 onPaste={(e) => {
                   e.preventDefault();
                   const text = e.clipboardData.getData('text');
@@ -565,7 +565,7 @@ ${promptContent}
               <input type="text" placeholder="输入网页URL" value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-2 text-sm" />
               
               {/* 用空白占位使左侧高度与右侧维度区域对齐 */}
-              <div className="h-[60px]"></div>
+              <div className="h-[20px]"></div>
               
               <input 
                 type="file" 
