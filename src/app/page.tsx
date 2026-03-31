@@ -564,9 +564,6 @@ ${promptContent}
               </div>
               <input type="text" placeholder="输入网页URL" value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-2 text-sm" />
               
-              {/* 用空白占位使左侧高度与右侧维度区域对齐 */}
-              <div className="h-[20px]"></div>
-              
               <input 
                 type="file" 
                 id="pb-file-input"

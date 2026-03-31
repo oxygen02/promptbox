@@ -16,8 +16,8 @@ function callAIAPI(prompt, config) {
         { role: 'system', content: '你是一个专业的提示词优化助手。' },
         { role: 'user', content: prompt }
       ],
-      max_tokens: 1000,
-      temperature: 0.7
+      max_tokens: 1500,
+      temperature: 0.9
     });
 
     const url = new URL(config.endpoint);
@@ -30,7 +30,7 @@ function callAIAPI(prompt, config) {
         'Authorization': `Bearer ${config.apiKey}`,
         'Content-Length': Buffer.byteLength(postData)
       },
-      timeout: 15000
+      timeout: 20000
     };
 
     const req = https.request(options, (res) => {
@@ -42,7 +42,7 @@ function callAIAPI(prompt, config) {
           if (json.choices && json.choices[0]) {
             resolve({ success: true, content: json.choices[0].message.content });
           } else {
-            resolve({ success: false, error: 'API error: ' + data.substring(0, 100) });
+            resolve({ success: false, error: 'API error' });
           }
         } catch (e) {
           resolve({ success: false, error: e.message });
@@ -57,25 +57,12 @@ function callAIAPI(prompt, config) {
   });
 }
 
-const MODEL_SPECS = {
-  'deepseek-chat': 'DeepSeek擅长逻辑推理和代码生成，提示词应强调结构化输出和推理步骤',
-  'kimi': 'Kimi擅长长文本理解，提示词应充分利用超长上下文优势',
-  'gpt4o': 'GPT-4o通用能力强，提示词应明确任务目标和输出格式',
-  'claude-3.5': 'Claude擅长分析和解释，提示词应逻辑严密、条理清晰',
-  'qwen-plus': 'Qwen擅长中文理解生成，提示词应适合中文场景',
-  'gemini-pro': 'Gemini多模态能力强，提示词应综合性强',
-};
-
 router.post('/analyze', async (req, res) => {
   try {
     const { content, dimensions, contentType, models } = req.body;
     
-    console.log('=== ANALYZE REQUEST ===');
-    console.log('Content length:', content?.length);
-    console.log('Content preview:', content?.substring(0, 100));
-    console.log('Dimensions:', dimensions);
+    console.log('=== ANALYZE ===');
     console.log('Models:', models);
-    console.log('=====================');
 
     if (!content) return res.status(400).json({ error: 'Content required' });
 
@@ -83,21 +70,35 @@ router.post('/analyze', async (req, res) => {
     const dims = dimensions?.join('、') || '通用';
     const results = {};
     
-    for (const modelKey of modelList) {
-      console.log(`Generating for model: ${modelKey}`);
-      const modelSpec = MODEL_SPECS[modelKey] || `针对${modelKey}模型`;
-      const prompt = `根据以下内容生成适合${modelKey}的提示词。${modelSpec}\n\n原始内容：${content}\n维度：${dims}\n\n直接输出提示词。`;
+    // 确保每个模型生成不同的内容
+    for (let i = 0; i < modelList.length; i++) {
+      const modelKey = modelList[i];
+      const uniqueId = `【${i+1}】`;
+      
+      const prompt = `${uniqueId}请根据以下内容生成一个专属的AI提示词。
+
+【重要】你必须为【${modelKey}】模型生成提示词，这是第${i+1}个模型。
+要求：
+1. 必须提到"${modelKey}模型专用"
+2. 结合该模型的特点生成专属提示词
+3. 输出格式要与第${i===0?2:1}个模型明显不同
+
+原始内容：${content}
+维度：${dims}
+
+直接输出专属提示词，不要有其他说明。`;
+      
+      console.log(`Generating for ${modelKey}...`);
       
       if (QWEN_CONFIG.apiKey) {
         const result = await callAIAPI(prompt, QWEN_CONFIG);
-        console.log(`Result for ${modelKey}:`, result.success ? 'OK' : result.error);
-        results[modelKey] = result.success ? result.content : `【${modelKey}】提示词 - 内容：${content.substring(0,50)}...`;
+        results[modelKey] = result.success ? result.content : `[${modelKey}] 提示词 - ${content.substring(0,100)}`;
       } else {
-        results[modelKey] = `【${modelKey}】专属提示词\n维度：${dims}\n内容：${content.substring(0,100)}...`;
+        results[modelKey] = `【${modelKey}模型专用提示词】\n维度：${dims}\n内容：${content.substring(0,150)}...`;
       }
     }
 
-    console.log('All results:', Object.keys(results));
+    console.log('Results:', Object.keys(results));
     res.json({ success: true, results });
   } catch (error) {
     console.error('Error:', error);
