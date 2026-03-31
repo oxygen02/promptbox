@@ -69,55 +69,93 @@ function callAIAPI(prompt, config) {
 
 // 所有模型的特定指令
 const MODEL_SPECS = {
-  'deepseek': `针对DeepSeek模型：
-- 擅长逻辑推理、代码生成和数学计算
-- 适合深度分析和结构化输出
-- 提示词应强调推理过程和步骤`,
+  // 文字模型
+  'deepseek-chat': `针对DeepSeek Chat模型：
+- 擅长逻辑推理和代码生成
+- 输出结构化、逻辑清晰
+- 适合深度分析任务`,
   
   'kimi': `针对Kimi模型：
-- 擅长长文本处理和超长上下文理解
-- 支持超长输入
-- 适合全面详细的分析`,
+- 擅长长文本理解和超长上下文
+- 适合全面详细的分析
+- 支持超长输入`,
   
-  'minimax': `针对MiniMax模型：
-- 擅长多模态理解和生成
-- 适合创意内容生成
-- 提示词应明确输出风格`,
-  
-  'gpt4o': `针对GPT-4o模型：
-- 通用能力强，多领域精通
-- 擅长创意写作和复杂推理
-- 适合高质量内容生成`,
-  
-  'claude': `针对Claude模型：
-- 擅长分析、写作和代码
-- 思维清晰，逻辑严密
-- 适合深入分析和解释`,
-  
-  'gemini': `针对Gemini模型：
-- 多模态能力强
-- 擅长理解复杂语境
-- 适合综合性任务`,
-  
-  'qwen': `针对Qwen模型：
+  'qwen-plus': `针对Qwen Plus模型：
 - 擅长中文理解和生成
 - 知识面广
 - 适合中文内容处理`,
   
-  'zhipu': `针对GLM模型：
-- 擅长对话和内容生成
-- 适合中文场景
-- 响应速度快`,
+  'qwen-turbo': `针对Qwen Turbo模型：
+- 响应速度快
+- 适合快速生成
+- 性价比高`,
   
-  'yi': `针对Yi模型：
+  'yi-light': `针对Yi Light模型：
 - 擅长中英双语
-- 长上下文处理能力强
-- 适合双语内容分析`,
+- 轻量快速
+- 适合简单任务`,
   
-  'spark': `针对Spark模型：
+  'gpt4o': `针对GPT-4o模型：
+- 通用能力最强
+- 多领域精通
+- 适合高质量内容生成`,
+  
+  'claude-3.5': `针对Claude 3.5 Sonnet模型：
+- 思维清晰、逻辑严密
+- 擅长分析和解释
+- 适合深入分析`,
+  
+  'spark-4': `针对Spark 4.0模型：
 - 擅长中文对话
 - 适合日常场景
-- 响应友好`
+- 响应友好`,
+
+  // 视觉模型
+  'gemini-pro': `针对Gemini Pro Vision模型：
+- 多模态能力强大
+- 擅长图像和视频理解
+- 适合视觉分析任务`,
+  
+  'kimi-vl': `针对Kimi-VL模型：
+- 视觉理解能力强
+- 擅长图像分析
+- 支持长文本+图片`,
+  
+  'qwen-vl': `针对Qwen-VL模型：
+- 擅长中文图像理解
+- 细粒度视觉分析
+- 适合中文图片任务`,
+  
+  'minimax-vision': `针对MiniMax-Vision模型：
+- 多模态理解
+- 创意图像分析
+- 适合创意任务`,
+  
+  'deepseek-vl': `针对DeepSeek-VL模型：
+- 视觉推理能力强
+- 适合复杂图像分析
+- 免费使用`,
+  
+  'yi-vision': `针对Yi-Vision模型：
+- 中英双语视觉理解
+- 适合双语图像任务`,
+  
+  'claude-3.5': `针对Claude 3.5视觉模型：
+- 详细图像分析
+- 视觉推理能力强
+- 适合复杂图像任务`,
+
+  // 视频模型
+  'minimax-video': `针对MiniMax-Video模型：
+- 视频理解分析
+- 关键帧提取
+- 适合视频内容分析`,
+
+  // 网页设计模型
+  'deepseek-chat': `针对DeepSeek模型（网页设计）：
+- 擅长代码生成
+- 理解技术实现
+- 适合前端开发任务`,
 };
 
 // 分析单个模型
@@ -141,8 +179,8 @@ ${content}
 
 请生成一个专业、结构化的提示词，要求：
 1. 必须是为${modelKey}模型量身定制的专属提示词
-2. 包含角色设定、任务描述、输出格式要求
-3. 充分发挥${modelKey}模型的独特能力
+2. 适合该模型的特点和优势
+3. 包含角色设定、任务描述、输出格式要求
 4. 与其他模型的提示词有明显区别
 
 请直接输出提示词内容，不需要任何说明。`;
@@ -162,11 +200,10 @@ ${modelSpec}
 ## 分析维度
 ${dims}
 
-## 原始内容
-${content.substring(0, 300)}...
+## 内容类型
+${contentTypeName}
 
-## 提示词模板
-根据上述内容，按照[${dims}]维度，生成适合${modelKey}的提示词...`;
+请根据上述内容生成适合${modelKey}的提示词...`;
 }
 
 // 提示词分析 - 支持多模型
@@ -178,10 +215,10 @@ router.post('/analyze', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Content is required' });
     }
 
-    console.log('Analyzing content with dimensions:', dimensions, 'models:', models);
+    console.log('Analyzing content with dimensions:', dimensions, 'models:', models, 'contentType:', contentType);
 
     // 默认模型列表
-    const modelList = models && models.length > 0 ? models : ['qwen'];
+    const modelList = models && models.length > 0 ? models : ['qwen-plus'];
     
     // 为每个模型生成专属提示词
     const results = {};

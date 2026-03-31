@@ -37,21 +37,66 @@ const SocialIcon = ({ platform }: { platform: string }) => {
   return <>{icons[platform]}</>;
 };
 
-type ContentType = "text" | "image" | "video" | "web";
-type Model = "deepseek" | "kimi" | "minimax" | "gpt4o" | "claude" | "gemini" | "qwen" | "zhipu" | "yi" | "spark";
 
-const MODELS: { key: Model; name: string; region: string }[] = [
-  { key: "deepseek", name: "DeepSeek", region: "Global" },
-  { key: "kimi", name: "Kimi", region: "CN" },
-  { key: "minimax", name: "MiniMax", region: "CN" },
-  { key: "gpt4o", name: "GPT-4o", region: "Global" },
-  { key: "claude", name: "Claude 3.5", region: "Global" },
-  { key: "gemini", name: "Gemini Pro", region: "Global" },
-  { key: "qwen", name: "Qwen", region: "CN" },
-  { key: "zhipu", name: "GLM", region: "CN" },
-  { key: "yi", name: "Yi", region: "CN" },
-  { key: "spark", name: "Spark", region: "CN" },
+type ContentType = "text" | "image" | "video" | "web";
+
+// 文字文档推荐模型
+const TEXT_MODELS = [
+  { key: "deepseek-chat", name: "DeepSeek Chat", free: true },
+  { key: "kimi", name: "Kimi (免费)", free: true },
+  { key: "qwen-plus", name: "Qwen Plus" },
+  { key: "qwen-turbo", name: "Qwen Turbo (免费)", free: true },
+  { key: "yi-light", name: "Yi Light (免费)", free: true },
+  { key: "gpt4o", name: "GPT-4o" },
+  { key: "claude-3.5", name: "Claude 3.5 Sonnet" },
+  { key: "spark-4", name: "Spark 4.0" },
 ];
+
+// 图片视觉推荐模型
+const IMAGE_MODELS = [
+  { key: "gpt4o", name: "GPT-4o (视觉版)" },
+  { key: "gemini-pro", name: "Gemini Pro Vision (免费)", free: true },
+  { key: "claude-3.5", name: "Claude 3.5 (视觉)" },
+  { key: "kimi-vl", name: "Kimi-VL (免费)", free: true },
+  { key: "qwen-vl", name: "Qwen-VL Plus" },
+  { key: "minimax-vision", name: "MiniMax-Vision" },
+  { key: "deepseek-vl", name: "DeepSeek-VL (免费)", free: true },
+  { key: "yi-vision", name: "Yi-Vision" },
+];
+
+// 视频解构推荐模型
+const VIDEO_MODELS = [
+  { key: "gpt4o", name: "GPT-4o" },
+  { key: "gemini-pro", name: "Gemini Pro Vision" },
+  { key: "kimi-vl", name: "Kimi-VL (免费)", free: true },
+  { key: "qwen-vl", name: "Qwen-VL Plus" },
+  { key: "claude-3.5", name: "Claude 3.5 Sonnet" },
+  { key: "minimax-video", name: "MiniMax-Video" },
+];
+
+// 网页设计推荐模型
+const WEB_MODELS = [
+  { key: "gpt4o", name: "GPT-4o" },
+  { key: "claude-3.5", name: "Claude 3.5 Sonnet (免费)", free: true },
+  { key: "gemini-pro", name: "Gemini Pro" },
+  { key: "deepseek-chat", name: "DeepSeek Chat (免费)", free: true },
+  { key: "kimi", name: "Kimi (免费)", free: true },
+  { key: "qwen-plus", name: "Qwen Plus" },
+];
+
+// 根据内容类型获取对应模型
+function getModelsForContentType(contentType: string) {
+  switch (contentType) {
+    case 'text': return TEXT_MODELS;
+    case 'image': return IMAGE_MODELS;
+    case 'video': return VIDEO_MODELS;
+    case 'web': return WEB_MODELS;
+    default: return TEXT_MODELS;
+  }
+}
+
+// 兼容旧的 Model 类型
+type Model = string;
 
 // 国际化文本
 const I18N = {
@@ -271,7 +316,7 @@ export default function HomePage() {
       // 检查其他卡片是否已选择相同模型
       for (const [idx, m] of Object.entries(cardModels)) {
         if (idx !== String(cardIndex) && m === model) {
-          alert(`模型 ${MODELS.find(x => x.key === model)?.name} 已被选择，请选择其他模型`);
+          alert(`模型 ${model} 已被选择，请选择其他模型`);
           return;
         }
       }
@@ -319,7 +364,7 @@ export default function HomePage() {
         
         const newCardPrompts: Record<number, string> = {};
         modelsToUse.forEach((modelKey, idx) => {
-          const modelInfo = MODELS.find(m => m.key === modelKey);
+          const modelInfo = getModelsForContentType(contentType).find(m => m.key === modelKey);
           newCardPrompts[idx] = `# ${modelInfo?.name} 提示词\n\n${data.result}`;
         });
         
@@ -360,7 +405,7 @@ export default function HomePage() {
     const allPrompts: string[] = [];
     
     modelsToUse.forEach((modelKey, idx) => {
-      const modelInfo = MODELS.find(m => m.key === modelKey);
+      const modelInfo = getModelsForContentType(contentType).find(m => m.key === modelKey);
       
       // 基于实际内容生成具体可编辑的提示词
       const isFileUpload = content.startsWith('[文件]');
@@ -446,7 +491,7 @@ ${promptContent}
     if (!selectedGenModel) return;
     setIsGenerating(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
-    setGeneratedContent("【" + MODELS.find(m => m.key === selectedGenModel)?.name + "】生成内容示例...");
+    setGeneratedContent("【" + getModelsForContentType(contentType).find(m => m.key === selectedGenModel)?.name + "】生成内容示例...");
     setIsGenerating(false);
   };
 
@@ -569,7 +614,8 @@ ${promptContent}
           </div>
         </div>
         <div className="grid grid-cols-3 gap-3 mb-4">
-          {[0, 1, 2].map((index) => { const model = cardModels[index]; const prompt = cardPrompts[index]; const modelInfo = MODELS.find((m) => m.key === model); return (
+          {[0, 1, 2].map((index) => { const model = cardModels[index]; const prompt = cardPrompts[index]; const currentModels = getModelsForContentType(contentType);
+          const modelInfo = currentModels.find((m) => m.key === model); return (
             <div key={index} className="glass-card rounded-xl p-4">
               <div className="relative">
                 <div className="relative">
@@ -579,8 +625,8 @@ ${promptContent}
                     className="w-full px-3 py-2 text-sm bg-slate-50 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none appearance-none cursor-pointer"
                   >
                     <option value="">— 选择模型 —</option>
-                    {MODELS.map((m) => (
-                      <option key={m.key} value={m.key}>{m.name} ({m.region})</option>
+                    {getModelsForContentType(contentType).map((m) => (
+                      <option key={m.key} value={m.key}>{m.name}</option>
                     ))}
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
@@ -609,7 +655,7 @@ ${promptContent}
               className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none appearance-none cursor-pointer"
             >
               <option value="">{t.selectModel}</option>
-              {MODELS.map((m) => (
+              {getModelsForContentType(contentType).map((m) => (
                 <option key={m.key} value={m.key}>{m.name}</option>
               ))}
             </select>
