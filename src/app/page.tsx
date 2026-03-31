@@ -1,4 +1,5 @@
 "use client";
+import mammoth from "mammoth";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
@@ -517,8 +518,34 @@ ${promptContent}
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
-                    // 只读取纯文本文件，其他文件显示文件名
-                    if (file.type.includes('text') || file.name.endsWith('.txt') || file.name.endsWith('.md')) {
+                    // 读取支持的文本文件
+                    const supportedText = file.type.includes('text') || 
+                                         file.name.endsWith('.txt') || 
+                                         file.name.endsWith('.md');
+                    
+                    // 尝试读取 .docx 文件
+                    if (file.name.endsWith('.docx')) {
+                      // 动态导入 mammoth
+                      import('mammoth').then((mammoth) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                          const arrayBuffer = e.target?.result as ArrayBuffer;
+                          mammoth.extractRawText({ arrayBuffer }).then((result: any) => {
+                            const text = result.value;
+                            setPastedContent(text || '');
+                            console.log('DOCX文件已读取:', file.name, '字数:', text?.length || 0);
+                          }).catch(() => {
+                            setPastedContent(`[文件] ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
+                          });
+                        };
+                        reader.onerror = () => {
+                          setPastedContent(`[文件] ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
+                        };
+                        reader.readAsArrayBuffer(file);
+                      }).catch(() => {
+                        setPastedContent(`[文件] ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
+                      });
+                    } else if (supportedText) {
                       const reader = new FileReader();
                       reader.onload = (e) => {
                         const text = e.target?.result as string;
