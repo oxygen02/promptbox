@@ -1,5 +1,4 @@
 "use client";
-import mammoth from "mammoth";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
@@ -523,29 +522,8 @@ ${promptContent}
                                          file.name.endsWith('.txt') || 
                                          file.name.endsWith('.md');
                     
-                    // 尝试读取 .docx 文件
-                    if (file.name.endsWith('.docx')) {
-                      // 动态导入 mammoth
-                      import('mammoth').then((mammoth) => {
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                          const arrayBuffer = e.target?.result as ArrayBuffer;
-                          mammoth.extractRawText({ arrayBuffer }).then((result: any) => {
-                            const text = result.value;
-                            setPastedContent(text || '');
-                            console.log('DOCX文件已读取:', file.name, '字数:', text?.length || 0);
-                          }).catch(() => {
-                            setPastedContent(`[文件] ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
-                          });
-                        };
-                        reader.onerror = () => {
-                          setPastedContent(`[文件] ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
-                        };
-                        reader.readAsArrayBuffer(file);
-                      }).catch(() => {
-                        setPastedContent(`[文件] ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
-                      });
-                    } else if (supportedText) {
+                    // 支持读取的文本文件类型
+                    if (supportedText) {
                       const reader = new FileReader();
                       reader.onload = (e) => {
                         const text = e.target?.result as string;
@@ -557,8 +535,8 @@ ${promptContent}
                       };
                       reader.readAsText(file);
                     } else {
-                      // 对于 .docx, .pdf, 图片等，只显示文件名
-                      setPastedContent(`[文件] ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
+                      // 对于 .docx, .pdf, 图片等，显示文件名并提示用户复制内容
+                      setPastedContent(`[文件] ${file.name}\n\n⚠️ 请复制文件内容粘贴到上方文本框中，以便AI分析内容。\n\n提示：Word/PPT/PDF文档可以选中内容后 Ctrl+C 复制，然后 Ctrl+V 粘贴到下方。`);
                       console.log('非文本文件:', file.name);
                     }
                   }
