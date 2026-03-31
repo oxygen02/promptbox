@@ -1,4 +1,5 @@
 const express = require('express');
+const https = require('https');
 const router = express.Router();
 
 // 阿里云千问 API 配置
@@ -42,42 +43,60 @@ ${dims}
 4. 适合目标AI模型使用`;
 }
 
-// 调用千问 API
-async function callQwenAPI(prompt, apiKey) {
-  try {
-    const response = await fetch(QWEN_CONFIG.endpoint, {
+// 使用 https 模块调用千问 API
+function callQwenAPI(prompt, apiKey) {
+  return new Promise((resolve) => {
+    const postData = JSON.stringify({
+      model: QWEN_CONFIG.model,
+      messages: [
+        { role: 'system', content: '你是一个专业的提示词优化助手，帮助用户生成高质量的AI提示词。' },
+        { role: 'user', content: prompt }
+      ],
+      max_tokens: 2000,
+      temperature: 0.7
+    });
+
+    const url = new URL(QWEN_CONFIG.endpoint);
+    const options = {
+      hostname: url.hostname,
+      path: url.pathname,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: QWEN_CONFIG.model,
-        messages: [
-          { role: 'system', content: '你是一个专业的提示词优化助手，帮助用户生成高质量的AI提示词。' },
-          { role: 'user', content: prompt }
-        ],
-        max_tokens: 2000,
-        temperature: 0.7
-      })
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          if (json.choices && json.choices[0]) {
+            resolve({
+              success: true,
+              content: json.choices[0].message.content,
+              model: QWEN_CONFIG.model,
+              usage: json.usage
+            });
+          } else {
+            resolve({ success: false, error: 'Invalid response' });
+          }
+        } catch (e) {
+          resolve({ success: false, error: e.message });
+        }
+      });
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(`API Error: ${response.status} - ${errorData.error?.message || response.statusText}`);
-    }
+    req.on('error', (e) => {
+      resolve({ success: false, error: e.message });
+    });
 
-    const data = await response.json();
-    return {
-      success: true,
-      content: data.choices?.[0]?.message?.content || '',
-      model: QWEN_CONFIG.model,
-      usage: data.usage
-    };
-  } catch (error) {
-    console.error('Qwen API Error:', error.message);
-    return { success: false, error: error.message };
-  }
+    req.write(postData);
+    req.end();
+  });
 }
 
 // 提示词分析
@@ -108,8 +127,8 @@ ${content}
     if (QWEN_CONFIG.apiKey) {
       console.log('Calling Qwen API...');
       const result = await callQwenAPI(prompt, QWEN_CONFIG.apiKey);
+      console.log('Qwen result:', result.success ? 'success' : result.error);
       if (result.success) {
-        console.log('Qwen API success!');
         return res.json({
           success: true,
           result: result.content,
@@ -117,7 +136,6 @@ ${content}
           timestamp: new Date().toISOString()
         });
       }
-      console.log('Qwen API failed:', result.error);
     }
 
     // 本地分析回退
@@ -145,11 +163,8 @@ router.post('/generate', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Prompt is required' });
     }
 
-    console.log('Generating content with model:', model || 'default');
-
-    const fullPrompt = `请根据以下提示词生成内容：\n\n${prompt}\n\n请直接输出生成结果。`;
-
     if (QWEN_CONFIG.apiKey) {
+      const fullPrompt = `请根据以下提示词生成内容：\n\n${prompt}\n\n请直接输出生成结果。`;
       const result = await callQwenAPI(fullPrompt, QWEN_CONFIG.apiKey);
       if (result.success) {
         return res.json({
