@@ -562,7 +562,22 @@ ${promptContent}
                   点击选择文件
                 </button>
               </div>
-              <input type="text" placeholder="输入网页URL" value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-2 text-sm mt-2" />
+              <input type="text" placeholder="输入网页URL" value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-2 text-sm" />
+              
+              {/* 自定义维度输入框 */}
+              <input 
+                type="text" 
+                placeholder="自定义维度..." 
+                className="input-field w-full py-2 text-sm mt-2"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                    if (!selectedDimensions.includes(e.currentTarget.value.trim())) {
+                      setSelectedDimensions([...selectedDimensions, e.currentTarget.value.trim()]);
+                    }
+                    e.currentTarget.value = '';
+                  }
+                }}
+              />
               
               {/* 用空白占位使左侧高度与右侧维度区域对齐 */}
               <div className="h-[50px]"></div>
@@ -624,7 +639,7 @@ ${promptContent}
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[0, 1, 2].map((index) => { const model = cardModels[index]; const prompt = cardPrompts[index]; const currentModels = getModelsForContentType(contentType);
           const modelInfo = currentModels.find((m) => m.key === model); return (
-            <div key={index} className="glass-card rounded-xl p-4">
+            <div key={index} className="glass-card rounded-xl p-4" style={{minHeight: '40vh'}}>
               <div className="relative">
                 <div className="relative">
                   <select 
@@ -640,7 +655,7 @@ ${promptContent}
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                 </div>
               </div>
-              <div className="mt-3 h-[120px] overflow-y-auto text-sm text-slate-600 whitespace-pre-wrap">{prompt || t.waitingGenerate}</div>
+              <div className="mt-3 h-[25vh] overflow-y-auto text-sm text-slate-600 whitespace-pre-wrap border border-slate-100 rounded-lg p-2">{prompt || t.waitingGenerate}</div>
               {prompt && (<div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-slate-100"><button onClick={() => handleShare(prompt)} className="p-1.5 hover:bg-slate-100 rounded-lg"><Share2 className="w-4 h-4 text-slate-400" /></button><button className="p-1.5 hover:bg-slate-100 rounded-lg"><Copy className="w-4 h-4 text-slate-400" /></button><button className="p-1.5 hover:bg-slate-100 rounded-lg"><Star className="w-4 h-4 text-slate-400" /></button></div>)}
             </div>
           );})}
