@@ -109,10 +109,10 @@ const I18N = {
       { key: "web", label: "网页设计" },
     ],
     tags: {
-      text: ["风格复刻", "语气还原", "结构复用", "核心要点", "受众定位", "平台适配", "标题逻辑", "摘要提炼", "扩写规则", "关键词复用", "句式参考", "逻辑框架"],
-      image: ["构图复刻", "色彩方案", "风格还原", "氛围参考", "光影指令", "主体描述", "细节标准", "场景设定", "元素复用", "质感参考", "画质要求", "创意方向"],
-      video: ["分镜参考", "叙事逻辑", "节奏设定", "画面风格", "转场指令", "旁白参考", "场景设定", "镜头语言", "剪辑逻辑", "开头设计", "结构复用", "氛围参考"],
-      web: ["布局复刻", "配色方案", "字体参考", "交互逻辑", "信息层级", "组件复用", "响应要求", "品牌风格", "体验标准", "视觉引导", "结构参考", "动效指令"],
+      text: ["整体描述", "优化建议", "风格复刻", "语气还原", "结构复用", "核心要点", "受众定位", "平台适配", "标题逻辑", "摘要提炼", "扩写规则", "关键词复用", "句式参考", "逻辑框架", "情感基调", "段落节奏"],
+      image: ["整体描述", "优化建议", "构图复刻", "色彩方案", "风格还原", "氛围参考", "光影指令", "主体描述", "细节标准", "场景设定", "元素复用", "质感参考", "画质要求", "创意方向", "透视角度", "景深控制"],
+      video: ["整体描述", "优化建议", "分镜参考", "叙事逻辑", "节奏设定", "画面风格", "转场指令", "旁白参考", "场景设定", "镜头语言", "剪辑逻辑", "开头设计", "结构复用", "氛围参考", "BGM情绪", "字幕风格"],
+      web: ["整体描述", "优化建议", "布局复刻", "配色方案", "字体参考", "交互逻辑", "信息层级", "组件复用", "响应要求", "品牌风格", "体验标准", "视觉引导", "结构参考", "动效指令", "暗黑模式", "加载策略"],
     },
     uploadContent: "上传内容",
     aiReady: "AI 就绪",
@@ -149,10 +149,10 @@ const I18N = {
       { key: "web", label: "Web" },
     ],
     tags: {
-      text: ["Style Copy", "Tone Restore", "Structure Reuse", "Key Points", "Audience Targeting", "Platform Fit", "Title Logic", "Summary Extract", "Expand Rules", "Keyword Reuse", "Sentence Ref", "Logic Frame"],
-      image: ["Composition Copy", "Color Scheme", "Style Restore", "Atmosphere Ref", "Lighting Cmd", "Subject Desc", "Details Std", "Scene Setting", "Elements Reuse", "Texture Ref", "Quality Req", "Creative Dir"],
-      video: ["Storyboard Ref", "Narrative Logic", "Rhythm Setting", "Visual Style", "Transition Cmd", "Voiceover Ref", "Scene Setting", "Camera Lang", "Editing Logic", "Opening Design", "Structure Reuse", "Atmosphere Ref"],
-      web: ["Layout Copy", "Color Scheme", "Typography Ref", "Interaction Logic", "Info Hierarchy", "Components Reuse", "Responsive Req", "Brand Style", "Experience Std", "Visual Guide", "Structure Ref", "Animation Cmd"],
+      text: ["Overall Desc", "Optimization", "Style Copy", "Tone Restore", "Structure Reuse", "Key Points", "Audience Targeting", "Platform Fit", "Title Logic", "Summary Extract", "Expand Rules", "Keyword Reuse", "Sentence Ref", "Logic Frame", "Emotional Tone", "Paragraph Rhythm"],
+      image: ["Overall Desc", "Optimization", "Composition Copy", "Color Scheme", "Style Restore", "Atmosphere Ref", "Lighting Cmd", "Subject Desc", "Details Std", "Scene Setting", "Elements Reuse", "Texture Ref", "Quality Req", "Creative Dir", "Perspective", "Depth Control"],
+      video: ["Overall Desc", "Optimization", "Storyboard Ref", "Narrative Logic", "Rhythm Setting", "Visual Style", "Transition Cmd", "Voiceover Ref", "Scene Setting", "Camera Lang", "Editing Logic", "Opening Design", "Structure Reuse", "Atmosphere Ref", "BGM Mood", "Subtitle Style"],
+      web: ["Overall Desc", "Optimization", "Layout Copy", "Color Scheme", "Typography Ref", "Interaction Logic", "Info Hierarchy", "Components Reuse", "Responsive Req", "Brand Style", "Experience Std", "Visual Guide", "Structure Ref", "Animation Cmd", "Dark Mode", "Loading Strategy"],
     },
     uploadContent: "Upload Content",
     aiReady: "AI Ready",
@@ -194,6 +194,7 @@ export default function HomePage() {
   const [pastedContent, setPastedContent] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [imageCount, setImageCount] = useState(1);
 
   // 从 URL 读取语言设置，并监听变化
   useEffect(() => {
@@ -348,7 +349,7 @@ export default function HomePage() {
     
     // 优先调用后端 API 进行真正的 AI 分析
     try {
-      const response = await fetch('http://124.156.200.127:3005/api/codingplan/analyze', {
+      const response = await fetch('http://124.156.200.127:3002/api/codingplan/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -383,6 +384,15 @@ export default function HomePage() {
           1: modelsToUse[1] || null, 
           2: modelsToUse[2] || null 
         });
+        
+        // 清空所有输入框
+        setPastedContent("");
+        setUploadUrl("");
+        (window as any).uploadedFileContent = null;
+        
+        // 清空文件输入框
+        const fileInput = document.getElementById('pb-file-input') as HTMLInputElement;
+        if (fileInput) fileInput.value = '';
         
         setIsAnalyzing(false);
         return;
@@ -497,15 +507,58 @@ ${promptContent}
   };
 
   const handleCreativeGenerate = async () => {
-    if (!selectedGenModel) return;
+    if (!selectedGenModel) {
+      alert("请先选择一个模型");
+      return;
+    }
+    
+    // 获取当前模型的提示词（优先从卡片获取，其次从编辑框获取）
+    const modelIndex = getModelsForContentType(contentType).findIndex(m => m.key === selectedGenModel);
+    const prompt = cardPrompts[modelIndex] || promptText;
+    
+    if (!prompt || prompt.trim() === "") {
+      alert("请先生成或输入提示词");
+      return;
+    }
+    
     setIsGenerating(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setGeneratedContent("【" + getModelsForContentType(contentType).find(m => m.key === selectedGenModel)?.name + "】生成内容示例...");
+    
+    try {
+      // 调用图像生成API（使用通义万相模型）
+      const response = await fetch('http://124.156.200.127:3002/api/generate/image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: prompt,
+          // 忽略前端选择的模型，始终使用通义万相生成图片
+          imageCount: imageCount
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success && data.images) {
+        // 显示生成的图片（作为图片链接）
+        const imageLinks = data.images.map((url: string) => `![image](${url})`).join('\n\n');
+        setGeneratedContent(imageLinks);
+      } else {
+        // 如果API失败，使用提示词作为内容
+        setGeneratedContent(`【提示词】\n\n${prompt}\n\n⚠️ 图片生成API暂不可用，请使用提示词在其他平台生成图片`);
+      }
+    } catch (error) {
+      console.error('生成失败:', error);
+      // 回退到显示提示词
+      setGeneratedContent(`【提示词】\n\n${prompt}\n\n⚠️ 生成失败，请检查网络后重试`);
+    }
+    
     setIsGenerating(false);
   };
 
   const handleShare = (content: string) => { setShareContent(content); setShowShare(true); setCopied(false); };
   const handleCopy = async () => { await navigator.clipboard.writeText(shareContent || generatedContent); setCopied(true); setTimeout(() => setCopied(false), 2000); };
+  const copyToClipboard = async (text: string) => { try { await navigator.clipboard.writeText(text); alert('已复制到剪贴板'); } catch { alert('复制失败'); } };
+  const clearCardPrompt = (index: number) => { setCardPrompts(prev => ({ ...prev, [index]: "" })); setCardModels(prev => ({ ...prev, [index]: null })); };
+  const clearAllPrompts = () => { setCardPrompts({ 0: "", 1: "", 2: "" }); setCardModels({ 0: null, 1: null, 2: null }); setPromptText(""); setGeneratedContent(""); };
   const handleDownload = () => { const blob = new Blob([shareContent || generatedContent], { type: "text/plain" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "prompt.txt"; a.click(); URL.revokeObjectURL(url); };
 
   const contentTypes = t.contentTypes;
@@ -515,7 +568,7 @@ ${promptContent}
     { key: "image", label: t.uploadTypes[2].label, icon: Image },
     { key: "video", label: t.uploadTypes[3].label, icon: Video },
   ];
-  const currentTags = t.tags[contentType].slice(0, 12);
+  const currentTags = t.tags[contentType].slice(0, 16);
   const selectedCount = Object.values(cardModels).filter(Boolean).length;
 
   return (
@@ -577,7 +630,7 @@ ${promptContent}
                       const formData = new FormData();
                       formData.append('file', file);
                       
-                      const response = await fetch('http://124.156.200.127:3005/api/upload/parse', {
+                      const response = await fetch('http://124.156.200.127:3002/api/upload/parse', {
                         method: 'POST',
                         body: formData
                       });
@@ -640,12 +693,13 @@ ${promptContent}
                 </div>
               </div>
               <div className="mt-3 flex-1 overflow-y-auto text-sm text-slate-600 whitespace-pre-wrap border border-slate-100 rounded-lg p-2">{prompt || t.waitingGenerate}</div>
-              {prompt && (<div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-slate-100"><button onClick={() => handleShare(prompt)} className="p-1.5 hover:bg-slate-100 rounded-lg"><Share2 className="w-4 h-4 text-slate-400" /></button><button className="p-1.5 hover:bg-slate-100 rounded-lg"><Copy className="w-4 h-4 text-slate-400" /></button><button className="p-1.5 hover:bg-slate-100 rounded-lg"><Star className="w-4 h-4 text-slate-400" /></button></div>)}
+              {prompt && (<div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-slate-100"><button onClick={() => handleShare(prompt)} className="p-1.5 hover:bg-slate-100 rounded-lg" title="分享"><Share2 className="w-4 h-4 text-slate-400" /></button><button onClick={() => copyToClipboard(prompt)} className="p-1.5 hover:bg-slate-100 rounded-lg" title="复制"><Copy className="w-4 h-4 text-slate-400" /></button><button className="p-1.5 hover:bg-slate-100 rounded-lg" title="收藏"><Star className="w-4 h-4 text-slate-400" /></button><button onClick={() => clearCardPrompt(index)} className="p-1.5 hover:bg-red-50 rounded-lg ml-auto" title="清除"><Trash2 className="w-4 h-4 text-slate-400 hover:text-red-500" /></button></div>)}
             </div>
           );})}
         </div>
         <div className="flex items-center gap-4 mb-4">
           <button onClick={handleAnalyze} disabled={false} className={cn("text-sm px-6 py-2 rounded-xl font-semibold transition-all shadow-lg bg-slate-800 text-white hover:bg-slate-900", selectedCount === 0 && "opacity-50 cursor-not-allowed")}>{isAnalyzing ? t.analyzing : t.startAnalyze}</button>
+          <button onClick={clearAllPrompts} className="text-sm px-4 py-2 rounded-xl font-medium transition-all border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300" title="清空所有">清空</button>
           <div className="flex items-center gap-2 text-sm"><span className="text-amber-500 font-medium">Credit</span><span className="text-slate-700 font-semibold">{credits}</span></div>
         </div>
         <div className="glass-card rounded-xl p-4 mb-4">
@@ -669,11 +723,51 @@ ${promptContent}
             </select>
             <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
           </div>
+          {/* 图片数量选择 */}
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-slate-500 mr-1">张数:</span>
+            {[1, 2, 3, 4].map(n => (
+              <button
+                key={n}
+                onClick={() => setImageCount(n)}
+                className={cn("w-8 h-8 rounded-lg text-sm font-medium transition-all", imageCount === n ? "bg-blue-500 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
           <div className="flex items-center gap-2 text-sm"><span className="text-amber-500 font-medium">Credit</span><span className="text-slate-700 font-semibold">{credits}</span></div>
         </div>
         <div className="glass-card rounded-xl p-5">
-          <div className="flex items-center justify-between mb-4"><h3 className="text-sm font-semibold text-slate-700">{t.generatedContent}</h3></div>
-          <div className="min-h-[140px] bg-slate-50 rounded-xl p-4 text-sm text-slate-700 whitespace-pre-wrap mb-4">{generatedContent || t.generatedPlaceholder}</div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-slate-700">{t.generatedContent}</h3>
+            {generatedContent && (
+              <button 
+                onClick={() => setGeneratedContent("")} 
+                className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                title="清空内容"
+              >
+                <Trash2 className="w-4 h-4 text-slate-400 hover:text-red-500" />
+              </button>
+            )}
+          </div>
+          <div className="min-h-[140px] bg-slate-50 rounded-xl p-4 text-sm text-slate-700 whitespace-pre-wrap mb-4">
+            {generatedContent ? (
+              generatedContent.includes('![image](') ? (
+                <div className="space-y-3">
+                  <p className="text-slate-500 mb-2">已生成 {generatedContent.split('![image](').length - 1} 张图片：</p>
+                  {generatedContent.match(/\!\[image\]\(([^)]+)\)/g)?.map((img, idx) => {
+                    const url = img.match(/\(([^)]+)\)/)?.[1];
+                    return url ? (
+                      <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="block">
+                        <img src={url} alt={`generated-${idx}`} className="max-w-full rounded-lg hover:opacity-90 transition-opacity" style={{maxHeight: '300px'}} />
+                      </a>
+                    ) : null;
+                  })}
+                </div>
+              ) : generatedContent
+            ) : t.generatedPlaceholder}
+          </div>
           <div className="flex items-center justify-end gap-3"><div className="flex gap-2">
               <button className="w-9 h-9 rounded-full bg-slate-700 hover:bg-slate-800 flex items-center justify-center text-white"><svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348z"/></svg></button>
               <button className="w-9 h-9 rounded-full bg-slate-700 hover:bg-slate-800 flex items-center justify-center text-white"><svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.05-.2-.06-.06-.16-.04-.23-.02-.1.02-1.59 1.01-4.49 2.98-.42.29-.8.43-1.14.42-.38-.01-1.1-.22-1.64-.4-.66-.23-1.19-.35-1.14-.74.02-.2.29-.41.79-.63 3.12-1.36 5.2-2.26 6.24-2.7 2.97-1.24 3.59-1.45 3.99-1.46.09 0 .28.02.41.12.11.08.14.19.16.27-.01.06.01.24 0 .38z"/></svg></button>

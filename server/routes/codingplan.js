@@ -1,5 +1,7 @@
 const express = require('express');
 const https = require('https');
+const axios = require('axios');
+const cheerio = require('cheerio');
 const router = express.Router();
 
 // 阿里云千问 API 配置
@@ -8,6 +10,44 @@ const QWEN_CONFIG = {
   model: 'qwen-plus',
   apiKey: process.env.QWEN_API_KEY || ''
 };
+
+// 网页内容提取
+async function fetchWebPage(url) {
+  try {
+    const response = await axios.get(url, {
+      timeout: 15000,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      },
+      maxContentLength: 5 * 1024 * 1024
+    });
+    
+    const $ = cheerio.load(response.data);
+    
+    // 提取标题
+    const title = $('title').text() || $('h1').first().text() || '';
+    
+    // 移除脚本和样式
+    $('script, style, nav, footer, header').remove();
+    
+    // 提取主要文本内容
+    const text = $('body').text().trim();
+    // 清理空白字符
+    const cleanText = text.replace(/\s+/g, ' ').substring(0, 5000);
+    
+    return {
+      success: true,
+      title: title.trim(),
+      content: cleanText,
+      url: url
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
 
 // 调用千问 API
 function callQwenAPI(prompt, apiKey) {
@@ -62,10 +102,30 @@ function callQwenAPI(prompt, apiKey) {
 // 提示词分析
 router.post('/analyze', async (req, res) => {
   try {
-    const { content, dimensions, contentType, models } = req.body;
+    let { content, dimensions, contentType, models } = req.body;
     
     console.log('=== ANALYZE (Qwen) ===');
+    console.log('Content type:', contentType);
     console.log('Models:', models);
+
+    // 如果content是URL，先获取网页内容
+    if (content && typeof content === 'string' && contentType === 'web') {
+      // 检查是否是URL格式
+      const urlPattern = /^(https?:\/\/)/i;
+      if (urlPattern.test(content.trim())) {
+        console.log('Fetching web page:', content);
+        const webResult = await fetchWebPage(content.trim());
+        
+        if (webResult.success && webResult.content) {
+          // 合并标题和内容
+          content = `【网页标题】${webResult.title}\n\n【网页内容】${webResult.content}`;
+          console.log('Web page fetched, content length:', content.length);
+        } else {
+          console.log('Web fetch failed:', webResult.error);
+          // 继续使用原始URL作为内容
+        }
+      }
+    }
 
     if (!content) return res.status(400).json({ error: 'Content required' });
 
