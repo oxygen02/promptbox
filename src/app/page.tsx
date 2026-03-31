@@ -301,7 +301,8 @@ export default function HomePage() {
         body: JSON.stringify({
           content: content,
           dimensions: selectedDimensions,
-          contentType: contentType
+          contentType: contentType,
+          models: [cardModels[0], cardModels[1], cardModels[2]].filter(Boolean)
         })
       });
       

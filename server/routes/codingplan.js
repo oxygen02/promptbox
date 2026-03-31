@@ -2,53 +2,19 @@ const express = require('express');
 const https = require('https');
 const router = express.Router();
 
-// DeepSeek API 配置（优先使用）
+// DeepSeek API 配置
 const DEEPSEEK_CONFIG = {
   endpoint: 'https://api.deepseek.com/chat/completions',
   model: 'deepseek-chat',
   apiKey: process.env.DEEPSEEK_API_KEY || ''
 };
 
-// 阿里云千问 API 配置（备用）
+// 阿里云千问 API 配置
 const QWEN_CONFIG = {
   endpoint: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
   model: 'qwen-plus',
   apiKey: process.env.QWEN_API_KEY || ''
 };
-
-// 本地分析回退
-function localAnalyze(content, dimensions, contentType) {
-  const dims = dimensions?.join('、') || '通用';
-  const contentTypeName = contentType === 'text' ? '文字文档' : 
-                          contentType === 'image' ? '图片视觉' : 
-                          contentType === 'video' ? '视频解构' : '网页设计';
-  
-  const lines = content.split(/[\n，。,.;；]/).filter(l => l.trim().length > 2);
-  const keyPoints = lines.slice(0, 5).map(l => '• ' + l.trim()).join('\n');
-  const wordCount = content.length;
-  
-  return `# ${contentTypeName} 分析结果
-
-## 分析维度
-${dims}
-
-## 内容概况
-- 字数：${wordCount} 字符
-- 内容类型：${contentTypeName}
-
-## 提取的关键信息
-${keyPoints || '（基于上传内容提取）'}
-
-## 提示词模板
-基于上述内容，请根据以下维度生成提示词：
-${dims}
-
-请确保提示词：
-1. 准确反映原始内容的核心信息
-2. 符合选定的分析维度要求
-3. 语言清晰、结构化
-4. 适合目标AI模型使用`;
-}
 
 // 使用 https 模块调用 AI API
 function callAIAPI(prompt, config) {
@@ -108,122 +74,97 @@ function callAIAPI(prompt, config) {
   });
 }
 
-// 提示词分析
+// 分析单个模型
+async function analyzeForModel(content, dimensions, contentType, modelName, apiConfig) {
+  const dims = dimensions?.join('、') || '通用';
+  const contentTypeName = contentType === 'text' ? '文字文档' : 
+                          contentType === 'image' ? '图片视觉' : 
+                          contentType === 'video' ? '视频解构' : '网页设计';
+  
+  const prompt = `请根据以下内容，为【${modelName}】模型生成一个专属的AI提示词。
+
+## 原始内容：
+${content}
+
+## 内容类型：${contentTypeName}
+## 分析维度：${dims}
+
+请为${modelName}模型生成一个专业、结构化的提示词，要求：
+1. 适合${modelName}模型的特点和优势
+2. 包含角色设定、任务描述、输出格式要求
+3. 提示词要能充分发挥该模型的能力
+
+请直接输出提示词内容，不需要其他说明。`;
+
+  if (apiConfig && apiConfig.apiKey) {
+    const result = await callAIAPI(prompt, apiConfig);
+    if (result.success) {
+      return result.content;
+    }
+  }
+  
+  // 回退到本地生成
+  return `# ${modelName} 提示词
+
+## 分析维度
+${dims}
+
+## 原始内容要点
+${content.substring(0, 200)}...
+
+## 提示词模板
+你是一位专业的${contentTypeName}分析师。根据上述内容，按照[${dims}]维度进行分析...`;
+}
+
+// 提示词分析 - 支持多模型
 router.post('/analyze', async (req, res) => {
   try {
-    const { content, dimensions, contentType } = req.body;
+    const { content, dimensions, contentType, models } = req.body;
 
     if (!content) {
       return res.status(400).json({ success: false, error: 'Content is required' });
     }
 
-    console.log('Analyzing content with dimensions:', dimensions);
+    console.log('Analyzing content with dimensions:', dimensions, 'models:', models);
 
-    const prompt = `请根据以下内容进行分析，提取关键信息并生成适合AI使用的提示词。
-
-## 原始内容：
-${content}
-
-## 内容类型：${contentType || '文字文档'}
-## 分析维度：${dimensions?.join('、') || '通用'}
-
-请按以下格式输出：
-1. 提取的核心信息
-2. 关键要点
-3. 适合的AI提示词模板`;
-
-    // 优先使用 DeepSeek
-    if (DEEPSEEK_CONFIG.apiKey) {
-      console.log('Calling DeepSeek API...');
-      const result = await callAIAPI(prompt, DEEPSEEK_CONFIG);
-      console.log('DeepSeek result:', result.success ? 'success' : result.error);
-      if (result.success) {
-        return res.json({
-          success: true,
-          result: result.content,
-          model: result.model,
-          timestamp: new Date().toISOString()
-        });
+    // 默认模型列表
+    const modelList = models && models.length > 0 ? models : ['deepseek'];
+    
+    // 为每个模型生成专属提示词
+    const results = {};
+    
+    for (const modelKey of modelList) {
+      let apiConfig = null;
+      let modelName = modelKey;
+      
+      // 确定使用哪个 API
+      if (modelKey.includes('deepseek') && DEEPSEEK_CONFIG.apiKey) {
+        apiConfig = DEEPSEEK_CONFIG;
+        modelName = 'DeepSeek';
+      } else if (modelKey.includes('kimi') || modelKey.includes('qwen') || modelKey.includes('moonshot')) {
+        if (QWEN_CONFIG.apiKey) {
+          apiConfig = QWEN_CONFIG;
+          modelName = 'Kimi';
+        }
+      } else if (QWEN_CONFIG.apiKey) {
+        // 默认使用千问
+        apiConfig = QWEN_CONFIG;
+        modelName = 'AI助手';
       }
+      
+      console.log(`Generating prompt for model: ${modelKey}`);
+      const prompt = await analyzeForModel(content, dimensions, contentType, modelName, apiConfig);
+      results[modelKey] = prompt;
     }
 
-    // 备用千问
-    if (QWEN_CONFIG.apiKey) {
-      console.log('Calling Qwen API...');
-      const result = await callAIAPI(prompt, QWEN_CONFIG);
-      console.log('Qwen result:', result.success ? 'success' : result.error);
-      if (result.success) {
-        return res.json({
-          success: true,
-          result: result.content,
-          model: result.model,
-          timestamp: new Date().toISOString()
-        });
-      }
-    }
-
-    // 本地分析回退
-    console.log('Using local analysis fallback');
-    const localResult = localAnalyze(content, dimensions, contentType);
     res.json({
       success: true,
-      result: localResult,
-      model: 'local-analysis',
+      results: results,
       timestamp: new Date().toISOString()
     });
 
   } catch (error) {
     console.error('Analyze error:', error);
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// 创意生成
-router.post('/generate', async (req, res) => {
-  try {
-    const { prompt, model } = req.body;
-
-    if (!prompt) {
-      return res.status(400).json({ success: false, error: 'Prompt is required' });
-    }
-
-    const fullPrompt = `请根据以下提示词生成内容：\n\n${prompt}\n\n请直接输出生成结果。`;
-
-    // 优先 DeepSeek
-    if (DEEPSEEK_CONFIG.apiKey) {
-      const result = await callAIAPI(fullPrompt, DEEPSEEK_CONFIG);
-      if (result.success) {
-        return res.json({
-          success: true,
-          content: result.content,
-          model: result.model,
-          timestamp: new Date().toISOString()
-        });
-      }
-    }
-
-    // 备用千问
-    if (QWEN_CONFIG.apiKey) {
-      const result = await callAIAPI(fullPrompt, QWEN_CONFIG);
-      if (result.success) {
-        return res.json({
-          success: true,
-          content: result.content,
-          model: result.model,
-          timestamp: new Date().toISOString()
-        });
-      }
-    }
-
-    res.json({
-      success: true,
-      content: `[生成内容]\n\n根据您的提示词生成的内容将显示在这里...`,
-      model: 'local-generation',
-      timestamp: new Date().toISOString()
-    });
-
-  } catch (error) {
-    console.error('Generate error:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
