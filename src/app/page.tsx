@@ -578,7 +578,7 @@ ${promptContent}
                       const formData = new FormData();
                       formData.append('file', file);
                       
-                      const response = await fetch('http://124.156.200.127:3020/api/upload/parse', {
+                      const response = await fetch('http://124.156.200.127:3002/api/upload/parse', {
                         method: 'POST',
                         body: formData
                       });
