@@ -2,42 +2,18 @@ const express = require('express');
 const https = require('https');
 const router = express.Router();
 
-// 腾讯云 CodingPlan API 配置
-const CODING_PLAN_CONFIG = {
-  endpoint: 'https://api.codingplan.com/v1/chat/completions',
-  apiKey: process.env.CODING_PLAN_API_KEY || 'sk-TYBFiCJwEglKf8PV5yAaFIuTJnDaW5PJ3mfMxim3QUAPp5xC'
+// 阿里云千问 API 配置
+const QWEN_CONFIG = {
+  endpoint: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+  model: 'qwen-plus',
+  apiKey: process.env.QWEN_API_KEY || ''
 };
 
-// Coding Plan 支持的模型映射
-const CODING_PLAN_MODELS = {
-  'auto': 'tc-code-latest',
-  'hunyuan-2.0-instruct': 'hunyuan-2.0-instruct',
-  'hunyuan-2.0-thinking': 'hunyuan-2.0-thinking',
-  'minimax-m2.5': 'minimax-m2.5',
-  'kimi-k2.5': 'kimi-k2.5',
-  'glm-5': 'glm-5',
-  'hunyuan-t1': 'hunyuan-t1',
-  'hunyuan-turbos': 'hunyuan-turbos'
-};
-
-// 前端模型映射到 Coding Plan 模型
-const MODEL_MAPPING = {
-  'deepseek-chat': 'tc-code-latest',  // 使用 Auto
-  'kimi': 'kimi-k2.5',
-  'minimax': 'minimax-m2.5',
-  'gpt4o': 'hunyuan-2.0-instruct',
-  'claude-3.5': 'hunyuan-2.0-thinking',
-  'gemini-pro': 'glm-5',
-  'qwen-plus': 'hunyuan-t1',
-  'qwen-turbo': 'hunyuan-turbos',
-  'yi-light': 'tc-code-latest'
-};
-
-// 调用 Coding Plan API
-function callCodingPlanAPI(prompt, modelId) {
+// 调用千问 API
+function callQwenAPI(prompt, apiKey) {
   return new Promise((resolve) => {
     const postData = JSON.stringify({
-      model: modelId,
+      model: QWEN_CONFIG.model,
       messages: [
         { role: 'system', content: '你是一个专业的提示词优化助手。' },
         { role: 'user', content: prompt }
@@ -46,14 +22,14 @@ function callCodingPlanAPI(prompt, modelId) {
       temperature: 0.8
     });
 
-    const url = new URL(CODING_PLAN_CONFIG.endpoint);
+    const url = new URL(QWEN_CONFIG.endpoint);
     const options = {
       hostname: url.hostname,
       path: url.pathname,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${CODING_PLAN_CONFIG.apiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Length': Buffer.byteLength(postData)
       },
       timeout: 30000
@@ -68,7 +44,7 @@ function callCodingPlanAPI(prompt, modelId) {
           if (json.choices && json.choices[0]) {
             resolve({ success: true, content: json.choices[0].message.content });
           } else {
-            resolve({ success: false, error: json.error?.message || 'API error' });
+            resolve({ success: false, error: 'API error' });
           }
         } catch (e) {
           resolve({ success: false, error: e.message });
@@ -88,22 +64,17 @@ router.post('/analyze', async (req, res) => {
   try {
     const { content, dimensions, contentType, models } = req.body;
     
-    console.log('=== ANALYZE ===');
-    console.log('Content length:', content?.length);
-    console.log('Dimensions:', dimensions);
+    console.log('=== ANALYZE (Qwen) ===');
     console.log('Models:', models);
 
     if (!content) return res.status(400).json({ error: 'Content required' });
 
-    const modelList = models && models.length > 0 ? models : ['tc-code-latest'];
+    const modelList = models && models.length > 0 ? models : ['qwen-plus'];
     const dims = dimensions?.join('、') || '通用';
     const results = {};
     
     for (const modelKey of modelList) {
-      // 映射到 Coding Plan 模型
-      const codingPlanModel = MODEL_MAPPING[modelKey] || 'tc-code-latest';
-      
-      console.log(`Generating for ${modelKey} -> ${codingPlanModel}`);
+      console.log(`Generating for ${modelKey}`);
       
       const prompt = `请根据以下内容，为【${modelKey}】模型生成一个专属的AI提示词。
 
@@ -119,12 +90,10 @@ router.post('/analyze', async (req, res) => {
 
 直接输出提示词内容。`;
       
-      const result = await callCodingPlanAPI(prompt, codingPlanModel);
-      
-      if (result.success) {
-        results[modelKey] = result.content;
+      if (QWEN_CONFIG.apiKey) {
+        const result = await callQwenAPI(prompt, QWEN_CONFIG.apiKey);
+        results[modelKey] = result.success ? result.content : `【${modelKey}模型专用提示词】\n\n维度：${dims}\n\n${content.substring(0, 200)}...`;
       } else {
-        console.log(`API failed for ${modelKey}:`, result.error);
         results[modelKey] = `【${modelKey}模型专用提示词】\n\n维度：${dims}\n\n${content.substring(0, 200)}...`;
       }
     }
