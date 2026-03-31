@@ -309,6 +309,25 @@ export default function HomePage() {
       
       if (data.success) {
         setPromptText(data.result);
+        
+        // 同时为选中的模型生成卡片内容
+        const selectedModels = [cardModels[0], cardModels[1], cardModels[2]].filter(Boolean);
+        const modelsToUse = selectedModels.length > 0 ? selectedModels : ['deepseek'];
+        const dims = selectedDimensions.length > 0 ? selectedDimensions.join('、') : '通用';
+        
+        const newCardPrompts: Record<number, string> = {};
+        modelsToUse.forEach((modelKey, idx) => {
+          const modelInfo = MODELS.find(m => m.key === modelKey);
+          newCardPrompts[idx] = `# ${modelInfo?.name} 提示词\n\n${data.result}`;
+        });
+        
+        setCardPrompts(newCardPrompts);
+        setCardModels({ 
+          0: modelsToUse[0] || null, 
+          1: modelsToUse[1] || null, 
+          2: modelsToUse[2] || null 
+        });
+        
         setIsAnalyzing(false);
         return;
       }
