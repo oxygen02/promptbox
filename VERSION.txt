@@ -1,0 +1,11 @@
+PromptBox v1.0.5
+
+版本特性：
+- 集成腾讯云 CodingPlan API
+- 支持多个AI模型（DeepSeek、Kimi、MiniMax、GPT-4o、Claude、Gemini、Qwen等）
+- 不同模型生成专属提示词
+- 支持文字、图片、视频、网页内容分析
+- 12个维度标签 + 自定义维度
+- 多语言支持（中文/英文）
+
+GitHub: https://github.com/oxygen02/promptbox/releases/tag/v1.0.5
