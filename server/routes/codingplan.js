@@ -94,3 +94,10 @@ router.post('/analyze', async (req, res) => {
 });
 
 module.exports = router;
+
+// Debug logging
+router.use((req, res, next) => {
+  console.log('=== API Request ===');
+  console.log('Body:', JSON.stringify(req.body).substring(0, 200));
+  next();
+});

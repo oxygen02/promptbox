@@ -330,6 +330,9 @@ export default function HomePage() {
     // 优先使用上传文件的实际内容(window.uploadedFileContent)，如果没有则使用pastedContent或uploadUrl
     const content = (window as any).uploadedFileContent || pastedContent || uploadUrl;
     
+    console.log('分析内容:', content ? content.substring(0, 100) : '无内容');
+    console.log('选中的模型:', [cardModels[0], cardModels[1], cardModels[2]].filter(Boolean));
+    
     if (!content) {
       alert("请先上传文件、粘贴内容或输入URL后再进行分析");
       return;
