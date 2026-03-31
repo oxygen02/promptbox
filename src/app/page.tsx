@@ -282,7 +282,8 @@ export default function HomePage() {
 
   const handleAnalyze = async () => {
     // 检查是否有上传内容或URL
-    const content = pastedContent || uploadUrl;
+    // 优先使用上传文件的实际内容(window.uploadedFileContent)，如果没有则使用pastedContent或uploadUrl
+    const content = (window as any).uploadedFileContent || pastedContent || uploadUrl;
     
     if (!content) {
       alert("请先上传文件、粘贴内容或输入URL后再进行分析");
@@ -532,7 +533,9 @@ ${promptContent}
                       const data = await response.json();
                       
                       if (data.success) {
-                        setPastedContent(data.content || `[文件] ${file.name}`);
+                        // 保存文件内容到隐藏变量，只显示文件名在界面上
+                        (window as any).uploadedFileContent = data.content || '';
+                        setPastedContent(`[文件] ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
                         console.log('文件已解析:', file.name, '字数:', data.content?.length || 0);
                       } else {
                         setPastedContent(`[文件] ${file.name}\n\n解析失败: ${data.error}`);
