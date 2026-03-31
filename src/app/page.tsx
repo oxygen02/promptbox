@@ -327,8 +327,11 @@ export default function HomePage() {
 
   const handleAnalyze = async () => {
     // 检查是否有上传内容或URL
-    // 优先使用上传文件的实际内容(window.uploadedFileContent)，如果没有则使用pastedContent或uploadUrl
-    const content = (window as any).uploadedFileContent || pastedContent || uploadUrl;
+    // 获取上传内容：优先使用上传文件的实际内容
+    const uploadedContent = (window as any).uploadedFileContent;
+    const content = uploadedContent || pastedContent || uploadUrl;
+    
+    console.log('上传内容长度:', uploadedContent?.length || 0);
     
     console.log('分析内容:', content ? content.substring(0, 100) : '无内容');
     console.log('选中的模型:', [cardModels[0], cardModels[1], cardModels[2]].filter(Boolean));
