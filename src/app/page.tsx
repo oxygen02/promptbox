@@ -555,8 +555,55 @@ ${promptContent}
   };
 
   const handleShare = (content: string) => { setShareContent(content); setShowShare(true); setCopied(false); };
-  const handleCopy = async () => { await navigator.clipboard.writeText(shareContent || generatedContent); setCopied(true); setTimeout(() => setCopied(false), 2000); };
-  const copyToClipboard = async (text: string) => { try { await navigator.clipboard.writeText(text); alert('已复制到剪贴板'); } catch { alert('复制失败'); } };
+  const handleCopy = async (text?: string) => {
+    const textToCopy = text || shareContent || generatedContent;
+    console.log('Copying:', textToCopy?.substring(0, 50));
+    try {
+      // 尝试 Clipboard API
+      await navigator.clipboard.writeText(textToCopy);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      // 回退：使用 textarea 方法
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = textToCopy;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (e) {
+        console.error('Copy failed:', e);
+        alert('复制失败，请手动复制');
+      }
+    }
+  };
+  
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      alert('已复制到剪贴板');
+    } catch (err) {
+      // 回退方法
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('已复制到剪贴板');
+      } catch (e) {
+        alert('复制失败，请手动复制');
+      }
+    }
+  };
   const clearCardPrompt = (index: number) => { setCardPrompts(prev => ({ ...prev, [index]: "" })); setCardModels(prev => ({ ...prev, [index]: null })); };
   const clearAllPrompts = () => { setCardPrompts({ 0: "", 1: "", 2: "" }); setCardModels({ 0: null, 1: null, 2: null }); setPromptText(""); setGeneratedContent(""); };
   const handleDownload = () => { const blob = new Blob([shareContent || generatedContent], { type: "text/plain" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "prompt.txt"; a.click(); URL.revokeObjectURL(url); };
