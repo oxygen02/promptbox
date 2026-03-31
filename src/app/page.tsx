@@ -540,7 +540,7 @@ ${promptContent}
             {/* 左侧：上传区域 */}
             <div className="w-1/2">
               <div 
-                className="upload-zone py-4 px-3 flex flex-col justify-center items-center border border-slate-200 rounded-lg bg-white hover:border-blue-400 hover:bg-blue-50 min-h-[100px] transition-all"
+                className="upload-zone py-4 px-3 flex flex-col justify-center items-center border border-slate-200 rounded-lg bg-white hover:border-blue-400 hover:bg-blue-50 min-h-[150px] transition-all"
                 onPaste={(e) => {
                   e.preventDefault();
                   const text = e.clipboardData.getData('text');
@@ -564,23 +564,8 @@ ${promptContent}
               </div>
               <input type="text" placeholder="输入网页URL" value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-2 text-sm" />
               
-              {/* 自定义维度输入框 */}
-              <input 
-                type="text" 
-                placeholder="自定义维度..." 
-                className="input-field w-full py-2 text-sm mt-2"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                    if (!selectedDimensions.includes(e.currentTarget.value.trim())) {
-                      setSelectedDimensions([...selectedDimensions, e.currentTarget.value.trim()]);
-                    }
-                    e.currentTarget.value = '';
-                  }
-                }}
-              />
-              
               {/* 用空白占位使左侧高度与右侧维度区域对齐 */}
-              <div className="h-[50px]"></div>
+              <div className="h-[100px]"></div>
               
               <input 
                 type="file" 
@@ -633,6 +618,20 @@ ${promptContent}
                   </button>
                 ))}
               </div>
+              {/* 自定义维度输入框 - 在维度下方 */}
+              <input 
+                type="text" 
+                placeholder="自定义维度（按回车添加）..." 
+                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg mt-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                    if (!selectedDimensions.includes(e.currentTarget.value.trim())) {
+                      setSelectedDimensions([...selectedDimensions, e.currentTarget.value.trim()]);
+                    }
+                    e.currentTarget.value = '';
+                  }
+                }}
+              />
             </div>
           </div>
         </div>
