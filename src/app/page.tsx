@@ -638,7 +638,7 @@ ${promptContent}
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[0, 1, 2].map((index) => { const model = cardModels[index]; const prompt = cardPrompts[index]; const currentModels = getModelsForContentType(contentType);
           const modelInfo = currentModels.find((m) => m.key === model); return (
-            <div key={index} className="glass-card rounded-xl p-4" style={{minHeight: '40vh'}}>
+            <div key={index} className="glass-card rounded-xl p-4 overflow-hidden" style={{minHeight: '40vh'}}>
               <div className="relative">
                 <div className="relative">
                   <select 
@@ -654,7 +654,7 @@ ${promptContent}
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                 </div>
               </div>
-              <div className="mt-3 h-[25vh] overflow-y-auto text-sm text-slate-600 whitespace-pre-wrap border border-slate-100 rounded-lg p-2">{prompt || t.waitingGenerate}</div>
+              <div className="mt-3 h-full overflow-y-auto text-sm text-slate-600 whitespace-pre-wrap border border-slate-100 rounded-lg p-2">{prompt || t.waitingGenerate}</div>
               {prompt && (<div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-slate-100"><button onClick={() => handleShare(prompt)} className="p-1.5 hover:bg-slate-100 rounded-lg"><Share2 className="w-4 h-4 text-slate-400" /></button><button className="p-1.5 hover:bg-slate-100 rounded-lg"><Copy className="w-4 h-4 text-slate-400" /></button><button className="p-1.5 hover:bg-slate-100 rounded-lg"><Star className="w-4 h-4 text-slate-400" /></button></div>)}
             </div>
           );})}
