@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
-// DeepSeek API 配置（免费）
-const DEEPSEEK_CONFIG = {
-  endpoint: 'https://api.deepseek.com/v1/chat/completions',
-  model: 'deepseek-chat',
-  apiKey: process.env.DEEPSEEK_API_KEY || ''
+// 阿里云千问 API 配置
+const QWEN_CONFIG = {
+  endpoint: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+  model: 'qwen-plus',
+  apiKey: process.env.QWEN_API_KEY || ''
 };
 
 // 本地分析回退
@@ -42,17 +42,17 @@ ${dims}
 4. 适合目标AI模型使用`;
 }
 
-// 调用 DeepSeek API
-async function callDeepSeekAPI(prompt, apiKey) {
+// 调用千问 API
+async function callQwenAPI(prompt, apiKey) {
   try {
-    const response = await fetch(DEEPSEEK_CONFIG.endpoint, {
+    const response = await fetch(QWEN_CONFIG.endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: DEEPSEEK_CONFIG.model,
+        model: QWEN_CONFIG.model,
         messages: [
           { role: 'system', content: '你是一个专业的提示词优化助手，帮助用户生成高质量的AI提示词。' },
           { role: 'user', content: prompt }
@@ -71,11 +71,11 @@ async function callDeepSeekAPI(prompt, apiKey) {
     return {
       success: true,
       content: data.choices?.[0]?.message?.content || '',
-      model: DEEPSEEK_CONFIG.model,
+      model: QWEN_CONFIG.model,
       usage: data.usage
     };
   } catch (error) {
-    console.error('DeepSeek API Error:', error.message);
+    console.error('Qwen API Error:', error.message);
     return { success: false, error: error.message };
   }
 }
@@ -104,10 +104,12 @@ ${content}
 2. 关键要点
 3. 适合的AI提示词模板`;
 
-    // 如果有 API Key，尝试调用 API
-    if (DEEPSEEK_CONFIG.apiKey) {
-      const result = await callDeepSeekAPI(prompt, DEEPSEEK_CONFIG.apiKey);
+    // 如果有 API Key，尝试调用千问 API
+    if (QWEN_CONFIG.apiKey) {
+      console.log('Calling Qwen API...');
+      const result = await callQwenAPI(prompt, QWEN_CONFIG.apiKey);
       if (result.success) {
+        console.log('Qwen API success!');
         return res.json({
           success: true,
           result: result.content,
@@ -115,10 +117,11 @@ ${content}
           timestamp: new Date().toISOString()
         });
       }
-      console.log('API call failed, using local analysis:', result.error);
+      console.log('Qwen API failed:', result.error);
     }
 
     // 本地分析回退
+    console.log('Using local analysis fallback');
     const localResult = localAnalyze(content, dimensions, contentType);
     res.json({
       success: true,
@@ -146,8 +149,8 @@ router.post('/generate', async (req, res) => {
 
     const fullPrompt = `请根据以下提示词生成内容：\n\n${prompt}\n\n请直接输出生成结果。`;
 
-    if (DEEPSEEK_CONFIG.apiKey) {
-      const result = await callDeepSeekAPI(fullPrompt, DEEPSEEK_CONFIG.apiKey);
+    if (QWEN_CONFIG.apiKey) {
+      const result = await callQwenAPI(fullPrompt, QWEN_CONFIG.apiKey);
       if (result.success) {
         return res.json({
           success: true,
