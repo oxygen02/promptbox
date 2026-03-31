@@ -154,11 +154,20 @@ export default function TemplatesPage() {
         </div>
 
         {/* 提示词模板 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
           {t.map((cat, i) => (
             <div key={i} className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-              <h3 className="text-base font-semibold text-slate-900 mb-4">{cat.category}</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <h3 
+                className="text-base font-semibold text-slate-900 mb-4 cursor-pointer hover:text-blue-600 flex items-center gap-2"
+                onClick={() => {
+                  const allItems = cat.items.join('\n');
+                  handleCopy(allItems);
+                }}
+              >
+                {cat.category}
+                {copied === cat.items.join('\n') && <span className="text-[10px] text-green-500 font-normal">已复制全部</span>}
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                 {cat.items.map((item, j) => (
                   <div 
                     key={j} 
