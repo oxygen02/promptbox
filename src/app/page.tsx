@@ -6,6 +6,7 @@ import {
   Upload,
   Sparkles,
   Copy,
+  Trash2,
   Star,
   Download,
   Share2,
@@ -648,7 +649,8 @@ ${promptContent}
           <div className="flex items-center gap-2 text-sm"><span className="text-amber-500 font-medium">Credit</span><span className="text-slate-700 font-semibold">{credits}</span></div>
         </div>
         <div className="glass-card rounded-xl p-4 mb-4">
-          <div className="flex items-center justify-between mb-3"><h3 className="text-sm font-semibold text-slate-700">{t.promptEdit}</h3><div className="flex gap-1.5"><button className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg"><Copy className="w-4 h-4 text-slate-400" /></button><button className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg"><Star className="w-4 h-4 text-slate-400" /></button></div></div>
+          <div className="flex items-center justify-between mb-3"><h3 className="text-sm font-semibold text-slate-700">{t.promptEdit}</h3><div className="flex gap-1.5"><button onClick={() => setPromptText("")} className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg" title="清空"><Trash2 className="w-4 h-4 text-slate-400" /></button>
+                  <button className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg"><Copy className="w-4 h-4 text-slate-400" /></button><button className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg"><Star className="w-4 h-4 text-slate-400" /></button></div></div>
           <textarea value={promptText} onChange={(e) => setPromptText(e.target.value)} className="input-field min-h-[160px] resize-none" placeholder={t.editPlaceholder} />
           <div className="text-xs text-slate-400 mt-2">0 字符</div>
         </div>
