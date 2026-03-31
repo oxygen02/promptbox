@@ -38,29 +38,53 @@ const templates = {
     { 
       category: "写作助手", 
       items: [
-        "文章标题生成", "内容润色", "大纲撰写", "结尾总结",
-        "SEO文章", "社交媒体", "邮件撰写", "广告文案"
+        { name: "文章标题生成", template: "请为以下文章生成5个吸引人的标题：[文章大纲]" },
+        { name: "内容润色", template: "请润色以下段落，使其更流畅、专业：[原文]" },
+        { name: "大纲撰写", template: "请为[主题]撰写一份详细的文章大纲，包含引言、正文和结论" },
+        { name: "结尾总结", template: "请为以下文章撰写一个有力的结尾总结：[文章要点]" },
+        { name: "SEO文章", template: "请围绕关键词[关键词]写一篇800字的SEO优化文章" },
+        { name: "社交媒体", template: "请为[产品/事件]撰写3条适合微博/小红书发布的文案" },
+        { name: "邮件撰写", template: "请写一封正式的商务邮件，主题是：[邮件主题]" },
+        { name: "广告文案", template: "请为[产品名称]创作一段吸引人的广告语" }
       ] 
     },
     { 
       category: "图像生成", 
       items: [
-        "人物肖像", "风景场景", "产品展示", "抽象艺术",
-        "Logo设计", "UI界面", "建筑渲染", "动漫风格"
+        { name: "人物肖像", template: "Portrait of a [gender], [age], [style], soft lighting, 8k, highly detailed --ar 3:4" },
+        { name: "风景场景", template: "[Landscape type], [time of day], [weather], [mood], cinematic composition, 8k --ar 16:9" },
+        { name: "产品展示", template: "Product photography of [product], clean background, professional lighting, studio setup, 4k" },
+        { name: "抽象艺术", template: "Abstract [color scheme] art, [texture], [pattern], modern, minimalist, high resolution" },
+        { name: "Logo设计", template: "Logo design for [company], [style], [colors], vector, minimalist, white background" },
+        { name: "UI界面", template: "UI design for [app type], [style], [color scheme], clean, modern, Figma style --ar 4:3" },
+        { name: "建筑渲染", template: "Architectural rendering of [building type], [style], [materials], photorealistic, 8k" },
+        { name: "动漫风格", template: "Anime style [subject], [expression], [background], vibrant colors, detailed, studio ghibli style --ar 3:2" }
       ] 
     },
     { 
       category: "视频创作", 
       items: [
-        "脚本撰写", "分镜设计", "配音稿", "字幕生成",
-        "短视频创意", "宣传片", "纪录片", "微电影"
+        { name: "脚本撰写", template: "请为[主题]撰写一个60秒短视频脚本，包含开场、内容、结尾" },
+        { name: "分镜设计", template: "请为[场景]设计分镜脚本，包含镜头景别、时长、画面描述" },
+        { name: "配音稿", template: "请撰写一段[风格]的配音稿，时长约[时间]，主题是[主题]" },
+        { name: "字幕生成", template: "请为以下视频内容生成配字幕的时间轴和文本：[视频内容描述]" },
+        { name: "短视频创意", template: "请提供3个关于[主题]的短视频创意点子" },
+        { name: "宣传片", template: "请为[公司/产品]撰写一分钟宣传片的脚本大纲" },
+        { name: "纪录片", template: "请为[主题]纪录片撰写旁白开场白（约100字）" },
+        { name: "微电影", template: "请为微电影[题材]设计一个三幕式故事大纲" }
       ] 
     },
     { 
       category: "网页设计", 
       items: [
-        "Landing Page", "仪表盘", "移动端页面", "电商详情页",
-        "博客主题", "个人主页", "企业官网", "作品集"
+        { name: "Landing Page", template: "设计一个[产品类型]落地页，包含：首屏、功能介绍、用户评价、CTA按钮" },
+        { name: "仪表盘", template: "设计[数据类型]仪表盘界面，需要展示：KPI卡片、趋势图表、数据表格" },
+        { name: "移动端页面", template: "设计[应用类型]移动端主页面，iOS风格，底部导航栏" },
+        { name: "电商详情页", template: "设计商品详情页结构：图片区、价格区、规格选择、详情描述、购买按钮" },
+        { name: "博客主题", template: "设计简洁的个人博客首页，包含：导航、文章列表、侧边栏、页脚" },
+        { name: "个人主页", template: "设计创意个人作品集主页，包含：头像、简介、技能、作品展示、联系方式" },
+        { name: "企业官网", template: "设计[行业]企业官网首页，包含：banner、关于我们、服务、案例、联系" },
+        { name: "作品集", template: "设计设计师作品集页面，瀑布流布局，筛选功能，作品详情弹窗" }
       ] 
     },
   ],
@@ -68,29 +92,53 @@ const templates = {
     { 
       category: "Writing", 
       items: [
-        "Title Generator", "Content Polish", "Outline Writer", "Summary",
-        "SEO Article", "Social Media", "Email Writing", "Ad Copy"
+        { name: "Title Generator", template: "Generate 5 catchy headlines for this article: [outline]" },
+        { name: "Content Polish", template: "Polish the following paragraph to make it more fluent and professional: [text]" },
+        { name: "Outline Writer", template: "Create a detailed outline for an article about [topic]" },
+        { name: "Summary", template: "Write a compelling conclusion for this article: [key points]" },
+        { name: "SEO Article", template: "Write an 800-word SEO-optimized article targeting the keyword [keyword]" },
+        { name: "Social Media", template: "Write 3 social media posts for [product/event] suitable for Twitter/Instagram" },
+        { name: "Email Writing", template: "Write a formal business email with the subject: [subject]" },
+        { name: "Ad Copy", template: "Create compelling ad copy for [product name]" }
       ] 
     },
     { 
       category: "Image", 
       items: [
-        "Portrait", "Landscape", "Product", "Abstract Art",
-        "Logo Design", "UI Interface", "Architectural", "Anime Style"
+        { name: "Portrait", template: "Portrait of a [gender], [age], [style], soft lighting, 8k, highly detailed --ar 3:4" },
+        { name: "Landscape", template: "[Landscape type], [time of day], [weather], [mood], cinematic composition, 8k --ar 16:9" },
+        { name: "Product", template: "Product photography of [product], clean background, professional lighting, studio setup, 4k" },
+        { name: "Abstract Art", template: "Abstract [color scheme] art, [texture], [pattern], modern, minimalist, high resolution" },
+        { name: "Logo Design", template: "Logo design for [company], [style], [colors], vector, minimalist, white background" },
+        { name: "UI Interface", template: "UI design for [app type], [style], [color scheme], clean, modern, Figma style --ar 4:3" },
+        { name: "Architectural", template: "Architectural rendering of [building type], [style], [materials], photorealistic, 8k" },
+        { name: "Anime Style", template: "Anime style [subject], [expression], [background], vibrant colors, detailed, studio ghibli style --ar 3:2" }
       ] 
     },
     { 
       category: "Video", 
       items: [
-        "Script", "Storyboard", "Voiceover", "Subtitles",
-        "Short Video", "Promo Video", "Documentary", "Film"
+        { name: "Script", template: "Write a 60-second video script about [topic] with hook, content, and CTA" },
+        { name: "Storyboard", template: "Create a storyboard for [scene] with shot types, duration, and visual descriptions" },
+        { name: "Voiceover", template: "Write a [style] voiceover script for [topic], approximately [duration] long" },
+        { name: "Subtitles", template: "Generate subtitle timestamps and text for: [video description]" },
+        { name: "Short Video", template: "Provide 3 creative short video ideas for [topic]" },
+        { name: "Promo Video", template: "Write a 1-minute promotional video script outline for [company/product]" },
+        { name: "Documentary", template: "Write a documentary opening narration (about 100 words) for [topic]" },
+        { name: "Film", template: "Design a three-act story outline for a [genre] short film" }
       ] 
     },
     { 
       category: "Web Design", 
       items: [
-        "Landing Page", "Dashboard", "Mobile Page", "E-commerce",
-        "Blog Theme", "Personal Portfolio", "Corporate", "Portfolio"
+        { name: "Landing Page", template: "Design a [product] landing page with: hero, features, testimonials, CTA" },
+        { name: "Dashboard", template: "Design a [data type] dashboard with: KPI cards, trend charts, data tables" },
+        { name: "Mobile Page", template: "Design a mobile homepage for [app type], iOS style, bottom navigation" },
+        { name: "E-commerce", template: "Design product detail page: image gallery, pricing, variants, description, buy button" },
+        { name: "Blog Theme", template: "Design a clean personal blog homepage: nav, article list, sidebar, footer" },
+        { name: "Personal Portfolio", template: "Design a creative portfolio homepage: avatar, bio, skills, projects, contact" },
+        { name: "Corporate", template: "Design a corporate homepage for [industry]: banner, about, services, cases, contact" },
+        { name: "Portfolio", template: "Design a designer portfolio with masonry layout, filter, project detail modal" }
       ] 
     },
   ],
@@ -102,9 +150,9 @@ export default function TemplatesPage() {
   const t = templates[language];
   const sites = language === "zh" ? chineseSites : englishSites;
 
-  const handleCopy = async (item: string) => {
-    await navigator.clipboard.writeText(item);
-    setCopied(item);
+  const handleCopy = async (template: string) => {
+    await navigator.clipboard.writeText(template);
+    setCopied(template);
     setTimeout(() => setCopied(null), 1500);
   };
 
@@ -156,29 +204,30 @@ export default function TemplatesPage() {
         {/* 提示词模板 */}
         <div className="space-y-4">
           {t.map((cat, i) => (
-            <div key={i} className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+            <div key={i} className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
               <h3 
-                className="text-base font-semibold text-slate-900 mb-4 cursor-pointer hover:text-blue-600 flex items-center gap-2"
+                className="text-sm font-semibold text-slate-800 mb-3 cursor-pointer hover:text-blue-600 flex items-center gap-2"
                 onClick={() => {
-                  const allItems = cat.items.join('\n');
-                  handleCopy(allItems);
+                  const allTemplates = cat.items.map(item => item.template).join('\n\n---\n\n');
+                  handleCopy(allTemplates);
                 }}
               >
                 {cat.category}
-                {copied === cat.items.join('\n') && <span className="text-[10px] text-green-500 font-normal">已复制全部</span>}
+                <span className="text-xs text-slate-400 font-normal">(点击复制全部)</span>
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+              <div className="grid grid-cols-5 gap-2">
                 {cat.items.map((item, j) => (
                   <div 
                     key={j} 
-                    onClick={() => handleCopy(item)}
-                    className="flex items-center justify-between p-2 bg-slate-50 hover:bg-blue-50 rounded-lg group cursor-pointer border border-transparent hover:border-blue-200 transition-all"
+                    onClick={() => handleCopy(item.template)}
+                    className="group p-2.5 rounded-lg bg-gradient-to-br from-white to-slate-50 hover:from-blue-50 hover:to-indigo-50 border border-slate-100 hover:border-blue-300 cursor-pointer transition-all shadow-sm hover:shadow-md"
                   >
-                    <span className="text-sm text-slate-600 group-hover:text-blue-600 truncate">{item}</span>
-                    {copied === item ? (
-                      <span className="text-[10px] text-green-500">已复制</span>
-                    ) : (
-                      <Copy className="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100" />
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-medium text-slate-700 group-hover:text-blue-700 truncate">{item.name}</span>
+                      <Copy className="w-3 h-3 text-slate-300 group-hover:text-blue-500 flex-shrink-0" />
+                    </div>
+                    {copied === item.template && (
+                      <span className="text-[9px] text-green-600 font-medium">已复制!</span>
                     )}
                   </div>
                 ))}
