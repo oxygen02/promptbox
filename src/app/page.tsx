@@ -341,7 +341,7 @@ export default function HomePage() {
     
     // 优先调用后端 API 进行真正的 AI 分析
     try {
-      const response = await fetch('http://124.156.200.127:3015/api/codingplan/analyze', {
+      const response = await fetch('http://124.156.200.127:3020/api/codingplan/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -570,7 +570,7 @@ ${promptContent}
                       const formData = new FormData();
                       formData.append('file', file);
                       
-                      const response = await fetch('http://124.156.200.127:3015/api/upload/parse', {
+                      const response = await fetch('http://124.156.200.127:3020/api/upload/parse', {
                         method: 'POST',
                         body: formData
                       });
