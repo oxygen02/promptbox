@@ -354,20 +354,22 @@ export default function HomePage() {
       
       const data = await response.json();
       
-      if (data.success) {
-        setPromptText(data.result);
-        
-        // 同时为选中的模型生成卡片内容
+      if (data.success && data.results) {
+        // 使用后端返回的每个模型的专属提示词
         const selectedModels = [cardModels[0], cardModels[1], cardModels[2]].filter(Boolean);
-        const modelsToUse = selectedModels.length > 0 ? selectedModels : ['deepseek'];
-        const dims = selectedDimensions.length > 0 ? selectedDimensions.join('、') : '通用';
+        const modelsToUse = selectedModels.length > 0 ? selectedModels : ['qwen-plus'];
         
         const newCardPrompts: Record<number, string> = {};
+        let firstPrompt = '';
+        
         modelsToUse.forEach((modelKey, idx) => {
           const modelInfo = getModelsForContentType(contentType).find(m => m.key === modelKey);
-          newCardPrompts[idx] = `# ${modelInfo?.name} 提示词\n\n${data.result}`;
+          const prompt = data.results[modelKey] || `# ${modelInfo?.name} 提示词\n\n请生成提示词`;
+          newCardPrompts[idx] = prompt;
+          if (idx === 0) firstPrompt = prompt;
         });
         
+        setPromptText(firstPrompt);
         setCardPrompts(newCardPrompts);
         setCardModels({ 
           0: modelsToUse[0] || null, 
