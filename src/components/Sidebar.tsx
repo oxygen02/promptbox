@@ -79,11 +79,13 @@ export default function Sidebar() {
   const [contentType, setContentType] = useState<string>("text");
   // 默认中文，避免 SSR hydration mismatch
   const [language, setLanguage] = useState<"zh" | "en">("zh");
+  const [mounted, setMounted] = useState(false);
 
   // 客户端挂载后读取语言设置
   useEffect(() => {
     if (typeof window === "undefined") return;
     
+    setMounted(true);
     const savedLang = localStorage.getItem('language');
     if (savedLang === 'zh' || savedLang === 'en') {
       setLanguage(savedLang);
