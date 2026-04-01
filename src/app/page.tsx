@@ -196,38 +196,22 @@ export default function HomePage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [imageCount, setImageCount] = useState(1);
 
-  // 从 URL 读取语言设置，并监听变化
+  // 客户端挂载后读取语言设置（优先 localStorage）
   useEffect(() => {
     if (typeof window !== "undefined") {
+      const savedLang = localStorage.getItem('language');
+      if (savedLang === 'zh' || savedLang === 'en') {
+        setLanguage(savedLang);
+        return;
+      }
+      
       const params = new URLSearchParams(window.location.search);
       const lang = params.get("lang");
       if (lang === "zh" || lang === "en") {
         setLanguage(lang);
       }
     }
-    
-    // 监听语言参数变化
-    const handleLangChange = () => {
-      const params = new URLSearchParams(window.location.search);
-      const lang = params.get("lang");
-      if (lang === "zh" || lang === "en") {
-        setLanguage(lang);
-      }
-    };
-    
-    window.addEventListener("popstate", handleLangChange);
-    // 监听 pushState 触发的更新
-    const originalPushState = window.history.pushState;
-    window.history.pushState = function(...args) {
-      originalPushState.apply(window.history, args);
-      handleLangChange();
-    };
-    
-    return () => {
-      window.removeEventListener("popstate", handleLangChange);
-      window.history.pushState = originalPushState;
-    };
-  }, [pathname]);
+  }, []);
 
   // 监听 Header 触发的语言切换事件
   useEffect(() => {
@@ -411,7 +395,7 @@ export default function HomePage() {
     
     // 获取维度
     const dims = selectedDimensions.length > 0 ? selectedDimensions.join('、') : '通用';
-    const contentTypeName = contentType === 'text' ? '文字文档' : contentType === 'image' ? '图片视觉' : contentType === 'video' ? '视频解构' : '网页设计';
+    const contentTypeName = contentType === 'text' ? (language === 'zh' ? '文字文档' : 'Text') : contentType === 'image' ? (language === 'zh' ? '图片视觉' : 'Image') : contentType === 'video' ? (language === 'zh' ? '视频解构' : 'Video') : (language === 'zh' ? '网页设计' : 'Web');
     
     // 简单提取内容中的关键信息（模拟 AI 分析）
     const lines = content.split(/[\n，。,.、]/).filter(l => l.trim().length > 2);

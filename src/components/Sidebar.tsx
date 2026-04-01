@@ -80,6 +80,19 @@ export default function Sidebar() {
   // 默认中文，避免 SSR hydration mismatch
   const [language, setLanguage] = useState<"zh" | "en">("zh");
 
+  // 客户端挂载后读取语言设置
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    
+    const savedLang = localStorage.getItem('language');
+    if (savedLang === 'zh' || savedLang === 'en') {
+      setLanguage(savedLang);
+    } else {
+      const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+      setLanguage(browserLang);
+    }
+  }, []);
+
   // 监听 pathname 变化
   useEffect(() => {
     if (typeof window !== "undefined") {
