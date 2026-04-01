@@ -23,9 +23,17 @@ export default function Header() {
   const router = useRouter();
   const [language, setLanguage] = useState<"zh" | "en">("zh");
 
-  // 从 URL 参数读取语言设置
+  // 客户端挂载后读取语言设置（优先 localStorage，其次 URL 参数）
   useEffect(() => {
     if (typeof window !== "undefined") {
+      // 首先检查 localStorage
+      const savedLang = localStorage.getItem('language') as 'zh' | 'en' | null;
+      if (savedLang) {
+        setLanguage(savedLang);
+        return;
+      }
+      
+      // 其次检查 URL 参数
       const params = new URLSearchParams(window.location.search);
       const lang = params.get("lang");
       if (lang === "zh" || lang === "en") {
@@ -39,6 +47,9 @@ export default function Header() {
     const newLang = language === "zh" ? "en" : "zh";
     setLanguage(newLang);
     if (typeof window !== "undefined") {
+      // 保存到 localStorage
+      localStorage.setItem('language', newLang);
+      
       const url = new URL(window.location.href);
       url.searchParams.set("lang", newLang);
       router.push(url.toString());

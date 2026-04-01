@@ -150,11 +150,18 @@ export default function TemplatesPage() {
   const [mounted, setMounted] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   
-  // 客户端挂载后检测浏览器语言
+  // 客户端挂载后检测浏览器语言或读取保存的语言偏好
   useEffect(() => {
     setMounted(true);
-    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    setLanguage(browserLang);
+    // 首先检查 localStorage 中保存的语言偏好
+    const savedLang = localStorage.getItem('language') as "zh" | "en" | null;
+    if (savedLang) {
+      setLanguage(savedLang);
+    } else {
+      // 如果没有保存的偏好，则检测浏览器语言
+      const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+      setLanguage(browserLang);
+    }
   }, []);
   
   // 监听语言切换事件
@@ -185,7 +192,12 @@ export default function TemplatesPage() {
               {language === "zh" ? "提示词模板库" : "Prompt Templates"}
             </h1>
           </div>
-          <Button variant="outline" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }}>
+          <Button variant="outline" onClick={() => { 
+            const newLang = language === "zh" ? "en" : "zh"; 
+            setLanguage(newLang); 
+            localStorage.setItem('language', newLang);
+            window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); 
+          }}>
             {language === "zh" ? "EN" : "中文"}
           </Button>
         </div>

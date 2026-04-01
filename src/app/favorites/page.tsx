@@ -51,7 +51,7 @@ export default function FavoritesPage() {
               <Download className="w-4 h-4 mr-1" />
               {language === "zh" ? "导出 JSON" : "Export JSON"}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }>
+            <Button variant="outline" size="sm" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; localStorage.setItem("language", newLang); setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }>
               {language === "zh" ? "EN" : "中文"}
             </Button>
           </div>

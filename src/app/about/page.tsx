@@ -57,7 +57,7 @@ export default function AboutPage() {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <button
-            onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }
+            onClick={() => { const newLang = language === "zh" ? "en" : "zh"; localStorage.setItem("language", newLang); setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }
             className="text-sm text-slate-500 hover:text-slate-700 mb-4"
           >
             {language === "zh" ? "Switch to English" : "切换到中文"}

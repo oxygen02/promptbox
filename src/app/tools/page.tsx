@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Globe, Image, Video, FileText, Layout, Monitor, Film, ExternalLink } from "lucide-react";
 
 // AI创作工具分类数据
@@ -243,8 +243,14 @@ export default function ToolsPage() {
   // 客户端挂载后检测浏览器语言
   useEffect(() => {
     setMounted(true);
-    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    setLanguage(browserLang);
+    // 优先使用 localStorage 保存的语言偏好
+    const savedLang = localStorage.getItem('language');
+    if (savedLang === 'zh' || savedLang === 'en') {
+      setLanguage(savedLang);
+    } else {
+      const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+      setLanguage(browserLang);
+    }
   }, []);
   
   // 监听语言切换事件
@@ -271,7 +277,7 @@ export default function ToolsPage() {
             </p>
           </div>
           <button 
-            onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }}
+            onClick={() => { const newLang = language === "zh" ? "en" : "zh"; localStorage.setItem('language', newLang); setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }}
             className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50"
           >
             {language === "zh" ? "Switch to EN" : "切换中文"}

@@ -26,8 +26,14 @@ export default function HistoryPage() {
   // 客户端挂载后检测浏览器语言
   useEffect(() => {
     setMounted(true);
-    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    setLanguage(browserLang);
+    // 首先检查 localStorage 中保存的语言偏好
+    const savedLang = localStorage.getItem('language') as 'zh' | 'en' | null;
+    if (savedLang) {
+      setLanguage(savedLang);
+    } else {
+      const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+      setLanguage(browserLang);
+    }
   }, []);
   
   // 监听语言切换事件
@@ -51,7 +57,7 @@ export default function HistoryPage() {
               {language === "zh" ? "历史记录" : "History"}
             </h1>
           </div>
-          <Button variant="outline" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }}>
+          <Button variant="outline" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; localStorage.setItem("language", newLang); setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }}>
             {language === "zh" ? "EN" : "中文"}
           </Button>
         </div>

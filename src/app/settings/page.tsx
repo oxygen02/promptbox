@@ -31,7 +31,7 @@ export default function SettingsPage() {
           <h1 className="text-2xl font-bold text-slate-900">
             {language === "zh" ? "设置" : "Settings"}
           </h1>
-          <Button variant="outline" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }>
+          <Button variant="outline" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; localStorage.setItem("language", newLang); setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }>
             {language === "zh" ? "EN" : "中文"}
           </Button>
         </div>
