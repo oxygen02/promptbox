@@ -18,20 +18,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh">
-      <body className={inter.className}>
-        <Header />
-        <div className="flex pt-16 min-h-screen overflow-visible" style={{ background: '#f0f4f8' }}>
-          <Sidebar />
-          <main className="flex-1 md:ml-[160px] min-h-[calc(100vh-4rem)] p-3 md:p-4 transition-all duration-300 overflow-visible">
-            <Suspense fallback={
-              <div className="flex items-center justify-center min-h-[50vh]">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
-              </div>
-            }>
-              {children}
-            </Suspense>
-          </main>
+    <html lang="zh" className="light">
+      <body className={`${inter.className} transition-colors duration-300`}>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+          <Header />
+          <div className="flex pt-16 min-h-screen overflow-visible" style={{ background: '#f0f4f8' }}>
+            <Sidebar />
+            <main className="flex-1 md:ml-[160px] min-h-[calc(100vh-4rem)] p-3 md:p-4 transition-all duration-300 overflow-visible">
+              <Suspense fallback={
+                <div className="flex items-center justify-center min-h-[50vh]">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
+                </div>
+              }>
+                {children}
+              </Suspense>
+            </main>
+          </div>
         </div>
       </body>
     </html>

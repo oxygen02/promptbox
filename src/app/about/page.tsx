@@ -1,10 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sparkles, Zap, Shield, Users } from "lucide-react";
 
 export default function AboutPage() {
   const [language, setLanguage] = useState<"zh" | "en">("zh");
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+    setLanguage(browserLang);
+  }, []);
+  
+  useEffect(() => {
+    const handleLanguageChange = (e: any) => {
+      setLanguage(e.detail);
+    };
+    window.addEventListener("language-change", handleLanguageChange);
+    return () => window.removeEventListener("language-change", handleLanguageChange);
+  }, []);
 
   const content = {
     zh: {
@@ -42,7 +57,7 @@ export default function AboutPage() {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <button
-            onClick={() => setLanguage(language === "zh" ? "en" : "zh")}
+            onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }
             className="text-sm text-slate-500 hover:text-slate-700 mb-4"
           >
             {language === "zh" ? "Switch to English" : "切换到中文"}

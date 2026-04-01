@@ -7,7 +7,8 @@ import { Sparkles, Mail, Github, Chrome } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [language, setLanguage] = useState<"zh" | "en">("zh");
+  const browserLang = typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+  const [language, setLanguage] = useState<"zh" | "en">(browserLang);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 

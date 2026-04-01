@@ -261,7 +261,7 @@ export default function HomePage() {
     if (file) {
       console.log("Uploaded file:", file.name);
       // 这里可以添加文件上传逻辑
-      alert(`已选择文件: ${file.name}`);
+      alert(`${language === 'zh' ? '已选择文件' : 'File selected'}: ${file.name}`);
     }
   };
   const [credits] = useState(520);
@@ -318,7 +318,7 @@ export default function HomePage() {
       // 检查其他卡片是否已选择相同模型
       for (const [idx, m] of Object.entries(cardModels)) {
         if (idx !== String(cardIndex) && m === model) {
-          alert(`模型 ${model} 已被选择，请选择其他模型`);
+          alert(`模型 ${model} ${language === 'zh' ? '已被选择，请选择其他模型' : 'is already selected, please choose another'}`);
           return;
         }
       }
@@ -339,13 +339,13 @@ export default function HomePage() {
     console.log('选中的模型:', [cardModels[0], cardModels[1], cardModels[2]].filter(Boolean));
     
     if (!content) {
-      alert("请先上传文件、粘贴内容或输入URL后再进行分析");
+      alert(language === 'zh' ? "请先上传文件、粘贴内容或输入URL后再进行分析" : "Please upload a file, paste content, or enter a URL before analyzing");
       return;
     }
     
     // 显示分析中状态
     setIsAnalyzing(true);
-    setPromptText("正在分析上传的内容...");
+    setPromptText(language === 'zh' ? "正在分析上传的内容..." : "Analyzing uploaded content...");
     
     // 优先调用后端 API 进行真正的 AI 分析
     try {
@@ -449,7 +449,7 @@ export default function HomePage() {
 3. 然后基于内容进行提示词生成
 
 ## 📋 文件内容（请粘贴在此处）
-[请在此处粘贴文件的主要内容...]
+[${language === 'zh' ? '请在此处粘贴文件的主要内容...' : 'Please paste the main content of the file here...'}]
 
 ## 🎯 分析维度：${dims}
 请基于上述内容，按照选定维度进行分析并生成提示词。
@@ -461,34 +461,34 @@ export default function HomePage() {
         const promptContent = content.length > 300 ? content.substring(0, 300) + '...' : content;
         prompt = `# ${modelInfo?.name} 提示词 - 基于内容生成
 
-## 📋 原始内容分析
-- 内容类型：${contentTypeName}
-- 字数统计：${wordCount} 字 / ${charCount} 字符
-- 分析维度：${dims}
+## 📋 ${language === 'zh' ? '原始内容分析' : 'Content Analysis'}
+- ${language === 'zh' ? '内容类型' : 'Content Type'}：${contentTypeName}
+- ${language === 'zh' ? '字数统计' : 'Word Count'}：${wordCount} ${language === 'zh' ? '字' : 'words'} / ${charCount} ${language === 'zh' ? '字符' : 'chars'}
+- ${language === 'zh' ? '分析维度' : 'Dimensions'}：${dims}
 
-## 📄 提取的关键信息
-${keyPoints || '（请在此补充关键信息）'}
+## 📄 ${language === 'zh' ? '提取的关键信息' : 'Key Information'}
+${keyPoints || (language === 'zh' ? '（请在此补充关键信息）' : '(Please add key information here)')}
 
-## 📝 原始内容
+## 📝 ${language === 'zh' ? '原始内容' : 'Original Content'}
 \`\`\`
 ${promptContent}
 \`\`\`
 
-## 💡 提示词模板（请编辑）
+## 💡 ${language === 'zh' ? '提示词模板（请编辑）' : 'Prompt Template (Please Edit)'}
 
-### 角色设定
-你是一位专业的内容分析师。
+### ${language === 'zh' ? '角色设定' : 'Role Setting'}
+${language === 'zh' ? '你是一位专业的内容分析师。' : 'You are a professional content analyst.'}
 
-### 任务
-基于上述内容，按照「${dims}」维度进行分析。
+### ${language === 'zh' ? '任务' : 'Task'}
+${language === 'zh' ? `基于上述内容，按照「${dims}」维度进行分析。` : `Based on the above content, analyze according to the dimensions: ${dims}.`}
 
-### 输出要求
-1. 总结核心观点
-2. 提取关键信息
-3. 生成针对性提示词
+### ${language === 'zh' ? '输出要求' : 'Output Requirements'}
+1. ${language === 'zh' ? '总结核心观点' : 'Summarize core viewpoints'}
+2. ${language === 'zh' ? '提取关键信息' : 'Extract key information'}
+3. ${language === 'zh' ? '生成针对性提示词' : 'Generate targeted prompts'}
 
-### ✏️ 生成的提示词（请编辑此处）
-[在此处输入生成的提示词...]`;
+### ${language === 'zh' ? '✏️ 生成的提示词（请编辑此处）' : '✏️ Generated Prompt (Please edit here)'}
+[${language === 'zh' ? '在此处输入生成的提示词...' : 'Enter generated prompt here...'}]`;
       }
 
       newCardPrompts[idx] = prompt;
@@ -508,7 +508,7 @@ ${promptContent}
 
   const handleCreativeGenerate = async () => {
     if (!selectedGenModel) {
-      alert("请先选择一个模型");
+      alert(language === 'zh' ? "请先选择一个模型" : "Please select a model first");
       return;
     }
     
@@ -517,7 +517,7 @@ ${promptContent}
     const prompt = cardPrompts[modelIndex] || promptText;
     
     if (!prompt || prompt.trim() === "") {
-      alert("请先生成或输入提示词");
+      alert(language === 'zh' ? "请先生成或输入提示词" : "Please generate or enter a prompt first");
       return;
     }
     
@@ -543,12 +543,12 @@ ${promptContent}
         setGeneratedContent(imageLinks);
       } else {
         // 如果API失败，使用提示词作为内容
-        setGeneratedContent(`【提示词】\n\n${prompt}\n\n⚠️ 图片生成API暂不可用，请使用提示词在其他平台生成图片`);
+        setGeneratedContent(`${language === 'zh' ? '【提示词】' : '【Prompt】'}\n\n${prompt}\n\n⚠️ ${language === 'zh' ? '图片生成API暂不可用，请使用提示词在其他平台生成图片' : 'Image generation API unavailable, please use the prompt on other platforms'}`);
       }
     } catch (error) {
-      console.error('生成失败:', error);
+      console.error('Generation failed:', error);
       // 回退到显示提示词
-      setGeneratedContent(`【提示词】\n\n${prompt}\n\n⚠️ 生成失败，请检查网络后重试`);
+      setGeneratedContent(`${language === 'zh' ? '【提示词】' : '【Prompt】'}\n\n${prompt}\n\n⚠️ ${language === 'zh' ? '生成失败，请检查网络后重试' : 'Generation failed, please check network and retry'}`);
     }
     
     setIsGenerating(false);
@@ -578,7 +578,7 @@ ${promptContent}
         setTimeout(() => setCopied(false), 2000);
       } catch (e) {
         console.error('Copy failed:', e);
-        alert('复制失败，请手动复制');
+        alert(language === 'zh' ? '复制失败，请手动复制' : 'Copy failed, please copy manually');
       }
     }
   };
@@ -586,7 +586,7 @@ ${promptContent}
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      alert('已复制到剪贴板');
+      alert(language === 'zh' ? '已复制到剪贴板' : 'Copied to clipboard');
     } catch (err) {
       // 回退方法
       try {
@@ -598,9 +598,9 @@ ${promptContent}
         textarea.select();
         document.execCommand('copy');
         document.body.removeChild(textarea);
-        alert('已复制到剪贴板');
+        alert(language === 'zh' ? '已复制到剪贴板' : 'Copied to clipboard');
       } catch (e) {
-        alert('复制失败，请手动复制');
+        alert(language === 'zh' ? '复制失败，请手动复制' : 'Copy failed, please copy manually');
       }
     }
   };
@@ -660,10 +660,10 @@ ${promptContent}
                   }}
                   className="px-4 py-2 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-colors"
                 >
-                  点击选择文件
+                  {language === 'zh' ? '点击选择文件' : 'Click to select file'}
                 </button>
               </div>
-              <input type="text" placeholder="输入网页URL" value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-2 text-sm" />
+              <input type="text" placeholder={language === 'zh' ? "输入网页URL" : "Enter webpage URL"} value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)} className="input-field w-full py-2 text-sm" />
               
               <input 
                 type="file" 
@@ -671,7 +671,7 @@ ${promptContent}
                 onChange={async (e) => {
                   const file = e.target.files?.[0];
                   if (file) {
-                    setPastedContent("正在解析文件...");
+                    setPastedContent(language === 'zh' ? "正在解析文件..." : "Parsing file...");
                     
                     try {
                       const formData = new FormData();
@@ -694,7 +694,7 @@ ${promptContent}
                       }
                     } catch (error) {
                       console.error('文件上传失败:', error);
-                      setPastedContent(`[文件] ${file.name}\n\n❌ 上传失败，请复制内容粘贴到上方文本框`);
+                      setPastedContent(`[文件] ${file.name}\n\n❌ ${language === 'zh' ? '上传失败，请复制内容粘贴到上方文本框' : 'Upload failed, please copy content to the text box above'}`);
                     }
                   }
                 }} 
@@ -731,7 +731,7 @@ ${promptContent}
                     onChange={(e) => handleCardModelSelect(index, e.target.value || null)}
                     className="w-full px-3 py-2 text-sm bg-slate-50 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none appearance-none cursor-pointer"
                   >
-                    <option value="">— 选择模型 —</option>
+                    <option value="">{language === 'zh' ? '— 选择模型 —' : '-- Select Model --'}</option>
                     {getModelsForContentType(contentType).map((m) => (
                       <option key={m.key} value={m.key}>{m.name}</option>
                     ))}
@@ -746,14 +746,16 @@ ${promptContent}
         </div>
         <div className="flex items-center gap-4 mb-4">
           <button onClick={handleAnalyze} disabled={false} className={cn("text-sm px-6 py-2 rounded-xl font-semibold transition-all shadow-lg bg-slate-800 text-white hover:bg-slate-900", selectedCount === 0 && "opacity-50 cursor-not-allowed")}>{isAnalyzing ? t.analyzing : t.startAnalyze}</button>
-          <button onClick={clearAllPrompts} className="text-sm px-4 py-2 rounded-xl font-medium transition-all border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300" title="清空所有">清空</button>
+          <button onClick={clearAllPrompts} className="text-sm px-4 py-2 rounded-xl font-medium transition-all border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300" title={language === 'zh' ? '清空所有' : 'Clear all'}>
+            {language === 'zh' ? '清空' : 'Clear'}
+          </button>
           <div className="flex items-center gap-2 text-sm"><span className="text-amber-500 font-medium">Credit</span><span className="text-slate-700 font-semibold">{credits}</span></div>
         </div>
         <div className="glass-card rounded-xl p-4 mb-4">
           <div className="flex items-center justify-between mb-3"><h3 className="text-sm font-semibold text-slate-700">{t.promptEdit}</h3><div className="flex gap-1.5"><button onClick={() => setPromptText("")} className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg" title="清空"><Trash2 className="w-4 h-4 text-slate-400" /></button>
                   <button className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg"><Copy className="w-4 h-4 text-slate-400" /></button><button className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg"><Star className="w-4 h-4 text-slate-400" /></button></div></div>
           <textarea value={promptText} onChange={(e) => setPromptText(e.target.value)} className="input-field min-h-[160px] resize-none" placeholder={t.editPlaceholder} />
-          <div className="text-xs text-slate-400 mt-2">0 字符</div>
+          <div className="text-xs text-slate-400 mt-2">0 {language === 'zh' ? '字符' : 'chars'}</div>
         </div>
         <div className="flex items-center gap-4 mb-4">
           <button onClick={handleCreativeGenerate} disabled={!selectedGenModel || isGenerating} className={cn("text-sm px-6 py-2 rounded-xl font-semibold transition-all shadow-lg bg-slate-800 text-white hover:bg-slate-900", !selectedGenModel && "opacity-50 cursor-not-allowed")}>{isGenerating ? t.generating : t.creativeGenerate}</button>
@@ -772,7 +774,7 @@ ${promptContent}
           </div>
           {/* 图片数量选择 */}
           <div className="flex items-center gap-1">
-            <span className="text-xs text-slate-500 mr-1">张数:</span>
+            <span className="text-xs text-slate-500 mr-1">{language === 'zh' ? '张数:' : 'Images:'}</span>
             {[1, 2, 3, 4].map(n => (
               <button
                 key={n}

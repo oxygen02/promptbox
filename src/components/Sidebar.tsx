@@ -77,41 +77,28 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [contentType, setContentType] = useState<string>("text");
+  // 默认中文，避免 SSR hydration mismatch
   const [language, setLanguage] = useState<"zh" | "en">("zh");
 
-  // 监听 pathname 和语言参数变化
+  // 监听 pathname 变化
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const type = params.get("type") || "text";
-      const lang = params.get("lang") || "zh";
       setContentType(type);
-      setLanguage(lang as "zh" | "en");
     }
   }, [pathname]);
 
-  // 监听语言变化事件
+  // 监听语言切换事件（响应 Header 和其他页面的语言切换）
   useEffect(() => {
     if (typeof window === "undefined") return;
     
-    const handleLanguageChange = () => {
-      const params = new URLSearchParams(window.location.search);
-      const lang = params.get("lang") || "zh";
-      setLanguage(lang as "zh" | "en");
+    const handleLanguageChange = (e: any) => {
+      setLanguage(e.detail);
     };
     
-    window.addEventListener("popstate", handleLanguageChange);
-    // 监听 pushState 变化
-    const originalPushState = window.history.pushState;
-    window.history.pushState = function(...args) {
-      originalPushState.apply(window.history, args);
-      handleLanguageChange();
-    };
-    
-    return () => {
-      window.removeEventListener("popstate", handleLanguageChange);
-      window.history.pushState = originalPushState;
-    };
+    window.addEventListener("language-change", handleLanguageChange);
+    return () => window.removeEventListener("language-change", handleLanguageChange);
   }, []);
 
   // 监听自定义事件（首页触发）
@@ -124,20 +111,6 @@ export default function Sidebar() {
     
     window.addEventListener("content-type-change", handleContentTypeChange as EventListener);
     return () => window.removeEventListener("content-type-change", handleContentTypeChange as EventListener);
-  }, []);
-
-  // 监听语言切换事件
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    
-    const handleLangChange = () => {
-      const params = new URLSearchParams(window.location.search);
-      const lang = params.get("lang") || "zh";
-      setLanguage(lang as "zh" | "en");
-    };
-    
-    window.addEventListener("popstate", handleLangChange);
-    return () => window.removeEventListener("popstate", handleLangChange);
   }, []);
 
   const handleContentClick = (key: string, href?: string) => {

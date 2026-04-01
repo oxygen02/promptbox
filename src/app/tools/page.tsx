@@ -236,7 +236,26 @@ const toolCategories = {
 };
 
 export default function ToolsPage() {
+  // 默认中文，避免 SSR hydration mismatch
   const [language, setLanguage] = useState<"zh" | "en">("zh");
+  const [mounted, setMounted] = useState(false);
+  
+  // 客户端挂载后检测浏览器语言
+  useEffect(() => {
+    setMounted(true);
+    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+    setLanguage(browserLang);
+  }, []);
+  
+  // 监听语言切换事件
+  useEffect(() => {
+    const handleLanguageChange = (e: any) => {
+      setLanguage(e.detail);
+    };
+    window.addEventListener("language-change", handleLanguageChange);
+    return () => window.removeEventListener("language-change", handleLanguageChange);
+  }, []);
+  
   const categories = toolCategories[language];
 
   return (
@@ -252,15 +271,17 @@ export default function ToolsPage() {
             </p>
           </div>
           <button 
-            onClick={() => setLanguage(language === "zh" ? "en" : "zh")}
+            onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }}
             className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50"
           >
             {language === "zh" ? "Switch to EN" : "切换中文"}
           </button>
         </div>
 
-        <div className="space-y-4">
-          {categories.map((cat, idx) => {
+        {/* Prevent hydration mismatch */}
+        {mounted && (
+          <div className="space-y-4">
+            {categories.map((cat, idx) => {
             const Icon = cat.icon;
             return (
               <div key={idx} className="bg-white rounded-lg border border-slate-200 overflow-hidden">
@@ -303,6 +324,7 @@ export default function ToolsPage() {
             );
           })}
         </div>
+        )}
       </div>
     </div>
   );

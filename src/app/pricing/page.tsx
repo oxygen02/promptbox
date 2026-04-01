@@ -1,11 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function PricingPage() {
   const [language, setLanguage] = useState<"zh" | "en">("zh");
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+    setLanguage(browserLang);
+  }, []);
+  
+  useEffect(() => {
+    const handleLanguageChange = (e: any) => {
+      setLanguage(e.detail);
+    };
+    window.addEventListener("language-change", handleLanguageChange);
+    return () => window.removeEventListener("language-change", handleLanguageChange);
+  }, []);
 
   const plans = {
     zh: [
@@ -34,7 +49,7 @@ export default function PricingPage() {
           <p className="text-lg text-slate-600 mb-6">
             {language === "zh" ? "灵活的定价方案，满足不同需求" : "Flexible pricing for every need"}
           </p>
-          <Button variant="outline" onClick={() => setLanguage(language === "zh" ? "en" : "zh")}>
+          <Button variant="outline" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }>
             {language === "zh" ? "Switch to English" : "切换到中文"}
           </Button>
         </div>

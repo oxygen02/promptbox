@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Star, Download, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -19,6 +19,21 @@ const favoritesData = {
 
 export default function FavoritesPage() {
   const [language, setLanguage] = useState<"zh" | "en">("zh");
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+    setLanguage(browserLang);
+  }, []);
+  
+  useEffect(() => {
+    const handleLanguageChange = (e: any) => {
+      setLanguage(e.detail);
+    };
+    window.addEventListener("language-change", handleLanguageChange);
+    return () => window.removeEventListener("language-change", handleLanguageChange);
+  }, []);
   const data = favoritesData[language];
 
   return (
@@ -36,7 +51,7 @@ export default function FavoritesPage() {
               <Download className="w-4 h-4 mr-1" />
               {language === "zh" ? "导出 JSON" : "Export JSON"}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setLanguage(language === "zh" ? "en" : "zh")}>
+            <Button variant="outline" size="sm" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }>
               {language === "zh" ? "EN" : "中文"}
             </Button>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BookOpen, Copy, Star, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -145,8 +145,27 @@ const templates = {
 };
 
 export default function TemplatesPage() {
+  // 默认中文，避免 SSR hydration mismatch
   const [language, setLanguage] = useState<"zh" | "en">("zh");
+  const [mounted, setMounted] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
+  
+  // 客户端挂载后检测浏览器语言
+  useEffect(() => {
+    setMounted(true);
+    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+    setLanguage(browserLang);
+  }, []);
+  
+  // 监听语言切换事件
+  useEffect(() => {
+    const handleLanguageChange = (e: any) => {
+      setLanguage(e.detail);
+    };
+    window.addEventListener("language-change", handleLanguageChange);
+    return () => window.removeEventListener("language-change", handleLanguageChange);
+  }, []);
+  
   const t = templates[language];
   const sites = language === "zh" ? chineseSites : englishSites;
 
@@ -166,18 +185,21 @@ export default function TemplatesPage() {
               {language === "zh" ? "提示词模板库" : "Prompt Templates"}
             </h1>
           </div>
-          <Button variant="outline" onClick={() => setLanguage(language === "zh" ? "en" : "zh")}>
+          <Button variant="outline" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }}>
             {language === "zh" ? "EN" : "中文"}
           </Button>
         </div>
 
+        {/* Prevent hydration mismatch by not rendering content-dependent UI until mounted */}
+        {mounted && (
+          <>
         {/* 提示词网站推荐 */}
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
             <Star className="w-5 h-5 text-yellow-500" />
             {language === "zh" ? "推荐提示词网站" : "Recommended Prompt Websites"}
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {sites.map((site, i) => (
               <a 
                 key={i} 
@@ -235,6 +257,8 @@ export default function TemplatesPage() {
             </div>
           ))}
         </div>
+          </>
+        )}
       </div>
     </div>
   );

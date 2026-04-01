@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { History, Calendar, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -21,6 +21,24 @@ const historyData = {
 
 export default function HistoryPage() {
   const [language, setLanguage] = useState<"zh" | "en">("zh");
+  const [mounted, setMounted] = useState(false);
+  
+  // 客户端挂载后检测浏览器语言
+  useEffect(() => {
+    setMounted(true);
+    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+    setLanguage(browserLang);
+  }, []);
+  
+  // 监听语言切换事件
+  useEffect(() => {
+    const handleLanguageChange = (e: any) => {
+      setLanguage(e.detail);
+    };
+    window.addEventListener("language-change", handleLanguageChange);
+    return () => window.removeEventListener("language-change", handleLanguageChange);
+  }, []);
+  
   const data = historyData[language];
 
   return (
@@ -33,7 +51,7 @@ export default function HistoryPage() {
               {language === "zh" ? "历史记录" : "History"}
             </h1>
           </div>
-          <Button variant="outline" onClick={() => setLanguage(language === "zh" ? "en" : "zh")}>
+          <Button variant="outline" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }}>
             {language === "zh" ? "EN" : "中文"}
           </Button>
         </div>
