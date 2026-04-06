@@ -34,7 +34,16 @@ export default function FavoritesPage() {
     window.addEventListener("language-change", handleLanguageChange);
     return () => window.removeEventListener("language-change", handleLanguageChange);
   }, []);
+  
   const data = favoritesData[language];
+
+  const handleLanguageToggle = () => {
+    const newLang = language === "zh" ? "en" : "zh";
+    setLanguage(newLang);
+    window.dispatchEvent(new CustomEvent("language-change", { detail: newLang }));
+  };
+
+  if (!mounted) return null;
 
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4">
@@ -51,7 +60,7 @@ export default function FavoritesPage() {
               <Download className="w-4 h-4 mr-1" />
               {language === "zh" ? "导出 JSON" : "Export JSON"}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }>
+            <Button variant="outline" size="sm" onClick={handleLanguageToggle}>
               {language === "zh" ? "EN" : "中文"}
             </Button>
           </div>

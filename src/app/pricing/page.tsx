@@ -49,7 +49,7 @@ export default function PricingPage() {
           <p className="text-lg text-slate-600 mb-6">
             {language === "zh" ? "灵活的定价方案，满足不同需求" : "Flexible pricing for every need"}
           </p>
-          <Button variant="outline" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }>
+          <Button variant="outline" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }}>
             {language === "zh" ? "Switch to English" : "切换到中文"}
           </Button>
         </div>

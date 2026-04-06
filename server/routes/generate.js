@@ -143,6 +143,137 @@ router.get('/models', (req, res) => {
   });
 });
 
+// 文字生成（专门用于文字文档）
+router.post('/text', async (req, res) => {
+  try {
+    const { prompt, model } = req.body;
+    
+    if (!prompt) {
+      return res.status(400).json({ success: false, error: 'Prompt is required' });
+    }
+
+    console.log('Generating text with model:', model || 'default');
+
+    // 优先使用阿里云千问 API (Qwen)
+    if (QWEN_CONFIG.apiKey) {
+      console.log('尝试调用阿里云千问 API...');
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+        
+        const response = await fetch(QWEN_CONFIG.endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${QWEN_CONFIG.apiKey}`
+          },
+          body: JSON.stringify({
+            model: 'qwen-plus',
+            messages: [
+              { role: 'system', content: '你是一个专业的文案助手，根据用户提供的提示词，生成高质量的文案内容。' },
+              { role: 'user', content: prompt }
+            ],
+            max_tokens: 3000,
+            temperature: 0.8
+          }),
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        console.log('千问 API 响应状态:', response.status);
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('千问 API 返回数据:', JSON.stringify(data).substring(0, 200));
+          const content = data.choices?.[0]?.message?.content;
+          if (content) {
+            return res.json({
+              success: true,
+              content: content,
+              prompt,
+              model: 'qwen-plus'
+            });
+          }
+        } else {
+          const errorText = await response.text();
+          console.error('千问 API 错误响应:', response.status, errorText);
+        }
+      } catch (apiError) {
+        console.error('千问 API 调用失败:', apiError.message);
+      }
+    }
+
+    // 降级到 CodingPlan API
+    if (CODING_PLAN_CONFIG.apiKey) {
+      console.log('尝试调用 CodingPlan API...');
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+        
+        const response = await fetch(CODING_PLAN_CONFIG.endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${CODING_PLAN_CONFIG.apiKey}`
+          },
+          body: JSON.stringify({
+            model: CODING_PLAN_CONFIG.model,
+            messages: [
+              { role: 'system', content: '你是一个专业的文案助手，根据用户提供的提示词，生成高质量的文案内容。' },
+              { role: 'user', content: prompt }
+            ],
+            max_tokens: 3000,
+            temperature: 0.8
+          }),
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (response.ok) {
+          const data = await response.json();
+          const content = data.choices?.[0]?.message?.content;
+          if (content) {
+            return res.json({
+              success: true,
+              content: content,
+              prompt,
+              model: 'codingplan-s1'
+            });
+          }
+        }
+      } catch (apiError) {
+        console.error('CodingPlan API 调用失败:', apiError.message);
+      }
+    }
+
+    // 如果所有 API 都不可用，返回模拟结果
+    res.json({
+      success: true,
+      content: `📝 创意文案生成结果
+
+基于您的提示词：
+"${prompt.substring(0, 100)}..."
+
+---
+
+✨ 生成的文案：
+
+（这里是AI生成的文案内容...）
+
+---
+💡 提示：后端API正在配置中，请稍后再试以获得更精准的生成结果。`,
+      prompt,
+      model: 'demo'
+    });
+
+  } catch (error) {
+    console.error('Text generation error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // 生成图片
 router.post('/image', async (req, res) => {
   try {

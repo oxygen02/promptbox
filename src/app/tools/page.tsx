@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Globe, Image, Video, FileText, Layout, Monitor, Film, ExternalLink } from "lucide-react";
 
 // AI创作工具分类数据

@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 export default function SettingsPage() {
   const [language, setLanguage] = useState<"zh" | "en">("zh");
   const [mounted, setMounted] = useState(false);
+  const [notifications, setNotifications] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
   
   useEffect(() => {
     setMounted(true);
@@ -21,96 +23,87 @@ export default function SettingsPage() {
     window.addEventListener("language-change", handleLanguageChange);
     return () => window.removeEventListener("language-change", handleLanguageChange);
   }, []);
-  const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
+
+  if (!mounted) return null;
 
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">
-            {language === "zh" ? "设置" : "Settings"}
-          </h1>
-          <Button variant="outline" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }>
-            {language === "zh" ? "EN" : "中文"}
-          </Button>
-        </div>
-
-        {/* Account */}
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden mb-4">
-          <div className="flex items-center gap-3 px-4 py-3 bg-slate-50 border-b border-slate-200">
-            <User className="w-5 h-5 text-slate-600" />
-            <h2 className="font-medium text-slate-900">{language === "zh" ? "账户信息" : "Account"}</h2>
-          </div>
-          <div className="divide-y divide-slate-100">
-            <div className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm text-slate-600">{language === "zh" ? "用户名" : "Username"}</span>
-              <span className="text-sm text-slate-700">Oliver</span>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-slate-800 rounded-lg">
+              <User className="w-6 h-6 text-white" />
             </div>
-            <div className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm text-slate-600">{language === "zh" ? "邮箱" : "Email"}</span>
-              <span className="text-sm text-slate-700">oygq1983@icloud.com</span>
+            <h1 className="text-2xl font-bold text-slate-900">
+              {language === "zh" ? "设置" : "Settings"}
+            </h1>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          {/* Language */}
+          <div className="bg-white rounded-xl border border-slate-200 p-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Globe className="w-5 h-5 text-slate-500" />
+                <div>
+                  <h3 className="font-medium text-slate-900">{language === "zh" ? "语言" : "Language"}</h3>
+                  <p className="text-sm text-slate-500">{language === "zh" ? "选择界面语言" : "Select interface language"}</p>
+                </div>
+              </div>
+              <select 
+                value={language}
+                onChange={(e) => {
+                  const newLang = e.target.value as "zh" | "en";
+                  setLanguage(newLang);
+                  window.dispatchEvent(new CustomEvent("language-change", { detail: newLang }));
+                }}
+                className="px-3 py-2 border border-slate-200 rounded-lg text-sm"
+              >
+                <option value="zh">中文</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Notifications */}
+          <div className="bg-white rounded-xl border border-slate-200 p-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Bell className="w-5 h-5 text-slate-500" />
+                <div>
+                  <h3 className="font-medium text-slate-900">{language === "zh" ? "通知" : "Notifications"}</h3>
+                  <p className="text-sm text-slate-500">{language === "zh" ? "接收新功能和更新通知" : "Receive new features and update notifications"}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setNotifications(!notifications)}
+                className={`w-12 h-6 rounded-full transition-colors ${notifications ? 'bg-slate-800' : 'bg-slate-300'}`}
+              >
+                <div className={`w-4 h-4 bg-white rounded-full transition-transform ${notifications ? 'translate-x-7' : 'translate-x-1'}`} />
+              </button>
+            </div>
+          </div>
+
+          {/* Dark Mode */}
+          <div className="bg-white rounded-xl border border-slate-200 p-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Palette className="w-5 h-5 text-slate-500" />
+                <div>
+                  <h3 className="font-medium text-slate-900">{language === "zh" ? "深色模式" : "Dark Mode"}</h3>
+                  <p className="text-sm text-slate-500">{language === "zh" ? "切换深色主题" : "Switch to dark theme"}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                className={`w-12 h-6 rounded-full transition-colors ${darkMode ? 'bg-slate-800' : 'bg-slate-300'}`}
+              >
+                <div className={`w-4 h-4 bg-white rounded-full transition-transform ${darkMode ? 'translate-x-7' : 'translate-x-1'}`} />
+              </button>
             </div>
           </div>
         </div>
-
-        {/* Notifications */}
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden mb-4">
-          <div className="flex items-center gap-3 px-4 py-3 bg-slate-50 border-b border-slate-200">
-            <Bell className="w-5 h-5 text-slate-600" />
-            <h2 className="font-medium text-slate-900">{language === "zh" ? "通知" : "Notifications"}</h2>
-          </div>
-          <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-sm text-slate-600">{language === "zh" ? "邮件通知" : "Email Notifications"}</span>
-            <button
-              onClick={() => setNotifications(!notifications)}
-              className={`w-11 h-6 rounded-full transition-colors ${notifications ? "bg-slate-800" : "bg-slate-200"}`}
-            >
-              <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${notifications ? "translate-x-5" : "translate-x-0.5"}`} />
-            </button>
-          </div>
-        </div>
-
-        {/* Language */}
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden mb-4">
-          <div className="flex items-center gap-3 px-4 py-3 bg-slate-50 border-b border-slate-200">
-            <Globe className="w-5 h-5 text-slate-600" />
-            <h2 className="font-medium text-slate-900">{language === "zh" ? "语言" : "Language"}</h2>
-          </div>
-          <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-sm text-slate-600">{language === "zh" ? "界面语言" : "Interface Language"}</span>
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value as "zh" | "en")}
-              className="px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-800"
-            >
-              <option value="zh">简体中文</option>
-              <option value="en">English</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Appearance */}
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden mb-4">
-          <div className="flex items-center gap-3 px-4 py-3 bg-slate-50 border-b border-slate-200">
-            <Palette className="w-5 h-5 text-slate-600" />
-            <h2 className="font-medium text-slate-900">{language === "zh" ? "外观" : "Appearance"}</h2>
-          </div>
-          <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-sm text-slate-600">{language === "zh" ? "深色模式" : "Dark Mode"}</span>
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className={`w-11 h-6 rounded-full transition-colors ${darkMode ? "bg-slate-800" : "bg-slate-200"}`}
-            >
-              <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${darkMode ? "translate-x-5" : "translate-x-0.5"}`} />
-            </button>
-          </div>
-        </div>
-
-        {/* Logout */}
-        <Button variant="outline" className="w-full text-red-500 border-red-200 hover:bg-red-50">
-          {language === "zh" ? "退出登录" : "Log Out"}
-        </Button>
       </div>
     </div>
   );
