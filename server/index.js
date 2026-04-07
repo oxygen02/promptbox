@@ -6,6 +6,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3002;
+const HOST = '0.0.0.0'; // 绑定到所有接口，允许外部访问
 
 // Middleware
 app.use(cors());
@@ -51,7 +52,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, HOST, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📡 API Health: http://localhost:${PORT}/api/health`);
 });

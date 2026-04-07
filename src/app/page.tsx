@@ -114,17 +114,20 @@ const I18N = {
       video: ["整体描述", "优化建议", "分镜参考", "叙事逻辑", "节奏设定", "画面风格", "转场指令", "旁白参考", "场景设定", "镜头语言", "剪辑逻辑", "开头设计", "结构复用", "氛围参考", "BGM情绪", "字幕风格"],
       web: ["整体描述", "优化建议", "布局复刻", "配色方案", "字体参考", "交互逻辑", "信息层级", "组件复用", "响应要求", "品牌风格", "体验标准", "视觉引导", "结构参考", "动效指令", "暗黑模式", "加载策略"],
     },
+    // 页面文本
     uploadContent: "上传内容",
     aiReady: "AI 就绪",
     selectModel: "选择模型",
     generating: "生成中...",
     creativeGenerate: "创意生成",
     startAnalyze: "开始分析",
-    analyzing: "分析中...",
+    analyzingStatus: "正在分析上传的内容...",
     generatedPlaceholder: "点击上方「创意生成」按钮生成内容...",
     promptDimensions: "提示词维度（可多选）",
     dragOrClick: "拖拽或点击上传",
+    clickSelectFile: "点击选择文件",
     enterUrl: "请输入网页链接 URL",
+    pasteContent: "粘贴内容",
     promptCards: "提示词卡片",
     waitingGenerate: "等待生成...",
     promptEdit: "提示词编辑",
@@ -134,6 +137,78 @@ const I18N = {
     copied: "已复制",
     download: "下载",
     copyText: "复制",
+    clear: "清空",
+    images: "张数:",
+    // 提示消息
+    fileSelected: "已选择文件",
+    modelAlreadySelected: "已被选择，请选择其他模型",
+    uploadUrlRequired: "请先上传文件、粘贴内容或输入URL后再进行分析",
+    selectModelFirst: "请先选择一个模型",
+    generatePromptFirst: "请先生成或输入提示词",
+    textGenApiUnavailable: "文字生成API暂不可用",
+    imgGenApiUnavailable: "图片生成API暂不可用，请使用提示词在其他平台生成图片",
+    genFailed: "生成失败，请检查网络后重试",
+    copySuccess: "已复制到剪贴板",
+    copyFailed: "复制失败，请手动复制",
+    analyzing: "正在分析上传的内容...",
+    parsingFile: "正在解析文件...",
+    uploadFailed: "上传失败，请复制内容粘贴到上方文本框",
+    // 表单占位符
+    enterUrlPlaceholder: "输入网页URL",
+    pasteFilePlaceholder: "请在此处粘贴文件的主要内容...",
+    // 按钮文本
+    selectFileButton: "点击选择文件",
+    clearButton: "清空",
+    selectModelPlaceholder: "— 选择模型 —",
+    // 模型名称
+    modelNames: {
+      "deepseek-chat": "DeepSeek Chat",
+      "kimi": "Kimi (免费)",
+      "qwen-plus": "Qwen Plus",
+      "qwen-turbo": "Qwen Turbo (免费)",
+      "yi-light": "Yi Light (免费)",
+      "gpt4o": "GPT-4o",
+      "claude-3.5": "Claude 3.5 (视觉)",
+      "kimi-vl": "Kimi-VL (免费)",
+      "deepseek-vl": "DeepSeek-VL (免费)",
+      "spark-4": "Spark 4.0",
+    },
+    // 提示词分析
+    analyzeSuccess: "File parsed:",
+    analyzeFailed: "Parse failed:",
+    contentAnalysis: "内容分析",
+    originalContent: "原始内容",
+    keyInfo: "关键信息",
+    promptTemplate: "提示词模板",
+    roleSetting: "角色设定",
+    task: "任务",
+    outputReq: "输出要求",
+    pasteFileContent: "请在此处粘贴文件的主要内容...",
+    contentType: "内容类型",
+    wordCount: "字数",
+    charCount: "字符",
+    dimensions: "分析维度",
+    // 侧边栏
+    contentCategory: "内容分类",
+    aiTools: "AI工具箱",
+    personalCenter: "个人中心",
+    // 维度
+    overallDesc: "整体描述",
+    optimization: "优化建议",
+    styleCopy: "风格复刻",
+    toneRestore: "语气还原",
+    structureReuse: "结构复用",
+    keyPoints: "核心要点",
+    audienceTargeting: "受众定位",
+    platformFit: "平台适配",
+    titleLogic: "标题逻辑",
+    summaryExtract: "摘要提炼",
+    expandRules: "扩写规则",
+    keywordReuse: "关键词复用",
+    sentenceRef: "句式参考",
+    logicFrame: "逻辑框架",
+    emotionalTone: "情感基调",
+    paragraphRhythm: "段落节奏",
     uploadTypes: [
       { key: "text", label: "文字" },
       { key: "doc", label: "文档" },
@@ -154,27 +229,101 @@ const I18N = {
       video: ["Overall Desc", "Optimization", "Storyboard Ref", "Narrative Logic", "Rhythm Setting", "Visual Style", "Transition Cmd", "Voiceover Ref", "Scene Setting", "Camera Lang", "Editing Logic", "Opening Design", "Structure Reuse", "Atmosphere Ref", "BGM Mood", "Subtitle Style"],
       web: ["Overall Desc", "Optimization", "Layout Copy", "Color Scheme", "Typography Ref", "Interaction Logic", "Info Hierarchy", "Components Reuse", "Responsive Req", "Brand Style", "Experience Std", "Visual Guide", "Structure Ref", "Animation Cmd", "Dark Mode", "Loading Strategy"],
     },
+    // 页面文本
     uploadContent: "Upload Content",
     aiReady: "AI Ready",
     selectModel: "Select Model",
     generating: "Generating...",
     creativeGenerate: "Generate",
     startAnalyze: "Analyze",
-    analyzing: "Analyzing...",
+    analyzingStatus: "Analyzing uploaded content...",
     generatedPlaceholder: "Click 'Generate' button to create content...",
     promptDimensions: "Prompt Dimensions (Multi-select)",
     dragOrClick: "Drag or click to upload",
+    clickSelectFile: "Select File",
     enterUrl: "Enter webpage URL",
+    pasteContent: "Paste content",
     promptCards: "Prompt Cards",
     waitingGenerate: "Waiting...",
     promptEdit: "Edit Prompt",
     editPlaceholder: "Edit your prompt...",
     generatedContent: "Generated Content",
     share: "Share",
-    copy: "Copy",
     copied: "Copied",
     download: "Download",
     copyText: "Copy",
+    clear: "Clear",
+    images: "Images:",
+    // 提示消息
+    fileSelected: "File selected",
+    modelAlreadySelected: "is already selected, please choose another",
+    uploadUrlRequired: "Please upload a file, paste content, or enter a URL before analyzing",
+    selectModelFirst: "Please select a model first",
+    generatePromptFirst: "Please generate or enter a prompt first",
+    textGenApiUnavailable: "Text generation API unavailable",
+    imgGenApiUnavailable: "Image generation API unavailable, please use the prompt on other platforms",
+    genFailed: "Generation failed, please check network and retry",
+    copySuccess: "Copied to clipboard",
+    copyFailed: "Copy failed, please copy manually",
+    analyzing: "Analyzing uploaded content...",
+    parsingFile: "Parsing file...",
+    uploadFailed: "Upload failed, please copy content to the text box above",
+    // 表单占位符
+    enterUrlPlaceholder: "Enter webpage URL",
+    pasteFilePlaceholder: "Please paste the main content of the file here...",
+    // 按钮文本
+    selectFileButton: "Select file",
+    clearButton: "Clear",
+    selectModelPlaceholder: "-- Select Model --",
+    // 模型名称
+    modelNames: {
+      "deepseek-chat": "DeepSeek Chat",
+      "kimi": "Kimi (Free)",
+      "qwen-plus": "Qwen Plus",
+      "qwen-turbo": "Qwen Turbo (Free)",
+      "yi-light": "Yi Light (Free)",
+      "gpt4o": "GPT-4o",
+      "claude-3.5": "Claude 3.5 Vision",
+      "kimi-vl": "Kimi-VL (Free)",
+      "deepseek-vl": "DeepSeek-VL (Free)",
+      "spark-4": "Spark 4.0",
+    },
+    // 提示词分析
+    analyzeSuccess: "File parsed:",
+    analyzeFailed: "Parse failed:",
+    contentAnalysis: "Content Analysis",
+    originalContent: "Original Content",
+    keyInfo: "Key Information",
+    promptTemplate: "Prompt Template",
+    roleSetting: "Role Setting",
+    task: "Task",
+    outputReq: "Output Requirements",
+    pasteFileContent: "Please paste the main content of the file here...",
+    contentType: "Content Type",
+    wordCount: "Words",
+    charCount: "Chars",
+    dimensions: "Dimensions",
+    // 侧边栏
+    contentCategory: "Content Type",
+    aiTools: "AI Tools",
+    personalCenter: "Personal Center",
+    // 维度
+    overallDesc: "Overall Desc",
+    optimization: "Optimization",
+    styleCopy: "Style Copy",
+    toneRestore: "Tone Restore",
+    structureReuse: "Structure Reuse",
+    keyPoints: "Key Points",
+    audienceTargeting: "Audience",
+    platformFit: "Platform Fit",
+    titleLogic: "Title Logic",
+    summaryExtract: "Summary",
+    expandRules: "Expansion",
+    keywordReuse: "Keywords",
+    sentenceRef: "Sentences",
+    logicFrame: "Logic",
+    emotionalTone: "Emotion",
+    paragraphRhythm: "Rhythm",
     uploadTypes: [
       { key: "text", label: "Text" },
       { key: "doc", label: "Doc" },
@@ -345,7 +494,7 @@ export default function HomePage() {
     
     // 显示分析中状态
     setIsAnalyzing(true);
-    setPromptText(language === 'zh' ? "正在分析上传的内容..." : "Analyzing uploaded content...");
+    setPromptText(t.analyzing);
     
     // 优先调用后端 API 进行真正的 AI 分析
     try {
@@ -372,7 +521,8 @@ export default function HomePage() {
         
         modelsToUse.forEach((modelKey, idx) => {
           const modelInfo = getModelsForContentType(contentType).find(m => m.key === modelKey);
-          const prompt = data.results[modelKey] || `# ${modelInfo?.name} 提示词\n\n请生成提示词`;
+          const modelName = t.modelNames[modelKey] || modelInfo?.name || modelKey;
+          const prompt = data.results[modelKey] || `# ${modelName} 提示词\n\n请生成提示词`;
           newCardPrompts[idx] = prompt;
           if (idx === 0) firstPrompt = prompt;
         });
@@ -425,6 +575,7 @@ export default function HomePage() {
     
     modelsToUse.forEach((modelKey, idx) => {
       const modelInfo = getModelsForContentType(contentType).find(m => m.key === modelKey);
+      const modelName = t.modelNames[modelKey] || modelInfo?.name || modelKey;
       
       // 基于实际内容生成具体可编辑的提示词
       const isFileUpload = content.startsWith('[文件]');
@@ -433,7 +584,7 @@ export default function HomePage() {
       if (isFileUpload) {
         // 文件上传的情况 - 提示用户文件已上传但内容无法直接读取
         const fileName = content.replace('[文件] ', '');
-        prompt = `# ${modelInfo?.name} 提示词 - 文件分析
+        prompt = `# ${modelName} 提示词 - 文件分析
 
 ## 📁 上传文件信息
 - 文件名：${fileName}
@@ -459,7 +610,7 @@ export default function HomePage() {
       } else {
         // 文本内容或URL
         const promptContent = content.length > 300 ? content.substring(0, 300) + '...' : content;
-        prompt = `# ${modelInfo?.name} 提示词 - 基于内容生成
+        prompt = `# ${modelName} 提示词 - 基于内容生成
 
 ## 📋 ${language === 'zh' ? '原始内容分析' : 'Content Analysis'}
 - ${language === 'zh' ? '内容类型' : 'Content Type'}：${contentTypeName}
@@ -524,26 +675,50 @@ ${language === 'zh' ? `基于上述内容，按照「${dims}」维度进行分�
     setIsGenerating(true);
     
     try {
-      // 调用图像生成API（使用通义万相模型）
-      const response = await fetch('http://124.156.200.127:3002/api/generate/image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: prompt,
-          // 忽略前端选择的模型，始终使用通义万相生成图片
-          imageCount: imageCount
-        })
-      });
+      let response;
+      
+      // 根据内容类型选择不同的生成 API
+      if (contentType === 'text') {
+        // 文字文档 → 文字生成
+        response = await fetch('http://124.156.200.127:3002/api/generate/text', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: prompt,
+            model: selectedGenModel
+          })
+        });
+      } else {
+        // 图片/视频/网页 → 图像生成
+        response = await fetch('http://124.156.200.127:3002/api/generate/image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: prompt,
+            imageCount: imageCount
+          })
+        });
+      }
       
       const data = await response.json();
       
-      if (data.success && data.images) {
-        // 显示生成的图片（作为图片链接）
-        const imageLinks = data.images.map((url: string) => `![image](${url})`).join('\n\n');
-        setGeneratedContent(imageLinks);
+      // 根据内容类型处理响应
+      if (contentType === 'text') {
+        // 文字生成
+        if (data.success && data.content) {
+          setGeneratedContent(data.content);
+        } else {
+          // 回退到显示提示词
+          setGeneratedContent(`${language === 'zh' ? '【提示词】' : '【Prompt】'}\n\n${prompt}\n\n⚠️ ${language === 'zh' ? '文字生成API暂不可用' : 'Text generation API unavailable'}`);
+        }
       } else {
-        // 如果API失败，使用提示词作为内容
-        setGeneratedContent(`${language === 'zh' ? '【提示词】' : '【Prompt】'}\n\n${prompt}\n\n⚠️ ${language === 'zh' ? '图片生成API暂不可用，请使用提示词在其他平台生成图片' : 'Image generation API unavailable, please use the prompt on other platforms'}`);
+        // 图像生成
+        if (data.success && data.images) {
+          const imageLinks = data.images.map((url: string) => `![image](${url})`).join('\n\n');
+          setGeneratedContent(imageLinks);
+        } else {
+          setGeneratedContent(`${language === 'zh' ? '【提示词】' : '【Prompt】'}\n\n${prompt}\n\n⚠️ ${language === 'zh' ? '图片生成API暂不可用，请使用提示词在其他平台生成图片' : 'Image generation API unavailable, please use the prompt on other platforms'}`);
+        }
       }
     } catch (error) {
       console.error('Generation failed:', error);
@@ -733,7 +908,7 @@ ${language === 'zh' ? `基于上述内容，按照「${dims}」维度进行分�
                   >
                     <option value="">{language === 'zh' ? '— 选择模型 —' : '-- Select Model --'}</option>
                     {getModelsForContentType(contentType).map((m) => (
-                      <option key={m.key} value={m.key}>{m.name}</option>
+                      <option key={m.key} value={m.key}>{t.modelNames[m.key] || m.name}</option>
                     ))}
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
@@ -757,72 +932,80 @@ ${language === 'zh' ? `基于上述内容，按照「${dims}」维度进行分�
           <textarea value={promptText} onChange={(e) => setPromptText(e.target.value)} className="input-field min-h-[160px] resize-none" placeholder={t.editPlaceholder} />
           <div className="text-xs text-slate-400 mt-2">0 {language === 'zh' ? '字符' : 'chars'}</div>
         </div>
-        <div className="flex items-center gap-4 mb-4">
-          <button onClick={handleCreativeGenerate} disabled={!selectedGenModel || isGenerating} className={cn("text-sm px-6 py-2 rounded-xl font-semibold transition-all shadow-lg bg-slate-800 text-white hover:bg-slate-900", !selectedGenModel && "opacity-50 cursor-not-allowed")}>{isGenerating ? t.generating : t.creativeGenerate}</button>
-          <div className="relative">
-            <select 
-              value={selectedGenModel || ''} 
-              onChange={(e) => setSelectedGenModel(e.target.value || undefined)}
-              className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none appearance-none cursor-pointer"
-            >
-              <option value="">{t.selectModel}</option>
-              {getModelsForContentType(contentType).map((m) => (
-                <option key={m.key} value={m.key}>{m.name}</option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-          </div>
-          {/* 图片数量选择 */}
-          <div className="flex items-center gap-1">
-            <span className="text-xs text-slate-500 mr-1">{language === 'zh' ? '张数:' : 'Images:'}</span>
-            {[1, 2, 3, 4].map(n => (
-              <button
-                key={n}
-                onClick={() => setImageCount(n)}
-                className={cn("w-8 h-8 rounded-lg text-sm font-medium transition-all", imageCount === n ? "bg-blue-500 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}
+        {/* 视频解构类型不显示创意生成和模型选择 */}
+        {contentType !== 'video' && (
+          <div className="flex items-center gap-4 mb-4">
+            <button onClick={handleCreativeGenerate} disabled={!selectedGenModel || isGenerating} className={cn("text-sm px-6 py-2 rounded-xl font-semibold transition-all shadow-lg bg-slate-800 text-white hover:bg-slate-900", !selectedGenModel && "opacity-50 cursor-not-allowed")}>{isGenerating ? t.generating : t.creativeGenerate}</button>
+            <div className="relative">
+              <select 
+                value={selectedGenModel || ''} 
+                onChange={(e) => setSelectedGenModel(e.target.value || undefined)}
+                className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none appearance-none cursor-pointer"
               >
-                {n}
-              </button>
-            ))}
-          </div>
-          <div className="flex items-center gap-2 text-sm"><span className="text-amber-500 font-medium">Credit</span><span className="text-slate-700 font-semibold">{credits}</span></div>
-        </div>
-        <div className="glass-card rounded-xl p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-slate-700">{t.generatedContent}</h3>
-            {generatedContent && (
-              <button 
-                onClick={() => setGeneratedContent("")} 
-                className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
-                title="清空内容"
-              >
-                <Trash2 className="w-4 h-4 text-slate-400 hover:text-red-500" />
-              </button>
+                <option value="">{t.selectModel}</option>
+                {getModelsForContentType(contentType).map((m) => (
+                  <option key={m.key} value={m.key}>{t.modelNames[m.key] || m.name}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            </div>
+            {/* 图片数量选择 - 只在图片视觉类型显示 */}
+            {contentType === 'image' && (
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-slate-500 mr-1">{language === 'zh' ? '张数:' : 'Images:'}</span>
+                {[1, 2, 3, 4].map(n => (
+                  <button
+                    key={n}
+                    onClick={() => setImageCount(n)}
+                    className={cn("w-8 h-8 rounded-lg text-sm font-medium transition-all", imageCount === n ? "bg-blue-500 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
             )}
           </div>
-          <div className="min-h-[140px] bg-slate-50 rounded-xl p-4 text-sm text-slate-700 whitespace-pre-wrap mb-4">
-            {generatedContent ? (
-              generatedContent.includes('![image](') ? (
-                <div className="space-y-3">
-                  <p className="text-slate-500 mb-2">已生成 {generatedContent.split('![image](').length - 1} 张图片：</p>
-                  {generatedContent.match(/\!\[image\]\(([^)]+)\)/g)?.map((img, idx) => {
-                    const url = img.match(/\(([^)]+)\)/)?.[1];
-                    return url ? (
-                      <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="block">
-                        <img src={url} alt={`generated-${idx}`} className="max-w-full rounded-lg hover:opacity-90 transition-opacity" style={{maxHeight: '300px'}} />
-                      </a>
-                    ) : null;
-                  })}
-                </div>
-              ) : generatedContent
-            ) : t.generatedPlaceholder}
+        )}
+        <div className="flex items-center gap-2 text-sm"><span className="text-amber-500 font-medium">Credit</span><span className="text-slate-700 font-semibold">{credits}</span></div>
+        {/* 视频解构类型不显示生成内容区域 */}
+        {contentType !== 'video' && (
+          <div className="glass-card rounded-xl p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold text-slate-700">{t.generatedContent}</h3>
+              {generatedContent && (
+                <button 
+                  onClick={() => setGeneratedContent("")} 
+                  className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                  title="清空内容"
+                >
+                  <Trash2 className="w-4 h-4 text-slate-400 hover:text-red-500" />
+                </button>
+              )}
+            </div>
+            <div className="min-h-[140px] bg-slate-50 rounded-xl p-4 text-sm text-slate-700 whitespace-pre-wrap mb-4">
+              {generatedContent ? (
+                generatedContent.includes('![image](') ? (
+                  <div className="space-y-3">
+                    <p className="text-slate-500 mb-2">已生成 {generatedContent.split('![image](').length - 1} 张图片：</p>
+                    {generatedContent.match(/\!\[image\]\(([^)]+)\)/g)?.map((img, idx) => {
+                      const url = img.match(/\(([^)]+)\)/)?.[1];
+                      return url ? (
+                        <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="block">
+                          <img src={url} alt={`generated-${idx}`} className="max-w-full rounded-lg hover:opacity-90 transition-opacity" style={{maxHeight: '300px'}} />
+                        </a>
+                      ) : null;
+                    })}
+                  </div>
+                ) : generatedContent
+              ) : t.generatedPlaceholder}
+            </div>
+            <div className="flex items-center justify-end gap-3"><div className="flex gap-2">
+                <button className="w-9 h-9 rounded-full bg-slate-700 hover:bg-slate-800 flex items-center justify-center text-white"><svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348z"/></svg></button>
+                <button className="w-9 h-9 rounded-full bg-slate-700 hover:bg-slate-800 flex items-center justify-center text-white"><svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.05-.2-.06-.06-.16-.04-.23-.02-.1.02-1.59 1.01-4.49 2.98-.42.29-.8.43-1.14.42-.38-.01-1.1-.22-1.64-.4-.66-.23-1.19-.35-1.14-.74.02-.2.29-.41.79-.63 3.12-1.36 5.2-2.26 6.24-2.7 2.97-1.24 3.59-1.45 3.99-1.46.09 0 .28.02.41.12.11.08.14.19.16.27-.01.06.01.24 0 .38z"/></svg></button>
+                <button className="w-9 h-9 rounded-full bg-slate-700 hover:bg-slate-800 flex items-center justify-center text-white"><svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/></svg></button>
+              </div><div className="flex gap-1.5 border-l border-slate-200 pl-3"><button onClick={() => handleShare(generatedContent)} disabled={!generatedContent} className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"><Share2 className="w-4 h-4 text-slate-500" /></button><button onClick={() => handleCopy()} disabled={!generatedContent} className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50">{copied ? <CheckCircle className="w-4 h-4 text-slate-500" /> : <Copy className="w-4 h-4 text-slate-500" />}</button><button onClick={handleDownload} disabled={!generatedContent} className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"><Download className="w-4 h-4 text-slate-500" /></button></div></div>
           </div>
-          <div className="flex items-center justify-end gap-3"><div className="flex gap-2">
-              <button className="w-9 h-9 rounded-full bg-slate-700 hover:bg-slate-800 flex items-center justify-center text-white"><svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348z"/></svg></button>
-              <button className="w-9 h-9 rounded-full bg-slate-700 hover:bg-slate-800 flex items-center justify-center text-white"><svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.05-.2-.06-.06-.16-.04-.23-.02-.1.02-1.59 1.01-4.49 2.98-.42.29-.8.43-1.14.42-.38-.01-1.1-.22-1.64-.4-.66-.23-1.19-.35-1.14-.74.02-.2.29-.41.79-.63 3.12-1.36 5.2-2.26 6.24-2.7 2.97-1.24 3.59-1.45 3.99-1.46.09 0 .28.02.41.12.11.08.14.19.16.27-.01.06.01.24 0 .38z"/></svg></button>
-              <button className="w-9 h-9 rounded-full bg-slate-700 hover:bg-slate-800 flex items-center justify-center text-white"><svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/></svg></button>
-            </div><div className="flex gap-1.5 border-l border-slate-200 pl-3"><button onClick={() => handleShare(generatedContent)} disabled={!generatedContent} className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"><Share2 className="w-4 h-4 text-slate-500" /></button><button onClick={handleCopy} disabled={!generatedContent} className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50">{copied ? <CheckCircle className="w-4 h-4 text-slate-500" /> : <Copy className="w-4 h-4 text-slate-500" />}</button><button onClick={handleDownload} disabled={!generatedContent} className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"><Download className="w-4 h-4 text-slate-500" /></button></div></div>
-        </div>
+        )}
         {showShare && (<div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50" onClick={() => setShowShare(false)}><div className="glass-card rounded-2xl p-6 w-80" onClick={(e) => e.stopPropagation()}><div className="flex items-center justify-between mb-5"><h3 className="text-base font-semibold text-slate-700">{t.share}</h3><button onClick={() => setShowShare(false)} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-5 h-5 text-slate-400" /></button></div><div className="flex justify-center gap-3 mb-5 flex-wrap">
               {(language === "zh" 
                 ? ["wechat", "weibo", "xiaohongshu"] 
@@ -832,7 +1015,7 @@ ${language === 'zh' ? `基于上述内容，按照「${dims}」维度进行分�
                   <SocialIcon platform={platform} />
                 </button>
               ))}
-            </div><div className="flex gap-2"><button onClick={handleCopy} className="flex-1 flex items-center justify-center gap-2 text-sm py-2.5 bg-slate-50 hover:bg-slate-100 rounded-lg">{copied ? <CheckCircle className="w-4 h-4 text-slate-500" /> : <Copy className="w-4 h-4 text-slate-400" />}{copied ? t.copied : t.copyText}</button><button onClick={handleDownload} className="flex-1 flex items-center justify-center gap-2 text-sm py-2.5 bg-slate-50 hover:bg-slate-100 rounded-lg"><Download className="w-4 h-4 text-slate-400" />{t.download}</button></div></div></div>)}
+            </div><div className="flex gap-2"><button onClick={() => handleCopy()} className="flex-1 flex items-center justify-center gap-2 text-sm py-2.5 bg-slate-50 hover:bg-slate-100 rounded-lg">{copied ? <CheckCircle className="w-4 h-4 text-slate-500" /> : <Copy className="w-4 h-4 text-slate-400" />}{copied ? t.copied : t.copyText}</button><button onClick={handleDownload} className="flex-1 flex items-center justify-center gap-2 text-sm py-2.5 bg-slate-50 hover:bg-slate-100 rounded-lg"><Download className="w-4 h-4 text-slate-400" />{t.download}</button></div></div></div>)}
       </div>
     </div>
   );
