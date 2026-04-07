@@ -23,9 +23,10 @@ export default function Header() {
   const router = useRouter();
   const [language, setLanguage] = useState<"zh" | "en">("zh");
 
-  // 从 URL 参数读取语言设置
+  // 从 URL 参数读取语言设置 - 同时监听 pathname 和语言切换事件
   useEffect(() => {
     if (typeof window !== "undefined") {
+      // 每次 pathname 变化时都重新读取 lang 参数
       const params = new URLSearchParams(window.location.search);
       const lang = params.get("lang");
       if (lang === "zh" || lang === "en") {
@@ -34,15 +35,33 @@ export default function Header() {
     }
   }, [pathname]);
 
-  // 切换语言并更新 URL
+  // 监听其他组件触发的语言切换事件
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    
+    const handleLanguageChange = (e: CustomEvent) => {
+      const newLang = e.detail;
+      setLanguage(newLang);
+      // 同时更新 URL 参数
+      const url = new URL(window.location.href);
+      url.searchParams.set("lang", newLang);
+      window.history.replaceState({}, '', url.toString());
+    };
+    
+    window.addEventListener("language-change", handleLanguageChange as EventListener);
+    return () => window.removeEventListener("language-change", handleLanguageChange as EventListener);
+  }, []);
+
+  // 切换语言 - 使用 history.replaceState 避免刷新
   const toggleLanguage = () => {
     const newLang = language === "zh" ? "en" : "zh";
     setLanguage(newLang);
     if (typeof window !== "undefined") {
+      // 使用 replaceState 保持当前页面，只更新 URL 参数
       const url = new URL(window.location.href);
       url.searchParams.set("lang", newLang);
-      router.push(url.toString());
-      // 触发自定义事件通知其他组件
+      window.history.replaceState({}, '', url.toString());
+      // 触发自定义事件通知其他组件（包括 Sidebar 和子页面）
       window.dispatchEvent(new CustomEvent("language-change", { detail: newLang }));
     }
   };
@@ -100,20 +119,30 @@ export default function Header() {
 
         {/* 导航 */}
         <nav className="hidden md:flex items-center gap-1 flex-shrink-0">
-          {navItems.map(item => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200",
-                pathname === item.href
-                  ? "bg-slate-100 text-slate-800"
-                  : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
-              )}
-            >
-              {language === "zh" ? item.zh : item.en}
-            </Link>
-          ))}
+          {navItems.map(item => {
+            // 构建带语言参数的 URL
+            let itemHref = item.href;
+            if (typeof window !== "undefined" && language) {
+              const params = new URLSearchParams(window.location.search);
+              if (params.toString()) {
+                itemHref = `${item.href}?${params.toString()}`;
+              }
+            }
+            return (
+              <Link
+                key={item.href}
+                href={itemHref}
+                className={cn(
+                  "px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200",
+                  pathname === item.href
+                    ? "bg-slate-100 text-slate-800"
+                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                )}
+              >
+                {language === "zh" ? item.zh : item.en}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* 右侧功能 */}

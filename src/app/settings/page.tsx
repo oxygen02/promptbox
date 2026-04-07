@@ -12,8 +12,16 @@ export default function SettingsPage() {
   
   useEffect(() => {
     setMounted(true);
-    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    setLanguage(browserLang);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlLang = params.get("lang");
+      if (urlLang === "zh" || urlLang === "en") {
+        setLanguage(urlLang);
+      } else {
+        const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+        setLanguage(browserLang);
+      }
+    }
   }, []);
   
   useEffect(() => {

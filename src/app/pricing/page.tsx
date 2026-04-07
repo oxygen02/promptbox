@@ -10,8 +10,16 @@ export default function PricingPage() {
   
   useEffect(() => {
     setMounted(true);
-    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    setLanguage(browserLang);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlLang = params.get("lang");
+      if (urlLang === "zh" || urlLang === "en") {
+        setLanguage(urlLang);
+      } else {
+        const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+        setLanguage(browserLang);
+      }
+    }
   }, []);
   
   useEffect(() => {
@@ -33,64 +41,74 @@ export default function PricingPage() {
       { name: "Free", price: "$0", credits: "50/day", features: ["50 credits daily", "Basic prompt generation", "Standard speed", "Community support"], cta: "Current Plan" },
       { name: "Basic", price: "$9", credits: "500", features: ["500 credits", "Advanced prompts", "Priority speed", "Email support", "No ads"], cta: "Buy Now" },
       { name: "Pro", price: "$29", credits: "2000", features: ["2000 credits", "Exclusive models", "Fastest speed", "Priority support", "API access", "Batch processing"], cta: "Buy Now" },
-      { name: "Enterprise", price: "$99", credits: "10000", features: ["10000 credits", "Custom models", "Dedicated support", "Unlimited collaboration", "Private deployment", "SLA"], cta: "Contact Us" },
+      { name: "Enterprise", price: "$99", credits: "10000", features: ["10000 credits", "Custom models", "Dedicated support", "Unlimited collaboration", "Private deployment", "SLA guarantee"], cta: "Contact Us" },
     ],
   };
 
-  const currentPlans = plans[language];
+  const handleLanguageToggle = () => {
+    const newLang = language === "zh" ? "en" : "zh";
+    setLanguage(newLang);
+    window.dispatchEvent(new CustomEvent("language-change", { detail: newLang }));
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 py-12 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-slate-900 mb-4">
-            {language === "zh" ? "选择您的计划" : "Choose Your Plan"}
-          </h1>
-          <p className="text-lg text-slate-600 mb-6">
-            {language === "zh" ? "灵活的定价方案，满足不同需求" : "Flexible pricing for every need"}
-          </p>
-          <Button variant="outline" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }}>
+          <Button variant="outline" onClick={handleLanguageToggle}>
             {language === "zh" ? "Switch to English" : "切换到中文"}
           </Button>
+          <h1 className="text-4xl font-bold text-slate-900 mt-6 mb-2">
+            {language === "zh" ? "定价方案" : "Pricing Plans"}
+          </h1>
+          <p className="text-lg text-slate-600">
+            {language === "zh" ? "选择适合您的计划，开始 AI 创作之旅" : "Choose the plan that fits you and start your AI creative journey"}
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {currentPlans.map((plan, index) => (
-            <div
-              key={plan.name}
-              className={`bg-white rounded-2xl border p-6 shadow-sm hover:shadow-lg transition-shadow ${
-                index === 0 ? "border-slate-200" : index === 2 ? "border-blue-500 ring-2 ring-blue-100" : "border-slate-200"
+          {plans[language].map((plan, index) => (
+            <div 
+              key={index} 
+              className={`bg-white rounded-2xl border p-6 shadow-sm ${
+                index === 0 ? 'border-slate-200' : 'border-blue-200 relative'
               }`}
             >
-              {index === 2 && (
-                <div className="flex items-center justify-center mb-4">
-                  <span className="bg-blue-500 text-white text-xs font-medium px-3 py-1 rounded-full flex items-center gap-1">
-                    <Zap className="w-3 h-3" />
-                    {language === "zh" ? "最受欢迎" : "Most Popular"}
-                  </span>
+              {index !== 0 && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs px-3 py-1 rounded-full">
+                  {language === "zh" ? "热门" : "Popular"}
                 </div>
               )}
-              <h3 className="text-lg font-semibold text-slate-900">{plan.name}</h3>
-              <div className="mt-4 mb-6">
-                <span className="text-4xl font-bold text-slate-900">{plan.price}</span>
-                <span className="text-slate-500 text-sm ml-2">/ {plan.credits}</span>
+              <div className="text-center mb-6">
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">{plan.name}</h3>
+                <div className="flex items-baseline justify-center gap-1">
+                  <span className="text-3xl font-bold text-slate-900">{plan.price}</span>
+                </div>
+                <p className="text-sm text-slate-500 mt-1">{plan.credits}</p>
               </div>
               <ul className="space-y-3 mb-6">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2 text-sm text-slate-600">
-                    <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                {plan.features.map((feature, fIndex) => (
+                  <li key={fIndex} className="flex items-center gap-2 text-sm text-slate-600">
+                    <Check className="w-4 h-4 text-blue-600 flex-shrink-0" />
                     {feature}
                   </li>
                 ))}
               </ul>
-              <Button
-                className={`w-full ${index === 0 ? "bg-slate-100 text-slate-700 hover:bg-slate-200" : index === 2 ? "bg-blue-500 hover:bg-blue-600" : "bg-slate-800 hover:bg-slate-700"}`}
-                variant={index === 0 ? "secondary" : "default"}
+              <Button 
+                className="w-full" 
+                variant={index === 0 ? "outline" : "default"}
               >
                 {plan.cta}
               </Button>
             </div>
           ))}
+        </div>
+
+        <div className="text-center mt-12">
+          <p className="text-slate-500 flex items-center justify-center gap-2">
+            <Zap className="w-5 h-5" />
+            {language === "zh" ? "所有计划都支持随时取消" : "All plans support cancellation anytime"}
+          </p>
         </div>
       </div>
     </div>

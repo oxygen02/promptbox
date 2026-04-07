@@ -150,24 +150,41 @@ export default function TemplatesPage() {
   const [mounted, setMounted] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   
-  // 客户端挂载后检测浏览器语言
+  // 客户端挂载后检测语言和URL参数
   useEffect(() => {
     setMounted(true);
-    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    setLanguage(browserLang);
+    if (typeof window !== "undefined") {
+      // 优先从 URL 参数读取语言
+      const params = new URLSearchParams(window.location.search);
+      const urlLang = params.get("lang");
+      if (urlLang === "zh" || urlLang === "en") {
+        setLanguage(urlLang);
+      } else {
+        // 否则使用浏览器语言
+        const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+        setLanguage(browserLang);
+      }
+    }
   }, []);
   
   // 监听语言切换事件
   useEffect(() => {
     const handleLanguageChange = (e: any) => {
       setLanguage(e.detail);
+      // 同步更新 URL 参数
+      if (typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        url.searchParams.set("lang", e.detail);
+        window.history.replaceState({}, '', url.toString());
+      }
     };
     window.addEventListener("language-change", handleLanguageChange);
     return () => window.removeEventListener("language-change", handleLanguageChange);
   }, []);
   
   const t = templates[language];
-  const sites = language === "zh" ? chineseSites : englishSites;
+  // 延迟初始化 sites，确保在 mounted 后才访问
+  const sites = mounted ? (language === "zh" ? chineseSites : englishSites) : [];
 
   const handleCopy = async (template: string) => {
     await navigator.clipboard.writeText(template);

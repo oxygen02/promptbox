@@ -77,28 +77,43 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [contentType, setContentType] = useState<string>("text");
-  // 默认中文，避免 SSR hydration mismatch
-  const [language, setLanguage] = useState<"zh" | "en">("zh");
+  // 默认空字符串，避免 SSR hydration mismatch
+  const [language, setLanguage] = useState<"zh" | "en">("");
 
-  // 监听 pathname 变化
+  // 监听 pathname 变化 - 同时读取 type 和 lang 参数
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const type = params.get("type") || "text";
       setContentType(type);
+      
+      // 读取语言参数
+      const urlLang = params.get("lang");
+      if (urlLang === "zh" || urlLang === "en") {
+        console.log("Sidebar reading lang from URL:", urlLang);
+        setLanguage(urlLang);
+      } else {
+        // 如果没有 lang 参数，使用浏览器语言
+        const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+        console.log("Sidebar using browser lang:", browserLang);
+        setLanguage(browserLang);
+      }
     }
   }, [pathname]);
 
-  // 监听语言切换事件（响应 Header 和其他页面的语言切换）
+  // 监听语言切换事件 - 使用 capture 阶段确保优先处理
   useEffect(() => {
     if (typeof window === "undefined") return;
     
     const handleLanguageChange = (e: any) => {
+      console.log("Sidebar received language-change event:", e.detail);
+      // 立即强制更新状态，不依赖 URL
       setLanguage(e.detail);
     };
     
-    window.addEventListener("language-change", handleLanguageChange);
-    return () => window.removeEventListener("language-change", handleLanguageChange);
+    // 使用 addEventListener 的 capture 选项
+    window.addEventListener("language-change", handleLanguageChange, false);
+    return () => window.removeEventListener("language-change", handleLanguageChange, false);
   }, []);
 
   // 监听自定义事件（首页触发）
@@ -115,14 +130,29 @@ export default function Sidebar() {
 
   const handleContentClick = (key: string, href?: string) => {
     if (href) {
-      router.push(href);
+      // 保留当前的 URL 参数（特别是 lang）
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        const queryString = params.toString();
+        const url = queryString ? `${href}?${queryString}` : href;
+        router.push(url);
+      } else {
+        router.push(href);
+      }
     } else {
       setContentType(key);
       // 触发自定义事件，让首页更新选中状态
       if (typeof window !== "undefined") {
         window.dispatchEvent(new CustomEvent("content-type-change", { detail: key }));
       }
-      router.push(`/?type=${key}`);
+      // 保留其他 URL 参数
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        params.set("type", key);
+        router.push(`/?${params.toString()}`);
+      } else {
+        router.push(`/?type=${key}`);
+      }
     }
   };
 
@@ -131,8 +161,22 @@ export default function Sidebar() {
     return contentType === key && pathname === "/";
   };
 
+  // 使用 key 强制重新渲染
+  const sidebarKey = `sidebar-${language}`;
+
+  // 等待语言加载完成
+  if (!language) {
+    return (
+      <aside className="fixed left-0 top-16 bottom-0 w-[160px] glass-sidebar hidden md:flex flex-col z-40 border-r border-slate-200">
+        <nav className="flex-1 py-4 overflow-y-auto">
+          {/* 加载状态 */}
+        </nav>
+      </aside>
+    );
+  }
+
   return (
-    <aside className="fixed left-0 top-16 bottom-0 w-[160px] glass-sidebar hidden md:flex flex-col z-40 border-r border-slate-200">
+    <aside key={sidebarKey} className="fixed left-0 top-16 bottom-0 w-[160px] glass-sidebar hidden md:flex flex-col z-40 border-r border-slate-200">
       <nav className="flex-1 py-4 overflow-y-auto">
         {navSections.map((section) => (
           <div key={section.key} className="mb-4">
@@ -164,7 +208,7 @@ export default function Sidebar() {
         ))}
       </nav>
       
-      {/* 底部用户信息 - 固定在左下角 */}
+      {/* 底部用户信息 */}
       <div className="px-4 py-3 border-t border-slate-200/50">
         <button onClick={() => router.push("/login")} className="w-full flex items-center gap-3 p-2 glass-card rounded-xl hover:scale-[1.02] transition-transform cursor-pointer">
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center flex-shrink-0">

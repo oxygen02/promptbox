@@ -240,22 +240,40 @@ export default function ToolsPage() {
   const [language, setLanguage] = useState<"zh" | "en">("zh");
   const [mounted, setMounted] = useState(false);
   
-  // 客户端挂载后检测浏览器语言
+  // 客户端挂载后检测语言和URL参数
   useEffect(() => {
     setMounted(true);
-    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    setLanguage(browserLang);
+    if (typeof window !== "undefined") {
+      // 优先从 URL 参数读取语言
+      const params = new URLSearchParams(window.location.search);
+      const urlLang = params.get("lang");
+      if (urlLang === "zh" || urlLang === "en") {
+        setLanguage(urlLang);
+      } else {
+        // 否则使用浏览器语言
+        const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+        setLanguage(browserLang);
+      }
+    }
   }, []);
   
   // 监听语言切换事件
   useEffect(() => {
     const handleLanguageChange = (e: any) => {
+      // 立即更新语言状态
       setLanguage(e.detail);
+      // 然后同步更新 URL 参数
+      if (typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        url.searchParams.set("lang", e.detail);
+        window.history.replaceState({}, '', url.toString());
+      }
     };
     window.addEventListener("language-change", handleLanguageChange);
     return () => window.removeEventListener("language-change", handleLanguageChange);
   }, []);
   
+  // 使用 useMemo 确保 categories 随 language 变化而更新
   const categories = toolCategories[language];
 
   return (
@@ -279,9 +297,9 @@ export default function ToolsPage() {
         </div>
 
         {/* Prevent hydration mismatch */}
-        {mounted && (
+        {mounted && categories && (
           <div className="space-y-4">
-            {categories.map((cat, idx) => {
+            {toolCategories[language].map((cat, idx) => {
             const Icon = cat.icon;
             return (
               <div key={idx} className="bg-white rounded-lg border border-slate-200 overflow-hidden">

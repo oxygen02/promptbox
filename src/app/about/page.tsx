@@ -9,8 +9,16 @@ export default function AboutPage() {
   
   useEffect(() => {
     setMounted(true);
-    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    setLanguage(browserLang);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlLang = params.get("lang");
+      if (urlLang === "zh" || urlLang === "en") {
+        setLanguage(urlLang);
+      } else {
+        const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+        setLanguage(browserLang);
+      }
+    }
   }, []);
   
   useEffect(() => {
@@ -41,9 +49,9 @@ export default function AboutPage() {
       description: "PromptBox is an AI prompt analysis and generation tool that helps users convert any content into high-quality AI prompts, supporting secondary creation and one-click sharing.",
       features: [
         { icon: Sparkles, title: "Smart Analysis", desc: "AI automatically identifies content type and generates precise prompts" },
-        { icon: Zap, title: "Multi-Model", desc: "Supports DeepSeek, Kimi, MiniMax and other AI models" },
-        { icon: Shield, title: "Secure", desc: "Data encryption to protect user privacy" },
-        { icon: Users, title: "Community", desc: "Template library and community for sharing creative prompts" },
+        { icon: Zap, title: "Multi-Model Support", desc: "Integrates DeepSeek, Kimi, MiniMax and other mainstream AI models" },
+        { icon: Shield, title: "Secure & Reliable", desc: "Encrypted data storage to protect user privacy" },
+        { icon: Users, title: "Community Sharing", desc: "Template library and community for sharing creative prompts" },
       ],
       contact: "Contact Us",
       email: "support@promptbox.ai",
@@ -71,20 +79,27 @@ export default function AboutPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          {c.features.map((feature, index) => (
-            <div key={index} className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-              <feature.icon className="w-8 h-8 text-slate-700 mb-4" />
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">{feature.title}</h3>
-              <p className="text-slate-600">{feature.desc}</p>
-            </div>
-          ))}
+          {c.features.map((feature, index) => {
+            const Icon = feature.icon;
+            return (
+              <div key={index} className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-blue-50 rounded-lg">
+                    <Icon className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-slate-900 mb-1">{feature.title}</h3>
+                    <p className="text-slate-600">{feature.desc}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
-        <div className="text-center">
-          <p className="text-slate-600 mb-2">{c.contact}</p>
-          <a href={`mailto:${c.email}`} className="text-blue-500 hover:underline">
-            {c.email}
-          </a>
+        <div className="bg-slate-800 rounded-2xl p-8 text-white text-center">
+          <h2 className="text-2xl font-bold mb-4">{c.contact}</h2>
+          <p className="text-slate-300">{c.email}</p>
         </div>
       </div>
     </div>
