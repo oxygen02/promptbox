@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Sparkles, Mail, Github, Chrome } from "lucide-react";
+import { Sparkles, Mail, Chrome } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -48,44 +48,33 @@ export default function LoginPage() {
           </button>
         </div>
 
-        {/* 第三方登录 */}
-        <div className="space-y-3 mb-6">
-          {language === "zh" ? (
-            // 中文区：邮箱登录
+        {/* 第三方登录 - 仅英文区显示 Google */}
+        {language === "en" && (
+          <div className="space-y-3 mb-6">
             <button className="w-full flex items-center justify-center gap-2 py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
-              <Mail className="w-5 h-5 text-slate-600" />
-              <span className="text-sm font-medium text-slate-700">{language === "zh" ? "邮箱登录" : "Email"}</span>
+              <Chrome className="w-5 h-5 text-slate-600" />
+              <span className="text-sm font-medium text-slate-700">Continue with Google</span>
             </button>
-          ) : (
-            // 英文区：Google + GitHub
-            <>
-              <button className="w-full flex items-center justify-center gap-2 py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
-                <Chrome className="w-5 h-5 text-slate-600" />
-                <span className="text-sm font-medium text-slate-700">Google</span>
-              </button>
-              <button className="w-full flex items-center justify-center gap-2 py-2.5 bg-slate-800 text-white rounded-xl hover:bg-slate-700 transition-colors">
-                <Github className="w-5 h-5" />
-                <span className="text-sm font-medium">GitHub</span>
-              </button>
-            </>
-          )}
-        </div>
+          </div>
+        )}
 
-        {/* 分隔线 */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="flex-1 h-px bg-slate-200"></div>
-          <span className="text-xs text-slate-400">OR</span>
-          <div className="flex-1 h-px bg-slate-200"></div>
-        </div>
+        {/* 分隔线 - 仅英文区显示 */}
+        {language === "en" && (
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-1 h-px bg-slate-200"></div>
+            <span className="text-xs text-slate-400">OR</span>
+            <div className="flex-1 h-px bg-slate-200"></div>
+          </div>
+        )}
 
-        {/* 邮箱密码登录表单 */}
+        {/* 邮箱登录表单 */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder={language === "zh" ? "邮箱地址" : "Email"}
+              placeholder={language === "zh" ? "邮箱地址" : "Email address"}
               className="input-field"
             />
           </div>

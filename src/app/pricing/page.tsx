@@ -1,22 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, Zap, Coins } from "lucide-react";
+import { Check, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function PricingPage() {
   const [language, setLanguage] = useState<"zh" | "en">("zh");
   const [mounted, setMounted] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<string>("免费");
+  const [selectedPack, setSelectedPack] = useState<string | null>(null);
   
   useEffect(() => {
     setMounted(true);
     const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
     setLanguage(browserLang);
+    setSelectedPlan(browserLang === 'zh' ? '免费' : 'Free');
   }, []);
   
   useEffect(() => {
     const handleLanguageChange = (e: any) => {
       setLanguage(e.detail);
+      setSelectedPlan(e.detail === 'zh' ? '免费' : 'Free');
     };
     window.addEventListener("language-change", handleLanguageChange);
     return () => window.removeEventListener("language-change", handleLanguageChange);
@@ -31,7 +35,7 @@ export default function PricingPage() {
         credits: "50 积分", 
         daily: "+10积分/天",
         features: ["基础模型", "7天历史"],
-        cta: "当前方案",
+        cta: "选择",
         highlight: false
       },
       { 
@@ -42,7 +46,7 @@ export default function PricingPage() {
         credits: "500 积分", 
         daily: "+15积分/天",
         features: ["全部模型", "无限历史", "批量模式"],
-        cta: "购买",
+        cta: "选择",
         highlight: false
       },
       { 
@@ -53,7 +57,7 @@ export default function PricingPage() {
         credits: "2000 积分", 
         daily: "+30积分/天",
         features: ["全部模型", "无限历史", "批量模式", "API接入"],
-        cta: "购买",
+        cta: "选择",
         highlight: true
       },
     ],
@@ -65,7 +69,7 @@ export default function PricingPage() {
         credits: "50 credits", 
         daily: "+10 credits/day",
         features: ["Basic models", "7-day history"],
-        cta: "Current Plan",
+        cta: "Select",
         highlight: false
       },
       { 
@@ -76,7 +80,7 @@ export default function PricingPage() {
         credits: "500 credits", 
         daily: "+15 credits/day",
         features: ["All models", "Unlimited history", "Batch mode"],
-        cta: "Subscribe",
+        cta: "Select",
         highlight: false
       },
       { 
@@ -87,7 +91,7 @@ export default function PricingPage() {
         credits: "2000 credits", 
         daily: "+30 credits/day",
         features: ["All models", "Unlimited history", "Batch mode", "API access"],
-        cta: "Subscribe",
+        cta: "Select",
         highlight: true
       },
     ],
@@ -112,7 +116,14 @@ export default function PricingPage() {
   const handleLanguageToggle = () => {
     const newLang = language === "zh" ? "en" : "zh";
     setLanguage(newLang);
+    setSelectedPlan(newLang === 'zh' ? '免费' : 'Free');
     window.dispatchEvent(new CustomEvent("language-change", { detail: newLang }));
+  };
+
+  const handleSelectPlan = (planName: string) => {
+    setSelectedPlan(planName);
+    // TODO: 处理选择方案逻辑
+    console.log('Selected plan:', planName);
   };
 
   if (!mounted) {
@@ -136,11 +147,14 @@ export default function PricingPage() {
           {currentPlans.map((plan, index) => (
             <div
               key={plan.name}
-              className={`bg-white rounded-2xl border p-6 flex flex-col ${
-                plan.highlight 
+              className={`bg-white rounded-2xl border p-6 flex flex-col cursor-pointer transition-all ${
+                selectedPlan === plan.name
                   ? "border-[#c75a2d] ring-2 ring-[#c75a2d]/20" 
-                  : "border-slate-200"
+                  : plan.highlight 
+                    ? "border-slate-200 hover:border-[#c75a2d]/50"
+                    : "border-slate-200 hover:border-slate-300"
               }`}
+              onClick={() => handleSelectPlan(plan.name)}
             >
               <div className="mb-1">
                 <h3 className="text-base font-semibold text-slate-900">{plan.name}</h3>
@@ -152,7 +166,7 @@ export default function PricingPage() {
                 {plan.period && <span className="text-slate-500 text-sm ml-1">{plan.period}</span>}
               </div>
 
-              <div className={`rounded-lg px-3 py-2 mb-5 ${plan.highlight ? 'bg-[#c75a2d]/10' : 'bg-[#c75a2d]/5'}`}>
+              <div className={`rounded-lg px-3 py-2 mb-5 ${selectedPlan === plan.name ? 'bg-[#c75a2d]/10' : 'bg-[#c75a2d]/5'}`}>
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-[#c75a2d]">🪙</span>
                   <span className="text-[#c75a2d] font-medium">{plan.credits}</span>
@@ -171,15 +185,18 @@ export default function PricingPage() {
 
               <Button
                 className={`w-full py-2.5 rounded-lg font-medium ${
-                  index === 0 
-                    ? "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50" 
-                    : plan.highlight 
-                      ? "bg-[#c75a2d] hover:bg-[#b54d24] text-white"
-                      : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
+                  selectedPlan === plan.name
+                    ? "bg-[#c75a2d] hover:bg-[#b54d24] text-white"
+                    : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
                 }`}
-                variant={index === 0 ? "outline" : "default"}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSelectPlan(plan.name);
+                }}
               >
-                {plan.cta}
+                {selectedPlan === plan.name 
+                  ? (language === "zh" ? "已选择" : "Selected") 
+                  : plan.cta}
               </Button>
             </div>
           ))}
@@ -202,7 +219,12 @@ export default function PricingPage() {
           {currentPacks.map((pack, index) => (
             <div
               key={pack.price}
-              className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col hover:border-[#c75a2d]/50 transition-colors"
+              className={`bg-white rounded-2xl border p-6 flex flex-col cursor-pointer transition-all ${
+                selectedPack === pack.price
+                  ? "border-[#c75a2d] ring-2 ring-[#c75a2d]/20"
+                  : "border-slate-200 hover:border-slate-300"
+              }`}
+              onClick={() => setSelectedPack(pack.price)}
             >
               <div className="text-center mb-4">
                 <span className="text-4xl font-bold text-slate-900">{pack.price}</span>
@@ -211,22 +233,27 @@ export default function PricingPage() {
                 </span>
               </div>
 
-              <div className="bg-[#c75a2d]/5 rounded-lg px-4 py-3 mb-4 text-center">
+              <div className={`rounded-lg px-4 py-3 mb-4 text-center ${selectedPack === pack.price ? 'bg-[#c75a2d]/10' : 'bg-[#c75a2d]/5'}`}>
                 <div className="text-2xl font-bold text-[#c75a2d]">{pack.total}</div>
                 <div className="text-xs text-slate-500">
                   {language === "zh" ? "总积分" : "total credits"}
                 </div>
               </div>
 
-              <div className="space-y-2 mb-6 text-sm text-slate-600">
+              <div className="space-y-2 mb-4 text-sm text-slate-600 flex-1">
                 <div className="flex justify-between">
                   <span>{language === "zh" ? "基础积分" : "Base credits"}</span>
                   <span className="font-medium">{pack.credits}</span>
                 </div>
-                {pack.bonus !== "0" && (
+                {pack.bonus !== "0" ? (
                   <div className="flex justify-between text-green-600">
                     <span>{language === "zh" ? "赠送" : "Bonus"}</span>
                     <span className="font-medium">{pack.bonus}</span>
+                  </div>
+                ) : (
+                  <div className="flex justify-between text-transparent">
+                    <span>占位</span>
+                    <span className="font-medium">0</span>
                   </div>
                 )}
                 <div className="flex justify-between text-slate-400 text-xs pt-2 border-t border-slate-100">
@@ -240,10 +267,19 @@ export default function PricingPage() {
               </div>
 
               <Button
-                className="w-full py-2.5 rounded-lg font-medium bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-[#c75a2d]/50"
-                variant="outline"
+                className={`w-full py-2.5 rounded-lg font-medium ${
+                  selectedPack === pack.price
+                    ? "bg-[#c75a2d] hover:bg-[#b54d24] text-white"
+                    : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedPack(pack.price);
+                }}
               >
-                {language === "zh" ? "立即购买" : "Buy Now"}
+                {selectedPack === pack.price
+                  ? (language === "zh" ? "已选择" : "Selected")
+                  : (language === "zh" ? "立即购买" : "Buy Now")}
               </Button>
             </div>
           ))}
