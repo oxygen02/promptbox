@@ -23,26 +23,22 @@ export default function Header() {
   const router = useRouter();
   const [language, setLanguage] = useState<"zh" | "en">("zh");
 
-  // 从 URL 参数读取语言设置
+  // 从 localStorage 读取语言设置
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const lang = params.get("lang");
-      if (lang === "zh" || lang === "en") {
-        setLanguage(lang);
+      const savedLang = localStorage.getItem('promptbox-language') as "zh" | "en";
+      if (savedLang) {
+        setLanguage(savedLang);
       }
     }
   }, [pathname]);
 
-  // 切换语言并更新 URL
+  // 切换语言并保存到 localStorage
   const toggleLanguage = () => {
     const newLang = language === "zh" ? "en" : "zh";
     setLanguage(newLang);
     if (typeof window !== "undefined") {
-      const url = new URL(window.location.href);
-      url.searchParams.set("lang", newLang);
-      router.push(url.toString());
-      // 触发自定义事件通知其他组件
+      localStorage.setItem('promptbox-language', newLang);
       window.dispatchEvent(new CustomEvent("language-change", { detail: newLang }));
     }
   };
@@ -70,6 +66,7 @@ export default function Header() {
             </svg>
           </div>
           <span className="text-lg font-bold text-slate-800">PromptBox</span>
+          <span className="text-xs font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">Pro</span>
         </Link>
 
         {/* 月球 + Slogan */}

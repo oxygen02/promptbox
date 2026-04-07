@@ -12,9 +12,16 @@ export default function PricingPage() {
   
   useEffect(() => {
     setMounted(true);
-    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    setLanguage(browserLang);
-    setSelectedPlan(browserLang === 'zh' ? '免费' : 'Free');
+    // 从 localStorage 读取语言设置
+    const savedLang = localStorage.getItem('promptbox-language') as "zh" | "en";
+    if (savedLang) {
+      setLanguage(savedLang);
+      setSelectedPlan(savedLang === 'zh' ? '免费' : 'Free');
+    } else {
+      const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+      setLanguage(browserLang);
+      setSelectedPlan(browserLang === 'zh' ? '免费' : 'Free');
+    }
   }, []);
   
   useEffect(() => {
@@ -117,6 +124,7 @@ export default function PricingPage() {
     const newLang = language === "zh" ? "en" : "zh";
     setLanguage(newLang);
     setSelectedPlan(newLang === 'zh' ? '免费' : 'Free');
+    localStorage.setItem('promptbox-language', newLang);
     window.dispatchEvent(new CustomEvent("language-change", { detail: newLang }));
   };
 

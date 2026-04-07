@@ -1,16 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Sparkles, Mail, Chrome } from "lucide-react";
+import { Sparkles, Chrome } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const browserLang = typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-  const [language, setLanguage] = useState<"zh" | "en">(browserLang);
+  const [language, setLanguage] = useState<"zh" | "en">("zh");
+  const [mounted, setMounted] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    setMounted(true);
+    // 从 localStorage 读取语言设置
+    const savedLang = localStorage.getItem('promptbox-language') as "zh" | "en";
+    if (savedLang) {
+      setLanguage(savedLang);
+    } else {
+      const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+      setLanguage(browserLang);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleLanguageChange = (e: any) => {
+      setLanguage(e.detail);
+    };
+    window.addEventListener("language-change", handleLanguageChange);
+    return () => window.removeEventListener("language-change", handleLanguageChange);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,16 +38,29 @@ export default function LoginPage() {
     router.push("/");
   };
 
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#f0f4f8' }}>
       <div className="glass-card rounded-2xl p-8 w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" className="w-full h-full">
+                <path d="M12 20 L32 12 L52 20 L52 48 L32 56 L12 48 Z" fill="#3b82f6"></path>
+                <path d="M12 20 L32 12 L52 20 L32 28 Z" fill="#60a5fa"></path>
+                <path d="M52 20 L32 28 L32 56 L52 48 Z" fill="#1d4ed8"></path>
+                <rect x="20" y="28" width="24" height="20" rx="3" fill="#1e40af" opacity="0.3"></rect>
+                <circle cx="26" cy="34" r="2" fill="white"></circle>
+                <circle cx="42" cy="32" r="1.5" fill="white"></circle>
+                <circle cx="38" cy="42" r="2" fill="white"></circle>
+                <circle cx="24" cy="40" r="1" fill="white"></circle>
+              </svg>
             </div>
-            <span className="text-xl font-bold text-slate-800">PromptBox</span>
+            <span className="text-lg font-bold text-slate-800">PromptBox</span>
             <span className="text-xs font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">Pro</span>
           </Link>
           <h1 className="text-lg font-semibold text-slate-800 mt-6">
@@ -41,7 +74,12 @@ export default function LoginPage() {
         {/* 语言切换 */}
         <div className="flex justify-center mb-6">
           <button
-            onClick={() => setLanguage(language === "zh" ? "en" : "zh")}
+            onClick={() => {
+              const newLang = language === "zh" ? "en" : "zh";
+              setLanguage(newLang);
+              localStorage.setItem('promptbox-language', newLang);
+              window.dispatchEvent(new CustomEvent("language-change", { detail: newLang }));
+            }}
             className="text-sm text-blue-500 hover:underline"
           >
             {language === "zh" ? "English" : "中文"}
