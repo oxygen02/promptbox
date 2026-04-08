@@ -23,8 +23,13 @@ export default function FavoritesPage() {
   
   useEffect(() => {
     setMounted(true);
-    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    setLanguage(browserLang);
+    const savedLang = localStorage.getItem('promptbox-language') as "zh" | "en";
+    if (savedLang) {
+      setLanguage(savedLang);
+    } else {
+      const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+      setLanguage(browserLang);
+    }
   }, []);
   
   useEffect(() => {
@@ -34,6 +39,11 @@ export default function FavoritesPage() {
     window.addEventListener("language-change", handleLanguageChange);
     return () => window.removeEventListener("language-change", handleLanguageChange);
   }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
   const data = favoritesData[language];
 
   return (
@@ -51,7 +61,7 @@ export default function FavoritesPage() {
               <Download className="w-4 h-4 mr-1" />
               {language === "zh" ? "导出 JSON" : "Export JSON"}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }>
+            <Button variant="outline" size="sm" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); localStorage.setItem('promptbox-language', newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }}>
               {language === "zh" ? "EN" : "中文"}
             </Button>
           </div>

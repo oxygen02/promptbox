@@ -345,13 +345,20 @@ export default function HomePage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [imageCount, setImageCount] = useState(1);
 
-  // 从 URL 读取语言设置，并监听变化
+  // 从 URL 或 localStorage 读取语言设置，并监听变化
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const lang = params.get("lang");
-      if (lang === "zh" || lang === "en") {
-        setLanguage(lang);
+      // 优先从 localStorage 读取
+      const savedLang = localStorage.getItem('promptbox-language') as "zh" | "en";
+      if (savedLang) {
+        setLanguage(savedLang);
+      } else {
+        // 其次从 URL 参数读取
+        const params = new URLSearchParams(window.location.search);
+        const lang = params.get("lang");
+        if (lang === "zh" || lang === "en") {
+          setLanguage(lang);
+        }
       }
     }
     

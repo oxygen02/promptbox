@@ -7,11 +7,19 @@ import { Button } from "@/components/ui/button";
 export default function SettingsPage() {
   const [language, setLanguage] = useState<"zh" | "en">("zh");
   const [mounted, setMounted] = useState(false);
+  const [notifications, setNotifications] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
   
   useEffect(() => {
     setMounted(true);
-    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    setLanguage(browserLang);
+    // 从 localStorage 读取
+    const savedLang = localStorage.getItem('promptbox-language');
+    if (savedLang) {
+      setLanguage(savedLang as "zh" | "en");
+    } else {
+      const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+      setLanguage(browserLang);
+    }
   }, []);
   
   useEffect(() => {
@@ -21,8 +29,10 @@ export default function SettingsPage() {
     window.addEventListener("language-change", handleLanguageChange);
     return () => window.removeEventListener("language-change", handleLanguageChange);
   }, []);
-  const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4">
@@ -31,7 +41,7 @@ export default function SettingsPage() {
           <h1 className="text-2xl font-bold text-slate-900">
             {language === "zh" ? "设置" : "Settings"}
           </h1>
-          <Button variant="outline" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }>
+          <Button variant="outline" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); localStorage.setItem('promptbox-language', newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }}>
             {language === "zh" ? "EN" : "中文"}
           </Button>
         </div>

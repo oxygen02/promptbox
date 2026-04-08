@@ -79,6 +79,18 @@ export default function Sidebar() {
   const [contentType, setContentType] = useState<string>("text");
   // 默认中文，避免 SSR hydration mismatch
   const [language, setLanguage] = useState<"zh" | "en">("zh");
+  const [mounted, setMounted] = useState(false);
+
+  // 初始化语言设置
+  useEffect(() => {
+    setMounted(true);
+    if (typeof window !== "undefined") {
+      const savedLang = localStorage.getItem('promptbox-language') as "zh" | "en";
+      if (savedLang) {
+        setLanguage(savedLang);
+      }
+    }
+  }, []);
 
   // 监听 pathname 变化
   useEffect(() => {
@@ -130,6 +142,10 @@ export default function Sidebar() {
     if (href) return pathname === href;
     return contentType === key && pathname === "/";
   };
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <aside className="fixed left-0 top-16 bottom-0 w-[160px] glass-sidebar hidden md:flex flex-col z-40 border-r border-slate-200">

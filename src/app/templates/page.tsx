@@ -153,8 +153,13 @@ export default function TemplatesPage() {
   // 客户端挂载后检测浏览器语言
   useEffect(() => {
     setMounted(true);
-    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    setLanguage(browserLang);
+    const savedLang = localStorage.getItem('promptbox-language') as "zh" | "en";
+    if (savedLang) {
+      setLanguage(savedLang);
+    } else {
+      const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+      setLanguage(browserLang);
+    }
   }, []);
   
   // 监听语言切换事件
@@ -185,7 +190,7 @@ export default function TemplatesPage() {
               {language === "zh" ? "提示词模板库" : "Prompt Templates"}
             </h1>
           </div>
-          <Button variant="outline" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }}>
+          <Button variant="outline" onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); localStorage.setItem('promptbox-language', newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }}>
             {language === "zh" ? "EN" : "中文"}
           </Button>
         </div>

@@ -9,8 +9,13 @@ export default function AboutPage() {
   
   useEffect(() => {
     setMounted(true);
-    const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    setLanguage(browserLang);
+    const savedLang = localStorage.getItem('promptbox-language') as "zh" | "en";
+    if (savedLang) {
+      setLanguage(savedLang);
+    } else {
+      const browserLang = navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+      setLanguage(browserLang);
+    }
   }, []);
   
   useEffect(() => {
@@ -57,7 +62,7 @@ export default function AboutPage() {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <button
-            onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }
+            onClick={() => { const newLang = language === "zh" ? "en" : "zh"; setLanguage(newLang); localStorage.setItem('promptbox-language', newLang); window.dispatchEvent(new CustomEvent("language-change", { detail: newLang })); }}
             className="text-sm text-slate-500 hover:text-slate-700 mb-4"
           >
             {language === "zh" ? "Switch to English" : "切换到中文"}
