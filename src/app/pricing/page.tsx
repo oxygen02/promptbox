@@ -111,9 +111,9 @@ export default function PricingPage() {
       { price: "¥49", credits: "550", bonus: "+50", total: "600", unitPrice: "¥0.082" },
     ],
     en: [
-      { price: "$2", credits: "60", bonus: "0", total: "60", unitPrice: "$0.033" },
-      { price: "$4", credits: "150", bonus: "+15", total: "165", unitPrice: "$0.024" },
-      { price: "$9", credits: "350", bonus: "+50", total: "400", unitPrice: "$0.023" },
+      { price: "$1.5", credits: "80", bonus: "0", total: "80", unitPrice: "$0.019" },
+      { price: "$3", credits: "200", bonus: "+20", total: "220", unitPrice: "$0.012" },
+      { price: "$7", credits: "550", bonus: "+50", total: "600", unitPrice: "$0.011" },
     ],
   };
 

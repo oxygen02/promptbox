@@ -136,22 +136,20 @@ router.post('/analyze', async (req, res) => {
     for (const modelKey of modelList) {
       console.log(`Generating for ${modelKey}`);
       
-      const prompt = `请根据以下内容，按照选定的【分析维度】进行深度分析并生成AI提示词。
+      const prompt = `请根据以下内容，按照选定的【分析维度】进行深度分析并生成简洁的AI提示词。
 
 【选定分析维度】：${dims}
-【重要】请严格按照以上维度进行分析，生成针对每个维度的专属提示词。
 
-原始内容：${content}
+原始内容：${content.substring(0, 3000)}
 
 要求：
-1. 针对【${dims}】每个维度分别生成对应的提示词内容
-2. 如果维度是"整体描述"，请对内容进行整体概括性描述
-3. 如果维度是"优化建议"，请提供具体的改进建议
-4. 其他维度请按其名称进行针对性分析
-5. 提示词开头必须标明【${modelKey}模型专用】
-6. 输出格式要清晰区分各个维度
+1. 针对每个维度生成1-2句话的简短提示词
+2. 提示词要能直接用于AI生成相似内容
+3. 格式：维度名称：提示词（换行）
+4. 每行一个维度，保持简洁
+5. 开头用【关键词】标注3-5个核心关键词
 
-直接输出提示词内容，不要有多余的说明。`;
+直接输出，不要有多余说明。`;
       
       if (QWEN_CONFIG.apiKey) {
         const result = await callQwenAPI(prompt, QWEN_CONFIG.apiKey);
