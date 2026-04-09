@@ -27,6 +27,7 @@ const SocialIcon = ({ platform }: { platform: string }) => {
     wechat: <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348z"/></svg>,
     weibo: <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.05-.2-.06-.06-.16-.04-.23-.02-.1.02-1.59 1.01-4.49 2.98-.42.29-.8.43-1.14.42-.38-.01-1.1-.22-1.64-.4-.66-.23-1.19-.35-1.14-.74.02-.2.29-.41.79-.63 3.12-1.36 5.2-2.26 6.24-2.7 2.97-1.24 3.59-1.45 3.99-1.46.09 0 .28.02.41.12.11.08.14.19.16.27-.01.06.01.24 0 .38z"/></svg>,
     xiaohongshu: <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/></svg>,
+    douyin: <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/></svg>,
     // International platforms
     x: <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>,
     facebook: <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>,
@@ -1064,8 +1065,8 @@ ${language === 'zh' ? `基于上述内容，按照「${dims}」维度进行分�
         )}
         {showShare && (<div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50" onClick={() => setShowShare(false)}><div className="glass-card rounded-2xl p-6 w-80" onClick={(e) => e.stopPropagation()}><div className="flex items-center justify-between mb-5"><h3 className="text-base font-semibold text-slate-700">{t.share}</h3><button onClick={() => setShowShare(false)} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-5 h-5 text-slate-400" /></button></div><div className="flex justify-center gap-3 mb-5 flex-wrap">
               {(language === "zh" 
-                ? ["wechat", "weibo", "xiaohongshu"] 
-                : ["x", "facebook", "instagram"]
+                ? ["wechat", "weibo", "xiaohongshu", "douyin"] 
+                : ["x", "facebook", "instagram", "tiktok"]
               ).map((platform) => (
                 <button key={platform} className="hover:scale-110 transition-transform">
                   <SocialIcon platform={platform} />
